@@ -169,7 +169,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_coasting)(
                          NS(PhysConst_charge0_si)();
 
     real_t fact_kick =
-        NS(SpaceChargeCoasting_num_particles)( sc_elem ) *
+        NS(SpaceChargeCoasting_number_of_particles)( sc_elem ) *
         NS(SpaceChargeCoasting_length)( sc_elem ) *
         NS(Particles_get_chi_value)( particles, ii ) *
         NS(Particles_get_charge_ratio_value)( particles, ii ) *
@@ -231,7 +231,7 @@ NS(Track_particle_space_charge_qgaussian_profile)( SIXTRL_PARTICLE_ARGPTR_DEC
         NS(SpaceChargeQGaussianProfile_length)( sc_elem ) *
         charge * charge * ( ( real_t )1 - beta0 * beta );
 
-    fact_kick *= NS(SpaceChargeQGaussianProfile_num_particles)( sc_elem );
+    fact_kick *= NS(SpaceChargeQGaussianProfile_number_of_particles)( sc_elem );
     fact_kick *= NS(exp)( ( real_t )-0.5 * exp_arg * exp_arg );
     fact_kick /= pc0 * beta * bunchlength_rms * NS(sqrt)(
                     ( real_t )2 * NS(MathConst_pi)() );
@@ -281,7 +281,7 @@ NS(Track_particle_space_charge_interpolated_profile)(
         NS(Particles_get_chi_value)( particles, ii ) *
         NS(Particles_get_charge_ratio_value)( particles, ii ) *
         NS(SpaceChargeInterpolatedProfile_length)( sc_elem ) *
-        NS(SpaceChargeInterpolatedProfile_num_particles)( sc_elem ) *
+        NS(SpaceChargeInterpolatedProfile_number_of_particles)( sc_elem ) *
         charge * charge * ( ( real_t )1 - beta0 * beta );
 
     SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData) const* interpol =

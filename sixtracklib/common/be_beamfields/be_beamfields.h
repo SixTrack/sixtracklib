@@ -417,15 +417,15 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_propagate_Sigma_matrix)(
 
 typedef struct NS(SpaceChargeCoasting)
 {
-    SIXTRL_REAL_T   num_particles     SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   circumference     SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   sigma_x           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   sigma_y           SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   length            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   x_co              SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   y_co              SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   min_sigma_diff    SIXTRL_ALIGN( 8 );
-    SIXTRL_UINT64_T enabled           SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   number_of_particles     SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   circumference           SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   sigma_x                 SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   sigma_y                 SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   length                  SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   x_co                    SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   y_co                    SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   min_sigma_diff          SIXTRL_ALIGN( 8 );
+    SIXTRL_UINT64_T enabled                 SIXTRL_ALIGN( 8 );
 }
 NS(SpaceChargeCoasting);
 
@@ -455,7 +455,8 @@ SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_num_particles)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(SpaceChargeCoasting_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
@@ -494,9 +495,9 @@ SIXTRL_STATIC SIXTRL_FN bool NS(SpaceChargeCoasting_enabled)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_set_num_particles)(
+NS(SpaceChargeCoasting_set_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT;
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(SpaceChargeCoasting_set_circumference)(
@@ -636,17 +637,17 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_copy)(
 
 typedef struct NS(SpaceChargeQGaussianProfile)
 {
-    SIXTRL_REAL_T   num_particles   SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   bunchlength_rms SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   sigma_x         SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   sigma_y         SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   length          SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   x_co            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   y_co            SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   min_sigma_diff  SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   q_param         SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   b_param         SIXTRL_ALIGN( 8 );
-    SIXTRL_UINT64_T enabled         SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   number_of_particles   SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   bunchlength_rms       SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   sigma_x               SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   sigma_y               SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   length                SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   x_co                  SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   y_co                  SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   min_sigma_diff        SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   q_param               SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   b_param               SIXTRL_ALIGN( 8 );
+    SIXTRL_UINT64_T enabled               SIXTRL_ALIGN( 8 );
 }
 NS(SpaceChargeQGaussianProfile);
 
@@ -678,7 +679,7 @@ NS(SpaceChargeQGaussianProfile_num_slots)( SIXTRL_BE_ARGPTR_DEC const
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(SpaceChargeQGaussianProfile_num_particles)( SIXTRL_BE_ARGPTR_DEC const
+NS(SpaceChargeQGaussianProfile_number_of_particles)( SIXTRL_BE_ARGPTR_DEC const
     NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
@@ -727,9 +728,9 @@ SIXTRL_STATIC SIXTRL_FN bool NS(SpaceChargeQGaussianProfile_enabled)(
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeQGaussianProfile_set_num_particles)(
+NS(SpaceChargeQGaussianProfile_set_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* SIXTRL_RESTRICT belem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT;
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)(
@@ -1285,7 +1286,7 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(LineDensityProfileData_copy)(
 
 typedef struct NS(SpaceChargeInterpolatedProfile)
 {
-    SIXTRL_REAL_T     num_particles              SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T     number_of_particles        SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T     sigma_x                    SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T     sigma_y                    SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T     length                     SIXTRL_ALIGN( 8 );
@@ -1351,7 +1352,7 @@ NS(SpaceChargeInterpolatedProfile_line_density_profile_data)( SIXTRL_BE_ARGPTR_D
     NS(SpaceChargeInterpolatedProfile)* SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(SpaceChargeInterpolatedProfile_num_particles)( SIXTRL_BE_ARGPTR_DEC const
+NS(SpaceChargeInterpolatedProfile_number_of_particles)( SIXTRL_BE_ARGPTR_DEC const
     NS(SpaceChargeInterpolatedProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
@@ -1401,10 +1402,10 @@ NS(SpaceChargeInterpolatedProfile_set_interpol_data_addr)(
     NS(buffer_addr_t) const interpol_data_addr ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeInterpolatedProfile_set_num_particles)(
+NS(SpaceChargeInterpolatedProfile_set_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
         SIXTRL_RESTRICT sc_elem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT;
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(SpaceChargeInterpolatedProfile_set_line_density_prof_fallback)(
@@ -2405,7 +2406,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_clear)(
 {
     typedef SIXTRL_REAL_T real_t;
 
-    NS(arch_status_t) status = NS(SpaceChargeCoasting_set_num_particles)(
+    NS(arch_status_t) status = NS(SpaceChargeCoasting_set_number_of_particles)(
         sc_elem, ( real_t )0 );
     status |= NS(SpaceChargeCoasting_set_circumference)( sc_elem, ( real_t )1 );
     status |= NS(SpaceChargeCoasting_set_sigma_x)( sc_elem, ( real_t )1 );
@@ -2457,12 +2458,12 @@ SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_num_particles)(
+SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    return sc_elem->num_particles;
+    return sc_elem->number_of_particles;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_circumference)(
@@ -2531,12 +2532,12 @@ SIXTRL_INLINE bool NS(SpaceChargeCoasting_enabled)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_num_particles)(
+SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    sc_elem->num_particles = num_particles;
+    sc_elem->number_of_particles = number_of_particles;
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
@@ -2667,8 +2668,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_copy)(
     {
         if( dest != src )
         {
-            status = NS(SpaceChargeCoasting_set_num_particles)( dest,
-                NS(SpaceChargeCoasting_num_particles)( src ) );
+            status = NS(SpaceChargeCoasting_set_number_of_particles)( dest,
+                NS(SpaceChargeCoasting_number_of_particles)( src ) );
 
             status |= NS(SpaceChargeCoasting_set_circumference)( dest,
                 NS(SpaceChargeCoasting_circumference)( src ) );
@@ -2724,7 +2725,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_clear)(
 {
     typedef SIXTRL_REAL_T real_t;
     NS(arch_status_t) status =
-        NS(SpaceChargeQGaussianProfile_set_num_particles)(
+        NS(SpaceChargeQGaussianProfile_set_number_of_particles)(
             sc_elem, ( real_t )0 );
 
     status |= NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)(
@@ -2787,12 +2788,12 @@ SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeQGaussianProfile_num_slots)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_num_particles)(
+SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    return sc_elem->num_particles;
+    return sc_elem->number_of_particles;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_bunchlength_rms)(
@@ -2878,12 +2879,12 @@ SIXTRL_INLINE bool NS(SpaceChargeQGaussianProfile_enabled)( SIXTRL_BE_ARGPTR_DEC
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(arch_status_t)
-NS(SpaceChargeQGaussianProfile_set_num_particles)( SIXTRL_BE_ARGPTR_DEC
+NS(SpaceChargeQGaussianProfile_set_number_of_particles)( SIXTRL_BE_ARGPTR_DEC
         NS(SpaceChargeQGaussianProfile)* SIXTRL_RESTRICT sc_elem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    sc_elem->num_particles = num_particles;
+    sc_elem->number_of_particles = number_of_particles;
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
@@ -3038,8 +3039,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_copy)(
     {
         if( dest != src )
         {
-            status = NS(SpaceChargeQGaussianProfile_set_num_particles)( dest,
-                NS(SpaceChargeQGaussianProfile_num_particles)( src ) );
+            status = NS(SpaceChargeQGaussianProfile_set_number_of_particles)( dest,
+                NS(SpaceChargeQGaussianProfile_number_of_particles)( src ) );
 
             status |= NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)( dest,
                 NS(SpaceChargeQGaussianProfile_bunchlength_rms)( src ) );
@@ -3716,7 +3717,7 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_clear)(
     typedef SIXTRL_REAL_T real_t;
 
     NS(arch_status_t) status =
-        NS(SpaceChargeInterpolatedProfile_set_num_particles)(
+        NS(SpaceChargeInterpolatedProfile_set_number_of_particles)(
             sc_elem, ( real_t )0 );
 
     status |= NS(SpaceChargeInterpolatedProfile_set_sigma_x)(
@@ -3832,12 +3833,12 @@ NS(SpaceChargeInterpolatedProfile_line_density_profile_data)(
         )( uintptr_t )sc_elem->interpol_data_addr;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeInterpolatedProfile_num_particles)(
+SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeInterpolatedProfile_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    return sc_elem->num_particles;
+    return sc_elem->number_of_particles;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T
@@ -3918,13 +3919,13 @@ NS(SpaceChargeInterpolatedProfile_set_interpol_data_addr)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_set_num_particles)(
+SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_set_number_of_particles)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
         SIXTRL_RESTRICT sc_elem,
-    SIXTRL_REAL_T const num_particles ) SIXTRL_NOEXCEPT
+    SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    sc_elem->num_particles = num_particles;
+    sc_elem->number_of_particles = number_of_particles;
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
@@ -4124,8 +4125,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_copy)(
     {
         if( dest != src )
         {
-            NS(SpaceChargeInterpolatedProfile_set_num_particles)( dest,
-                NS(SpaceChargeInterpolatedProfile_num_particles)( src ) );
+            NS(SpaceChargeInterpolatedProfile_set_number_of_particles)( dest,
+                NS(SpaceChargeInterpolatedProfile_number_of_particles)( src ) );
 
             NS(SpaceChargeInterpolatedProfile_set_sigma_x)( dest,
                 NS(SpaceChargeInterpolatedProfile_sigma_x)( src ) );
