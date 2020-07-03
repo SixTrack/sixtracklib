@@ -536,7 +536,7 @@ class BeamBeam6D(CObject):
 
 class SpaceChargeCoasting(CObject):
     _typeid = st_SpaceChargeCoasting_type_id()
-    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
     circumference = CField(1, "float64", default=1.0, alignment=8)
     sigma_x = CField(2, "float64", default=1.0, alignment=8)
     sigma_y = CField(3, "float64", default=1.0, alignment=8 )
@@ -552,7 +552,7 @@ class SpaceChargeCoasting(CObject):
 
 class SpaceChargeQGaussianProfile(CObject):
     _typeid = st_SpaceChargeQGaussianProfile_type_id()
-    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
     bunchlength_rms = CField(1, "float64", default=1.0, alignment=8)
     sigma_x = CField(2, "float64", default=1.0, alignment=8 )
     sigma_y = CField(3, "float64", default=1.0, alignment=8 )
@@ -569,7 +569,7 @@ class SpaceChargeQGaussianProfile(CObject):
 
 class SpaceChargeInterpolatedProfile(CObject):
     _typeid = st_SpaceChargeInterpolatedProfile_type_id()
-    num_particles = CField(0, "float64", default=0.0, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
     sigma_x = CField(1, "float64", default=1.0, alignment=8)
     sigma_y = CField(2, "float64", default=1.0, alignment=8)
     length = CField(3, "float64", default=0.0, alignment=8)
