@@ -512,7 +512,7 @@ SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
         if( lhs != rhs )
         {
             cmp_result = NS(Type_value_comp_result)(
-                lhs->num_particles, rhs->num_particles );
+                lhs->number_of_particles, rhs->number_of_particles );
 
             if( cmp_result == 0 )
             {
@@ -583,7 +583,7 @@ SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
         {
             SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
             cmp_result = NS(Type_value_comp_result_with_tolerances)(
-                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+                lhs->number_of_particles, rhs->number_of_particles, REL_TOL, ABS_TOL );
 
             if( cmp_result == 0 )
             {
@@ -648,16 +648,16 @@ SIXTRL_INLINE void NS(SpaceChargeCoasting_print_out)(
 
     if( != SIXTRL_NULLPTR )
     {
-        printf( "|sc coasting     | num_particles     = %+20.12f\r\n"
-                "                 | circumference     = %+20.12f\r\n"
-                "                 | sigma_x           = %+20.12f\r\n"
-                "                 | sigma_y           = %+20.12f\r\n"
-                "                 | length            = %+20.12f\r\n"
-                "                 | x_co              = %+20.12f\r\n"
-                "                 | y_co              = %+20.12f\r\n"
-                "                 | min_sigma_diff    = %+20.12f\r\n"
-                "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->circumference, e->sigma_x, e->sigma_y,
+        printf( "|sc coasting     | number_of_particles = %+20.12f\r\n"
+                "                 | circumference       = %+20.12f\r\n"
+                "                 | sigma_x             = %+20.12f\r\n"
+                "                 | sigma_y             = %+20.12f\r\n"
+                "                 | length              = %+20.12f\r\n"
+                "                 | x_co                = %+20.12f\r\n"
+                "                 | y_co                = %+20.12f\r\n"
+                "                 | min_sigma_diff      = %+20.12f\r\n"
+                "                 | enabled             = %20lu\r\n",
+            e->number_of_particles, e->circumference, e->sigma_x, e->sigma_y,
             e->length, e->x_co, e->y_co, e->min_sigma_diff,
             ( unsigned long )e->enabled );
     }
@@ -686,7 +686,7 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
         if( lhs != rhs )
         {
             cmp_result = NS(Type_value_comp_result)(
-                lhs->num_particles, rhs->num_particles );
+                lhs->number_of_particles, rhs->number_of_particles );
 
             if( cmp_result == 0 )
             {
@@ -764,7 +764,7 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
         {
             SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
             cmp_result = NS(Type_value_comp_result_with_tolerances)(
-                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+                lhs->number_of_particles, rhs->number_of_particles, REL_TOL, ABS_TOL );
 
             if( cmp_result == 0 )
             {
@@ -843,18 +843,18 @@ SIXTRL_INLINE void NS(SpaceChargeQGaussianProfile_print_out)(
 
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {
-        printf( "|sc q-gaussian   | num_particles     = %+20.12f\r\n"
-                "                 | circumference     = %+20.12f\r\n"
-                "                 | sigma_x           = %+20.12f\r\n"
-                "                 | sigma_y           = %+20.12f\r\n"
-                "                 | length            = %+20.12f\r\n"
-                "                 | x_co              = %+20.12f\r\n"
-                "                 | y_co              = %+20.12f\r\n"
-                "                 | min_sigma_diff    = %+20.12f\r\n"
-                "                 | q_param           = %+20.12f\r\n"
-                "                 | b_param           = %+20.12f\r\n"
-                "                 | enabled           = %20lu\r\n",
-            e->num_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
+        printf( "|sc q-gaussian   | number_of_particles = %+20.12f\r\n"
+                "                 | circumference       = %+20.12f\r\n"
+                "                 | sigma_x             = %+20.12f\r\n"
+                "                 | sigma_y             = %+20.12f\r\n"
+                "                 | length              = %+20.12f\r\n"
+                "                 | x_co                = %+20.12f\r\n"
+                "                 | y_co                = %+20.12f\r\n"
+                "                 | min_sigma_diff      = %+20.12f\r\n"
+                "                 | q_param             = %+20.12f\r\n"
+                "                 | b_param             = %+20.12f\r\n"
+                "                 | enabled             = %20lu\r\n",
+            e->number_of_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
             e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
             e->b_param, ( unsigned long )e->enabled );
     }
@@ -1109,7 +1109,7 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values)(
         if( lhs != rhs )
         {
             cmp_result = NS(Type_value_comp_result)(
-                lhs->num_particles, rhs->num_particles );
+                lhs->number_of_particles, rhs->number_of_particles );
 
             if( cmp_result == 0 )
             {
@@ -1190,7 +1190,7 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold
         {
             SIXTRL_REAL_T const REL_TOL = ( SIXTRL_REAL_T )0;
             cmp_result = NS(Type_value_comp_result_with_tolerances)(
-                lhs->num_particles, rhs->num_particles, REL_TOL, ABS_TOL );
+                lhs->number_of_particles, rhs->number_of_particles, REL_TOL, ABS_TOL );
 
             if( cmp_result == 0 )
             {
@@ -1263,7 +1263,7 @@ SIXTRL_INLINE void NS(SpaceChargeInterpolatedProfile_print_out)(
         SIXTRL_RESTRICT e )
 {
     SIXTRL_ASSERT( e != SIXTRL_NULLPTR );
-    printf( "|sc interpolated | num_particles         = %+20.12f\r\n"
+    printf( "|sc interpolated | number_of_particles   = %+20.12f\r\n"
             "                 | sigma_x               = %+20.12f\r\n"
             "                 | sigma_y               = %+20.12f\r\n"
             "                 | length                = %+20.12f\r\n"
@@ -1273,7 +1273,7 @@ SIXTRL_INLINE void NS(SpaceChargeInterpolatedProfile_print_out)(
             "                 | line_density_fallback = %+20.12f\r\n"
             "                 | min_sigma_diff        = %+20.12f\r\n"
             "                 | enabled               = %20lu\r\n",
-            NS(SpaceChargeInterpolatedProfile_num_particles)( e ),
+            NS(SpaceChargeInterpolatedProfile_number_of_particles)( e ),
             NS(SpaceChargeInterpolatedProfile_sigma_x)( e ),
             NS(SpaceChargeInterpolatedProfile_sigma_y)( e ),
             NS(SpaceChargeInterpolatedProfile_length)( e ),
