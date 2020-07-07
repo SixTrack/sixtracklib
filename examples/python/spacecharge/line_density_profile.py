@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # -------------------------------------------------------------------------
     # B) Init the particle set
     beam = st.ParticlesSet()
-    particles = beam.Particles(num_particles=100, p0c=6.5e12)
+    particles = beam.Particles(number_of_particles=100, p0c=6.5e12)
 
     # -------------------------------------------------------------------------
     # C) Build the lattice. We add three interpolated space charge elements
@@ -78,17 +78,17 @@ if __name__ == '__main__':
     lattice = st.Elements()
 
     sc0_index = lattice.cbuffer.n_objects # index of sc0 element
-    sc0 = lattice.SpaceChargeInterpolatedProfile(num_particles=particles.num_particles)
+    sc0 = lattice.SpaceChargeInterpolatedProfile(number_of_particles=particles.num_particles)
     dr0 = lattice.Drift(length=1.0)
     q0 = lattice.Multipole(knl=[0.0, 0.1])
 
     sc1_index = lattice.cbuffer.n_objects # index of sc1 element
-    sc1 = lattice.SpaceChargeInterpolatedProfile(num_particles=particles.num_particles)
+    sc1 = lattice.SpaceChargeInterpolatedProfile(number_of_particles=particles.num_particles)
     dr1 = lattice.Drift(length=1.0)
     q1 = lattice.Multipole(knl=[0.0, -0.1])
 
     sc2_index = lattice.cbuffer.n_objects # index of sc2 element
-    sc2 = lattice.SpaceChargeInterpolatedProfile(num_particles=particles.num_particles)
+    sc2 = lattice.SpaceChargeInterpolatedProfile(number_of_particles=particles.num_particles)
 
     # --------------------------------------------------------------------------
     # D) Create the track-job
