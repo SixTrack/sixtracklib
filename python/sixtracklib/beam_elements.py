@@ -26,20 +26,20 @@ from .stcommon import st_BeamBeam4D_type_id, st_BeamBeam4D_data_addr_offset, \
 
 class Drift(CObject):
     _typeid = st_Drift_type_id()
-    length = CField(0, "real", default=0.0, alignment=8)
+    length = CField(0, "real", default=0.0)
 
 
 class DriftExact(CObject):
     _typeid = st_DriftExact_type_id()
-    length = CField(0, "real", default=0.0, alignment=8)
+    length = CField(0, "real", default=0.0)
 
 
 class Multipole(CObject):
     _typeid = st_Multipole_type_id()
-    order = CField(0, "int64", default=0, const=True, alignment=8)
-    length = CField(1, "real", default=0.0, alignment=8)
-    hxl = CField(2, "real", default=0.0, alignment=8)
-    hyl = CField(3, "real", default=0.0, alignment=8)
+    order = CField(0, "int64", default=0, const=True)
+    length = CField(1, "real", default=0.0)
+    hxl = CField(2, "real", default=0.0)
+    hyl = CField(3, "real", default=0.0)
     bal = CField(
         4,
         "real",
@@ -117,16 +117,12 @@ class Multipole(CObject):
 
 class RFMultipole(CObject):
     _typeid = st_RFMultipole_type_id()
-    order = CField(0, "int64", default=0, const=True, alignment=8)
-    voltage = CField(1, "real", default=0.0, alignment=8)
-    frequency = CField(2, "real", default=0.0, alignment=8)
-    lag = CField(3, "real", default=0.0, alignment=8)
-    bal = CField(
-        4, "real", pointer=True, length="2*order+2", default=0.0, alignment=8
-    )
-    phase = CField(
-        5, "real", pointer=True, length="2*order+2", default=0.0, alignment=8
-    )
+    order = CField(0, "int64", default=0, const=True)
+    voltage = CField(1, "real", default=0.0)
+    frequency = CField(2, "real", default=0.0)
+    lag = CField(3, "real", default=0.0)
+    bal = CField( 4, "real", pointer=True, length="2*order+2", default=0.0)
+    phase = CField(5, "real", pointer=True, length="2*order+2", default=0.0)
 
     def __init__(
         self,
@@ -259,21 +255,21 @@ class RFMultipole(CObject):
 
 class Cavity(CObject):
     _typeid = st_Cavity_type_id()
-    voltage = CField(0, "real", default=0.0, alignment=8)
-    frequency = CField(1, "real", default=0.0, alignment=8)
-    lag = CField(2, "real", default=0.0, alignment=8)
+    voltage = CField(0, "real", default=0.0)
+    frequency = CField(1, "real", default=0.0)
+    lag = CField(2, "real", default=0.0)
 
 
 class XYShift(CObject):
     _typeid = st_XYShift_type_id()
-    dx = CField(0, "real", default=0.0, alignment=8)
-    dy = CField(1, "real", default=0.0, alignment=8)
+    dx = CField(0, "real", default=0.0)
+    dy = CField(1, "real", default=0.0)
 
 
 class SRotation(CObject):
     _typeid = st_SRotation_type_id()
-    cos_z = CField(0, "real", default=1.0, alignment=8)
-    sin_z = CField(1, "real", default=0.0, alignment=8)
+    cos_z = CField(0, "real", default=1.0)
+    sin_z = CField(1, "real", default=0.0)
 
     def __init__(self, angle=0, **nargs):
         anglerad = angle / 180 * np.pi
@@ -292,14 +288,14 @@ class SRotation(CObject):
 
 class BeamMonitor(CObject):
     _typeid = st_BeamMonitor_type_id()
-    num_stores = CField(0, "int64", default=0, alignment=8)
-    start = CField(1, "int64", default=0, alignment=8)
-    skip = CField(2, "int64", default=1, alignment=8)
-    out_address = CField(3, "uint64", default=0, alignment=8)
-    max_particle_id = CField(4, "int64", default=0, alignment=8)
-    min_particle_id = CField(5, "int64", default=0, alignment=8)
-    is_rolling = CField(6, "int64", default=0, alignment=8)
-    is_turn_ordered = CField(7, "int64", default=1, alignment=8)
+    num_stores = CField(0, "int64", default=0)
+    start = CField(1, "int64", default=0)
+    skip = CField(2, "int64", default=1)
+    out_address = CField(3, "uint64", default=0)
+    max_particle_id = CField(4, "int64", default=0)
+    min_particle_id = CField(5, "int64", default=0)
+    is_rolling = CField(6, "int64", default=0)
+    is_turn_ordered = CField(7, "int64", default=1)
 
 
 def append_beam_monitors_to_lattice(
@@ -360,10 +356,10 @@ def append_beam_monitors_to_lattice(
 
 class LimitRect(CObject):
     _typeid = st_LimitRect_type_id()
-    min_x = CField(0, "float64", default=-1.0, alignment=8)
-    max_x = CField(1, "float64", default=+1.0, alignment=8)
-    min_y = CField(2, "float64", default=-1.0, alignment=8)
-    max_y = CField(3, "float64", default=+1.0, alignment=8)
+    min_x = CField(0, "float64", default=-1.0)
+    max_x = CField(1, "float64", default=+1.0)
+    min_y = CField(2, "float64", default=-1.0)
+    max_y = CField(3, "float64", default=+1.0)
 
     def __init__(
         self,
@@ -421,9 +417,9 @@ class LimitRect(CObject):
 
 class LimitEllipse(CObject):
     _typeid = st_LimitEllipse_type_id()
-    a_squ = CField(0, "float64", default=+1.0, alignment=8)
-    b_squ = CField(1, "float64", default=+1.0, alignment=8)
-    a_b_squ = CField(2, "float64", alignment=8)
+    a_squ = CField(0, "float64", default=+1.0)
+    b_squ = CField(1, "float64", default=+1.0)
+    a_b_squ = CField(2, "float64")
 
     def __init__(self, a_squ=None, b_squ=None, **kwargs):
         if a_squ is None and "a" in kwargs:
@@ -536,15 +532,15 @@ class BeamBeam6D(CObject):
 
 class SpaceChargeCoasting(CObject):
     _typeid = st_SpaceChargeCoasting_type_id()
-    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
-    circumference = CField(1, "float64", default=1.0, alignment=8)
-    sigma_x = CField(2, "float64", default=1.0, alignment=8)
-    sigma_y = CField(3, "float64", default=1.0, alignment=8 )
-    length = CField(4, "float64", default=0.0, alignment=8 )
-    x_co = CField(5, "float64", default=0.0, alignment=8 )
-    y_co = CField(6, "float64", default=0.0, alignment=8 )
-    min_sigma_diff = CField(7, "float64", default=1e-10, alignment=8)
-    enabled = CField(8, "uint64", default=1, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0)
+    circumference = CField(1, "float64", default=1.0)
+    sigma_x = CField(2, "float64", default=1.0)
+    sigma_y = CField(3, "float64", default=1.0)
+    length = CField(4, "float64", default=0.0)
+    x_co = CField(5, "float64", default=0.0)
+    y_co = CField(6, "float64", default=0.0)
+    min_sigma_diff = CField(7, "float64", default=1e-10)
+    enabled = CField(8, "uint64", default=1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -552,33 +548,33 @@ class SpaceChargeCoasting(CObject):
 
 class SpaceChargeQGaussianProfile(CObject):
     _typeid = st_SpaceChargeQGaussianProfile_type_id()
-    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
-    bunchlength_rms = CField(1, "float64", default=1.0, alignment=8)
-    sigma_x = CField(2, "float64", default=1.0, alignment=8 )
-    sigma_y = CField(3, "float64", default=1.0, alignment=8 )
-    length = CField(4, "float64", default=0.0, alignment=8 )
-    x_co = CField(5, "float64", default=0.0, alignment=8 )
-    y_co = CField(6, "float64", default=0.0, alignment=8)
-    min_sigma_diff = CField(7, "float64", default=1e-10, alignment=8)
-    q_param = CField(8, "float64", default=0.0, alignment=8)
-    b_param = CField(9, "float64", default=1.0, alignment=8)
-    enabled = CField(10, "uint64", default=1, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0)
+    bunchlength_rms = CField(1, "float64", default=1.0)
+    sigma_x = CField(2, "float64", default=1.0)
+    sigma_y = CField(3, "float64", default=1.0)
+    length = CField(4, "float64", default=0.0)
+    x_co = CField(5, "float64", default=0.0 )
+    y_co = CField(6, "float64", default=0.0)
+    min_sigma_diff = CField(7, "float64", default=1e-10)
+    q_param = CField(8, "float64", default=1.0)
+    b_param = CField(9, "float64", default=1.0)
+    enabled = CField(10, "uint64", default=1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 class SpaceChargeInterpolatedProfile(CObject):
     _typeid = st_SpaceChargeInterpolatedProfile_type_id()
-    number_of_particles = CField(0, "float64", default=0.0, alignment=8)
-    sigma_x = CField(1, "float64", default=1.0, alignment=8)
-    sigma_y = CField(2, "float64", default=1.0, alignment=8)
-    length = CField(3, "float64", default=0.0, alignment=8)
-    x_co = CField(4, "float64", default=0.0, alignment=8 )
-    y_co = CField(5, "float64", default=0.0, alignment=8 )
-    interpol_data_addr = CField(6, "uint64", default=0, alignment=8)
-    line_density_prof_fallback = CField(7, "float64", default=1.0, alignment=8)
-    min_sigma_diff = CField(8, "float64", default=1e-10, alignment=8)
-    enabled = CField(9, "uint64", default=1, alignment=8)
+    number_of_particles = CField(0, "float64", default=0.0)
+    sigma_x = CField(1, "float64", default=1.0)
+    sigma_y = CField(2, "float64", default=1.0)
+    length = CField(3, "float64", default=0.0)
+    x_co = CField(4, "float64", default=0.0)
+    y_co = CField(5, "float64", default=0.0)
+    interpol_data_addr = CField(6, "uint64", default=0)
+    line_density_prof_fallback = CField(7, "float64", default=1.0)
+    min_sigma_diff = CField(8, "float64", default=1e-10)
+    enabled = CField(9, "uint64", default=1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -586,11 +582,11 @@ class SpaceChargeInterpolatedProfile(CObject):
 
 class LimitRectEllipse(CObject):
     _typeid = st_LimitRectEllipse_type_id()
-    max_x = CField(0, "float64", default=+1.0, alignment=8)
-    max_y = CField(1, "float64", default=+1.0, alignment=8)
-    a_squ = CField(2, "float64", default=+1.0, alignment=8)
-    b_squ = CField(3, "float64", default=+1.0, alignment=8)
-    a_b_squ = CField(4, "float64", alignment=8)
+    max_x = CField(0, "float64", default=+1.0)
+    max_y = CField(1, "float64", default=+1.0)
+    a_squ = CField(2, "float64", default=+1.0)
+    b_squ = CField(3, "float64", default=+1.0)
+    a_b_squ = CField(4, "float64")
 
     def __init__(
         self, max_x=None, max_y=None, a_squ=None, b_squ=None, **kwargs
@@ -643,8 +639,8 @@ class LimitRectEllipse(CObject):
 
 class DipoleEdge(CObject):
     _typeid = st_DipoleEedge_type_id()
-    r21 = CField(0, "float64", default=0.0, alignment=8)
-    r43 = CField(1, "float64", default=0.0, alignment=8)
+    r21 = CField(0, "float64", default=0.0)
+    r43 = CField(1, "float64", default=0.0)
 
     def __init__(
         self,
