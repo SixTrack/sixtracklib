@@ -996,6 +996,8 @@ NS(TriCubData_from_managed_buffer)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#if !defined( _GPUCODE )
+    
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(TriCubData) const*
 NS(TriCubData_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
@@ -1023,6 +1025,8 @@ SIXTRL_INLINE NS(arch_size_t) NS(TriCubData_ptr_offset)(
     return ( NS(arch_size_t) )offsetof( NS(TriCubData), table_addr );
 }
 
+#endif /* !defined( _GPUCODE ) */
+    
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_INLINE NS(arch_status_t) NS(TriCubData_copy)(
