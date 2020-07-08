@@ -7,6 +7,7 @@ from collections import namedtuple
 
 import numpy as np
 from scipy.special import factorial
+from scipy.special import gamma as tgamma
 from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
 from .mad_helper import madseq_to_generator
@@ -557,10 +558,27 @@ class SpaceChargeQGaussianProfile(CObject):
     y_co = CField(6, "float64", default=0.0)
     min_sigma_diff = CField(7, "float64", default=1e-10)
     q_param = CField(8, "float64", default=1.0)
-    b_param = CField(9, "float64", default=1.0)
+    cq = CField(9, "float64", default=np.sqrt(np.pi))
     enabled = CField(10, "uint64", default=1)
 
+    @staticmethod
+    def calc_cq(q):
+        assert q < 3.0
+        Q_EPS = 1e-6
+        cq = np.sqrt( np.pi )
+        if q >= ( 1.0 + Q_EPS ):
+            cq *= tgamma( 0.5 * ( 3.0 - q ) / ( q - 1.0 ) )
+            cq /= np.sqrt( q - 1.0 ) * tgamma( 1.0 / ( q - 1.0 ) )
+        elif q <= ( 1.0 - Q_EPS ):
+            cq *= 2.0 * tgamma( 1.0 / ( 1.0 - q ) )
+            cq /= ( 3.0 - q ) * np.sqrt( 1.0 - q ) * \
+                  tgamma( 0.5 * ( 3.0 - q ) / ( 1.0 - q ) )
+        return cq
+
     def __init__(self, **kwargs):
+        q = kwargs.get( 'q_param', 1.0 )
+        kwargs[ 'cq' ] = SpaceChargeQGaussianProfile.calc_cq( q )
+        kwargs[ 'q_param'] = q
         super().__init__(**kwargs)
 
 class SpaceChargeInterpolatedProfile(CObject):
