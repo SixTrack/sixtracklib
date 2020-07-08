@@ -6374,7 +6374,7 @@ st_TriCubData_type_id = sixtracklib.st_TriCubData_type_id_ext
 st_TriCubData_type_id.argtypes = [st_TriCubData_p]
 st_TriCubData_type_id.restype = st_object_type_id_t
 
-st_TriCubData_ptr_offset = sixtracklib.st_TriCubData_ptr_offset
+st_TriCubData_ptr_offset = sixtracklib.st_TriCubData_ptr_offset_ext
 st_TriCubData_ptr_offset.argtypes = [st_TriCubData_p]
 st_TriCubData_ptr_offset.restype = st_arch_size_t
 
@@ -6385,7 +6385,7 @@ st_TriCub_type_id = sixtracklib.st_TriCub_type_id_ext
 st_TriCub_type_id.argtypes = [st_TriCub_p]
 st_TriCub_type_id.restype = st_object_type_id_t
 
-st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset
+st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset_ext
 st_TriCub_data_addr_offset.argtypes = [st_TriCub_p]
 st_TriCub_data_addr_offset.restype = st_arch_size_t
 
