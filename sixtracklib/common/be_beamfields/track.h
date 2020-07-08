@@ -28,8 +28,6 @@ NS(Track_particle_beam_beam_4d)(
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb );
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
@@ -45,31 +43,12 @@ NS(Track_particle_space_charge_coasting)(
     SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting) *const
         SIXTRL_RESTRICT sc_elem )  SIXTRL_NOEXCEPT;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Math_q_gaussian_cq)(
-    SIXTRL_REAL_T const q ) SIXTRL_NOEXCEPT;
-
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(Math_q_gaussian_sqrt_beta_from_gaussian_sigma)(
-    SIXTRL_REAL_T const q ) SIXTRL_NOEXCEPT;
-
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Math_q_gaussian)(
-    SIXTRL_REAL_T const x, SIXTRL_REAL_T const q, SIXTRL_REAL_T const sqrt_beta,
-    SIXTRL_REAL_T const Cq ) SIXTRL_NOEXCEPT;
-
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(Math_q_gaussian_shifted)(
-    SIXTRL_REAL_T const x, SIXTRL_REAL_T const q, SIXTRL_REAL_T const sqrt_beta,
-    SIXTRL_REAL_T const Cq, SIXTRL_REAL_T const mu ) SIXTRL_NOEXCEPT;
-
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_space_charge_qgaussian_profile)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
     SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_space_charge_interpolated_profile)(
