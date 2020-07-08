@@ -26,10 +26,6 @@
         (&((dataptr)->name))) + ((SIXTRL_UINT64_T) (dataptr)->name) + 1)
 #endif /* defined( SIXTRL_BB_GET_PTR ) */
 
-#if !defined( SIXTRL_MATH_QGAUSSIAN_Q_EPS )
-    #define SIXTRL_MATH_QGAUSSIAN_Q_EPS 1e-6L
-#endif /* SIXTRL_MATH_QGAUSSIAN_Q_EPS */
-
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -650,7 +646,7 @@ typedef struct NS(SpaceChargeQGaussianProfile)
     SIXTRL_REAL_T   y_co                  SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T   min_sigma_diff        SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T   q_param               SIXTRL_ALIGN( 8 );
-    SIXTRL_REAL_T   b_param               SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T   cq                    SIXTRL_ALIGN( 8 );
     SIXTRL_UINT64_T enabled               SIXTRL_ALIGN( 8 );
 }
 NS(SpaceChargeQGaussianProfile);
@@ -721,7 +717,7 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_q_param)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_b_param)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_cq)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
@@ -775,11 +771,6 @@ SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(SpaceChargeQGaussianProfile_set_q_param)(
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const q_param ) SIXTRL_NOEXCEPT;
-
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeQGaussianProfile_set_b_param)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* SIXTRL_RESTRICT belem,
-    SIXTRL_REAL_T const b_param ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
 NS(SpaceChargeQGaussianProfile_set_enabled)(
@@ -875,8 +866,7 @@ NS(SpaceChargeQGaussianProfile)* NS(SpaceChargeQGaussianProfile_add)(
     SIXTRL_REAL_T const length,
     SIXTRL_REAL_T const x_co, SIXTRL_REAL_T const y_co,
     SIXTRL_REAL_T const min_sigma_diff,
-    SIXTRL_REAL_T const q_param, SIXTRL_REAL_T const b_param,
-    bool const enabled );
+    SIXTRL_REAL_T const q_param, bool const enabled );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC
 NS(SpaceChargeQGaussianProfile)* NS(SpaceChargeQGaussianProfile_add_copy)(
@@ -1601,6 +1591,8 @@ NS(SpaceChargeInterpolatedProfile_copy)( SIXTRL_BE_ARGPTR_DEC
     #if !defined( _GPUCODE ) || defined( __CUDACC__ )
     #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) || defined( __CUDACC__ ) */
+
+    #include "sixtracklib/common/internal/math_qgauss.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -2749,9 +2741,6 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_clear)(
     status |= NS(SpaceChargeQGaussianProfile_set_q_param)(
         sc_elem, ( real_t )1 );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_b_param)(
-        sc_elem, ( real_t )1 );
-
     status |= NS(SpaceChargeQGaussianProfile_set_enabled)( sc_elem, true );
     return status;
 }
@@ -2856,12 +2845,12 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_q_param)(
     return sc_elem->q_param;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_b_param)(
+SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_cq)(
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    return sc_elem->b_param;
+    return sc_elem->cq;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeQGaussianProfile_min_sigma_diff)(
@@ -2962,19 +2951,17 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_set_q_param)(
         SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const q_param ) SIXTRL_NOEXCEPT
 {
-    SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    sc_elem->q_param = q_param;
-    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
-}
+    NS(arch_status_t) status = ( NS(arch_status_t)
+        )SIXTRL_ARCH_STATUS_GENERAL_FAILURE;
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_set_b_param)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
-        SIXTRL_RESTRICT sc_elem,
-    SIXTRL_REAL_T const b_param ) SIXTRL_NOEXCEPT
-{
-    SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
-    sc_elem->b_param = b_param;
-    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    if( ( sc_elem != SIXTRL_NULLPTR ) && ( q_param < ( SIXTRL_REAL_T )3 ) )
+    {
+        sc_elem->q_param = q_param;
+        sc_elem->cq = NS(Math_q_gauss_cq)( q_param );
+        status = ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
+    }
+
+    return status;
 }
 
 SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_set_enabled)(
@@ -3069,9 +3056,6 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeQGaussianProfile_copy)(
 
             status |= NS(SpaceChargeQGaussianProfile_set_q_param)( dest,
                 NS(SpaceChargeQGaussianProfile_q_param)( src ) );
-
-            status |= NS(SpaceChargeQGaussianProfile_set_b_param)( dest,
-                NS(SpaceChargeQGaussianProfile_b_param)( src ) );
 
             status |= NS(SpaceChargeQGaussianProfile_set_enabled)( dest,
                 NS(SpaceChargeQGaussianProfile_enabled)( src ) );

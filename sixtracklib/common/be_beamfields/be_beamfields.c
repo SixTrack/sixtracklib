@@ -974,8 +974,7 @@ NS(SpaceChargeQGaussianProfile_add)(
     SIXTRL_REAL_T const length,
     SIXTRL_REAL_T const x_co, SIXTRL_REAL_T const y_co,
     SIXTRL_REAL_T const min_sigma_diff,
-    SIXTRL_REAL_T const q_param, SIXTRL_REAL_T const b_param,
-    bool const enabled )
+    SIXTRL_REAL_T const q_param, bool const enabled )
 {
     SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
         added_elem = SIXTRL_NULLPTR;
@@ -1002,7 +1001,6 @@ NS(SpaceChargeQGaussianProfile_add)(
         &sc_elem, min_sigma_diff );
 
     status |= NS(SpaceChargeQGaussianProfile_set_q_param)( &sc_elem, q_param );
-    status |= NS(SpaceChargeQGaussianProfile_set_b_param)( &sc_elem, b_param );
     status |= NS(SpaceChargeQGaussianProfile_set_enabled)( &sc_elem, enabled );
 
     num_dataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );

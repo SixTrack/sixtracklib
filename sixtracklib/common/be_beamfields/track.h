@@ -97,6 +97,7 @@ NS(Track_particle_space_charge_interpolated_profile)(
     #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_beamfields/be_beamfields.h"
+    #include "sixtracklib/common/internal/math_qgauss.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -220,94 +221,9 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_coasting)(
 /* ************************************************************************* */
 /* NS(SpaceChargeQGaussianProfile) */
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gaussian_cq)(
-    SIXTRL_REAL_T const q ) SIXTRL_NOEXCEPT
-{
-    typedef SIXTRL_REAL_T real_t;
-    real_t Cq = ( real_t )0;
-
-    if( NS(Type_comp_all_less)( q, ( real_t )3 ) )
-    {
-        Cq = NS(MathConst_sqrt_pi)();
-
-        if( NS(Type_comp_all_more_or_equal)( q, ( real_t )(
-                1.0L + SIXTRL_MATH_QGAUSSIAN_Q_EPS ) ) )
-        {
-            real_t const three_minus_q = ( real_t )3 - q;
-            real_t const q_minus_one = q - ( real_t )1;
-            real_t const inv_q_minus_one = ( real_t )1 / q_minus_one;
-
-            Cq *= NS(gamma)( inv_q_minus_one * three_minus_q / ( ( real_t )2 ) );
-            Cq /= NS(sqrt)( q_minus_one ) *
-                  NS(gamma)( ( real_t )1 / q_minus_one );
-        }
-        else if( NS(Type_comp_all_less_or_equal)( q, ( real_t )(
-                1.0L - SIXTRL_MATH_QGAUSSIAN_Q_EPS ) ) )
-        {
-            real_t const three_minus_q = ( real_t )3 - q;
-            real_t const one_minus_q = ( real_t )1 - q;
-            real_t const inv_one_minus_q = ( real_t )1 / one_minus_q;
-
-            Cq *= ( real_t )2 * NS(gamma)( inv_one_minus_q );
-            Cq /= three_minus_q * NS(sqrt)( one_minus_q ) *
-                    NS(gamma)( inv_one_minus_q * three_minus_q / ( real_t )2 );
-        }
-    }
-
-    return Cq;
-}
-
-SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gaussian_sqrt_beta_from_gaussian_sigma)(
-    SIXTRL_REAL_T const sigma ) SIXTRL_NOEXCEPT
-{
-    SIXTRL_ASSERT( sigma > ( SIXTRL_REAL_T )0 );
-    return ( SIXTRL_REAL_T )1 / ( sigma * NS(sqrt)( ( SIXTRL_REAL_T )2 ) );
-}
-
-SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gaussian)(
-    SIXTRL_REAL_T const x, SIXTRL_REAL_T const q, SIXTRL_REAL_T const sqrt_beta,
-    SIXTRL_REAL_T const Cq ) SIXTRL_NOEXCEPT
-{
-    typedef SIXTRL_REAL_T real_t;
-
-    real_t result = sqrt_beta / Cq;
-    real_t const one_minus_q = ( real_t )1 - q;
-    real_t const temp_arg = sqrt_beta * x;
-
-    SIXTRL_ASSERT( NS(Type_comp_all_more)( sqrt_beta, ( real_t )0 ) );
-    SIXTRL_ASSERT( NS(Type_comp_all_less)( q, ( real_t )3 ) );
-    SIXTRL_ASSERT( NS(Type_comp_all_more)( NS(abs)( Cq ), ( real_t )0 ) );
-    SIXTRL_ASSERT( NS(Type_comp_all_are_close)( Cq,
-            NS(Math_q_gaussian_cq)( q ), ( real_t )0, ( real_t )1e-12 ) );
-
-    if( NS(Type_comp_all_more)( NS(abs)( one_minus_q ),
-            ( real_t )SIXTRL_MATH_QGAUSSIAN_Q_EPS ) )
-    {
-        /*e_q( x ) : = [u]+^1/(1-q) := max( ( 1 + (1-q)*x, 0 ) )^(1/(1-q)) ) */
-        real_t const u_plus = NS(max)(
-            ( real_t )1 + temp_arg * one_minus_q, ( real_t )0 );
-
-        result *= NS(pow_positive_base)( u_plus, ( real_t )1 / one_minus_q );
-    }
-    else
-    {
-        result *= NS(exp)( -temp_arg * temp_arg / ( real_t )2 );
-    }
-
-    return result;
-}
-
-SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gaussian_shifted)(
-    SIXTRL_REAL_T const x, SIXTRL_REAL_T const q, SIXTRL_REAL_T const sqrt_beta,
-    SIXTRL_REAL_T const Cq, SIXTRL_REAL_T const mu ) SIXTRL_NOEXCEPT
-{
-    return NS(Math_q_gaussian)( x - mu, q, sqrt_beta, Cq );
-}
-
 SIXTRL_INLINE NS(track_status_t)
 NS(Track_particle_space_charge_qgaussian_profile)( SIXTRL_PARTICLE_ARGPTR_DEC
-        NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const ii,
+        NS(Particles)* SIXTRL_RESTRICT p, NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
@@ -319,42 +235,55 @@ NS(Track_particle_space_charge_qgaussian_profile)( SIXTRL_PARTICLE_ARGPTR_DEC
     SIXTRL_ARGPTR_DEC real_t Gy;
 
     real_t const charge = NS(PhysConst_charge0_si)() *
-        NS(Particles_get_q0_value)( particles, ii );
+        NS(Particles_get_q0_value)( p, ii );
 
-    real_t const beta0 = NS(Particles_get_beta0_value)( particles, ii );
-    real_t const beta  = beta0 * NS(Particles_get_rvv_value)( particles, ii );
-    real_t const pc0   = NS(Particles_get_p0c_value)( particles, ii ) *
+    real_t const beta0 = NS(Particles_get_beta0_value)( p, ii );
+    real_t const beta  = beta0 * NS(Particles_get_rvv_value)( p, ii );
+    real_t const pc0   = NS(Particles_get_p0c_value)( p, ii ) *
                          NS(PhysConst_charge0_si)();
+
+    real_t const z = NS(Particles_get_zeta_value)( p, ii ) /
+                     NS(Particles_get_rvv_value)( p, ii );
 
     real_t const bunchlength_rms =
         NS(SpaceChargeQGaussianProfile_bunchlength_rms)( sc_elem );
 
-    real_t const exp_arg = NS(Particles_get_zeta_value)( particles, ii ) /
-        ( NS(Particles_get_rvv_value)( particles, ii ) * bunchlength_rms );
-
     real_t fact_kick =
-        NS(Particles_get_chi_value)( particles, ii ) *
-        NS(Particles_get_charge_ratio_value)( particles, ii ) *
+        NS(Particles_get_chi_value)( p, ii ) *
+        NS(Particles_get_charge_ratio_value)( p, ii ) *
         NS(SpaceChargeQGaussianProfile_length)( sc_elem ) *
         charge * charge * ( ( real_t )1 - beta0 * beta );
 
-    fact_kick *= NS(SpaceChargeQGaussianProfile_number_of_particles)( sc_elem );
-    fact_kick *= NS(exp)( ( real_t )-0.5 * exp_arg * exp_arg );
-    fact_kick /= pc0 * beta * bunchlength_rms * NS(sqrt)(
-                    ( real_t )2 * NS(MathConst_pi)() );
+    SIXTRL_ASSERT( NS(Type_comp_all_more)(
+        NS(Particles_get_rvv_value)( p, ii ), ( real_t )0 ) );
 
+    SIXTRL_ASSERT( NS(Type_comp_all_more)(
+        NS(Particles_get_beta0_value)( p, ii ), ( real_t )0 ) );
+
+    SIXTRL_ASSERT( NS(Type_comp_all_less_or_equal)(
+        NS(Particles_get_beta0_value)( p, ii ), ( real_t )1 ) );
+
+    fact_kick *=
+        NS(SpaceChargeQGaussianProfile_number_of_particles)( sc_elem );
+
+    fact_kick *= NS(Math_q_gauss)( z,
+        NS(SpaceChargeQGaussianProfile_q_param)( sc_elem ),
+        NS(Math_q_gauss_sqrt_beta_from_gauss_sigma)( bunchlength_rms ),
+        NS(SpaceChargeQGaussianProfile_cq)( sc_elem ) );
+
+    fact_kick /= pc0 * beta;
     NS(get_Ex_Ey_Gx_Gy_gauss)(
-            NS(Particles_get_x_value)( particles, ii ) -
+            NS(Particles_get_x_value)( p, ii ) -
                 NS(SpaceChargeQGaussianProfile_x_co)( sc_elem ),
-            NS(Particles_get_y_value)( particles, ii ) -
+            NS(Particles_get_y_value)( p, ii ) -
                 NS(SpaceChargeQGaussianProfile_y_co)( sc_elem ),
             NS(SpaceChargeQGaussianProfile_sigma_x)( sc_elem ),
             NS(SpaceChargeQGaussianProfile_sigma_y)( sc_elem ),
             NS(SpaceChargeQGaussianProfile_min_sigma_diff)( sc_elem ),
             ( int )1, &Ex, &Ey, &Gx, &Gy );
 
-    NS(Particles_add_to_px_value)( particles, ii, fact_kick * Ex );
-    NS(Particles_add_to_py_value)( particles, ii, fact_kick * Ey );
+    NS(Particles_add_to_px_value)( p, ii, fact_kick * Ex );
+    NS(Particles_add_to_py_value)( p, ii, fact_kick * Ey );
 
     return ( NS(track_status_t) )SIXTRL_TRACK_SUCCESS;
 }
