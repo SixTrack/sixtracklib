@@ -1,5 +1,3 @@
-# sixtracklib/tests/sixtracklib/common/math/CMakeLists.txt
-
 if( GTEST_FOUND )
     set( SIXTRACKL_COMMON_TESTS_DEPEND_ON_TRACKING_TESTDATA )
 
@@ -8,16 +6,18 @@ if( GTEST_FOUND )
          ${SIXTRACKL_GTEST_LIBRARIES} )
 
     # ==========================================================================
-    # test_debug_register_common_c99:
+    # test_interpol_1d_common_c99:
 
-    add_executable( test_interpol_linear_common_c99
-                    test_interpol_linear_c99.cpp )
+    add_executable( test_interpol_1d_common_c99 test_interpol_1d_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_interpol_1d_common_c99 )
+    add_test( C99_Common_Math_Interpol1D test_interpol_1d_common_c99 )
 
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}
-         test_interpol_linear_common_c99 )
+    # ==========================================================================
+    # test_qgauss_common_c99:
 
-    add_test( C99_CommonControlDebuggingRegisterTests
-              test_interpol_linear_common_c99 )
+    add_executable( test_qgauss_common_c99 test_qgauss_c99.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_qgauss_common_c99 )
+    add_test( C99_Common_Math_QGauss test_qgauss_common_c99 )
 
     # *************************************************************************
     # Set all properties:
@@ -41,5 +41,3 @@ if( GTEST_FOUND )
                       ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
     endif()
 endif()
-
-#end : sixtracklib/tests/sixtracklib/common/control/CMakeLists.txt
