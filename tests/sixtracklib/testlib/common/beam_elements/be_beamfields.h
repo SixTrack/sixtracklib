@@ -730,8 +730,7 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
 
             if( cmp_result == 0 )
             {
-                cmp_result = NS(Type_value_comp_result)(
-                    lhs->b_param, rhs->b_param );
+                cmp_result = NS(Type_value_comp_result)( lhs->cq, rhs->cq );
             }
 
             if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )
@@ -818,7 +817,7 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
             if( cmp_result == 0 )
             {
                 cmp_result = NS(Type_value_comp_result_with_tolerances)(
-                    lhs->b_param, rhs->b_param, REL_TOL, ABS_TOL );
+                    lhs->cq, rhs->cq, REL_TOL, ABS_TOL );
             }
 
             if( ( cmp_result == 0 ) && ( lhs->enabled != rhs->enabled ) )

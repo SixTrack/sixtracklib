@@ -155,11 +155,11 @@ void NS(SpaceChargeQGaussianProfile_print)(
                  "                 | y_co                = %+20.12f\r\n"
                  "                 | min_sigma_diff      = %+20.12f\r\n"
                  "                 | q_param             = %+20.12f\r\n"
-                 "                 | b_param             = %+20.12f\r\n"
+                 "                 | cq                  = %+20.12f\r\n"
                  "                 | enabled             = %20lu\r\n",
             e->number_of_particles, e->bunchlength_rms, e->sigma_x, e->sigma_y,
             e->length, e->x_co, e->y_co, e->min_sigma_diff, e->q_param,
-            e->b_param, ( unsigned long )e->enabled );
+            e->cq, ( unsigned long )e->enabled );
     }
 
     return;
