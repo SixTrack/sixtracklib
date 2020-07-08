@@ -26,6 +26,10 @@
         (&((dataptr)->name))) + ((SIXTRL_UINT64_T) (dataptr)->name) + 1)
 #endif /* defined( SIXTRL_BB_GET_PTR ) */
 
+#if !defined( SIXTRL_MATH_QGAUSSIAN_Q_EPS )
+    #define SIXTRL_MATH_QGAUSSIAN_Q_EPS 1e-6L
+#endif /* SIXTRL_MATH_QGAUSSIAN_Q_EPS */
+
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
