@@ -19,6 +19,7 @@ from .stcommon import st_BeamBeam4D_type_id, st_BeamBeam4D_data_addr_offset, \
     st_LimitRect_type_id, st_LimitEllipse_type_id, \
     st_LimitRectEllipse_type_id, st_Multipole_type_id, st_RFMultipole_type_id, \
     st_SpaceChargeCoasting_type_id, \
+    Math_q_gauss_cq, \
     st_SpaceChargeQGaussianProfile_type_id, st_LineDensityProfileData_type_id, \
     st_NullSpaceChargeInterpolatedProfile, \
     st_SpaceChargeInterpolatedProfile_type_id, \
@@ -558,26 +559,12 @@ class SpaceChargeQGaussianProfile(CObject):
     y_co = CField(6, "float64", default=0.0)
     min_sigma_diff = CField(7, "float64", default=1e-10)
     q_param = CField(8, "float64", default=1.0)
-    cq = CField(9, "float64", default=np.sqrt(np.pi))
+    cq = CField(9, "float64", default=Math_q_gauss_cq(1.0))
     enabled = CField(10, "uint64", default=1)
-
-    @staticmethod
-    def calc_cq(q):
-        assert q < 3.0
-        Q_EPS = 1e-6
-        cq = np.sqrt( np.pi )
-        if q >= ( 1.0 + Q_EPS ):
-            cq *= tgamma( 0.5 * ( 3.0 - q ) / ( q - 1.0 ) )
-            cq /= np.sqrt( q - 1.0 ) * tgamma( 1.0 / ( q - 1.0 ) )
-        elif q <= ( 1.0 - Q_EPS ):
-            cq *= 2.0 * tgamma( 1.0 / ( 1.0 - q ) )
-            cq /= ( 3.0 - q ) * np.sqrt( 1.0 - q ) * \
-                  tgamma( 0.5 * ( 3.0 - q ) / ( 1.0 - q ) )
-        return cq
 
     def __init__(self, **kwargs):
         q = kwargs.get( 'q_param', 1.0 )
-        kwargs[ 'cq' ] = SpaceChargeQGaussianProfile.calc_cq( q )
+        kwargs[ 'cq' ] = Math_q_gauss_cq(q)
         kwargs[ 'q_param'] = q
         super().__init__(**kwargs)
 
