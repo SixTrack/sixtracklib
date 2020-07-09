@@ -55,13 +55,11 @@ SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
 SIXTRL_STATIC SIXTRL_DEVICE_FN unsigned long
     NS(Cuda_get_total_num_threads_in_kernel)( void );
 
-// SIXTRL_STATIC SIXTRL_DEVICE_FN void NS(Cuda_handle_debug_flag_in_kernel)(
-//     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_debug_flag,
-//     NS(arch_debugging_t) const debug_flag );
+SIXTRL_STATIC SIXTRL_DEVICE_FN void NS(Cuda_collect_status_flag_value)(
+    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* ptr_status_flags,
+    NS(arch_debugging_t) const status_flags );
 
 #endif /* #if defined( _GPUCODE ) */
-
-
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -144,11 +142,9 @@ SIXTRL_INLINE SIXTRL_HOST_FN unsigned long NS(Cuda_get_total_num_threads)(
     return ( grid_dim.x  * grid_dim.y  * grid_dim.z  ) *
            ( block_dim.x * block_dim.y * block_dim.z );
 }
-
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( _GPUCODE )
-
 SIXTRL_INLINE SIXTRL_DEVICE_FN unsigned long NS(Cuda_get_1d_thread_id_in_kernel)()
 {
     unsigned long const num_threads_per_block =
@@ -219,25 +215,25 @@ SIXTRL_INLINE SIXTRL_DEVICE_FN void NS(Cuda_collect_status_flag_value)(
         #if ( defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) )
             /* sm_35 or larger defines atomicOr also for
              * 64Bit variables -> this is the only clean solution */
-            ::atomicOr( ( unsigned long long* )ptr_status_flags, 
-			( unsigned long long )status_flags );
+            ::atomicOr( ( NS(arch_debugging_t)* )ptr_status_flags,
+			( NS(arch_debugging_t) )status_flags );
 
-//         #elif defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 )
+        #elif defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 120 )
             /* NOTE: 64 bit atomic support is available but not atomicOr ->
              * use a spin-lock + copy&swap to emulate proper atomics.
              * this is not exactly a clean solution but since this is
              * intended to be used only in the debug kernels, it should not
              * be a big problem. */
 
-//             SIXTRL_UINT64_T old;
-//             SIXTRL_UINT64_T ret = *ptr_status_flags;
-//
-//             do
-//             {
-//                 old = ret;
-//             }
-//             while( ( ret = ::atomicCAS( ptr_status_flags, old,
-//                     ( SIXTRL_UINT64_T )( old | status_flags ) ) ) != old );
+            NS(arch_debugging_t) old;
+            NS(arch_debugging_t) ret = *ptr_status_flags;
+
+            do
+            {
+                old = ret;
+            }
+            while( ( ret = ::atomicCAS( ptr_status_flags, old,
+                ( NS(arch_debugging_t) )( old | status_flags ) ) ) != old );
         #else
 
             /* No integer atomic support. let's cross fingers and hope for the
@@ -248,13 +244,9 @@ SIXTRL_INLINE SIXTRL_DEVICE_FN void NS(Cuda_collect_status_flag_value)(
         #endif /* defined( __CUDA_ARCH__ ) && ( __CUDA_ARCH__ >= 350 ) */
     }
 }
-
 #endif /* defined( _GPUCODE ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_CUDA_IMPL_CUDA_TOOLS_H__ */
-
-/* end: sixtracklib/cuda/impl/cuda_tools.h */
