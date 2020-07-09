@@ -6365,6 +6365,57 @@ st_Track_all_particles_element_by_element_until_turn.argtypes = [
     ct.c_int64,
 ]
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Q-Gaussian methods:
+
+st_Math_q_gauss_min_support = sixtracklib.st_Math_q_gauss_min_support_ext
+st_Math_q_gauss_min_support.argtypes = [ ct.c_double, ct.c_double ]
+st_Math_q_gauss_min_support.restype = ct.c_double
+
+st_Math_q_gauss_max_support = sixtracklib.st_Math_q_gauss_max_support_ext
+st_Math_q_gauss_max_support.argtypes = [ ct.c_double, ct.c_double ]
+st_Math_q_gauss_max_support.restype = ct.c_double
+
+st_Math_q_gauss_cq = sixtracklib.st_Math_q_gauss_cq_ext
+st_Math_q_gauss_cq.argtypes = [ ct.c_double ]
+st_Math_q_gauss_cq.restype = ct.c_double
+
+st_Math_q_gauss_sqrt_beta_from_gauss_sigma = \
+    sixtracklib.st_Math_q_gauss_sqrt_beta_from_gauss_sigma_ext
+st_Math_q_gauss_sqrt_beta_from_gauss_sigma.argtypes = [ ct.c_double ]
+st_Math_q_gauss_sqrt_beta_from_gauss_sigma.restype = ct.c_double
+
+st_Math_q_gauss_exp_q = sixtracklib.st_Math_q_gauss_exp_q_ext
+st_Math_q_gauss_exp_q.argtypes = [ ct.c_double, ct.c_double ]
+st_Math_q_gauss_exp_q.restype = ct.c_double
+
+st_Math_q_gauss = sixtracklib.st_Math_q_gauss_ext
+st_Math_q_gauss.restype = ct.c_double
+st_Math_q_gauss.argtypes = [
+        ct.c_double, ct.c_double, ct.c_double, ct.c_double ]
+
+st_Math_q_gauss_shifted = sixtracklib.st_Math_q_gauss_shifted_ext
+st_Math_q_gauss_shifted.restype = ct.c_double
+st_Math_q_gauss_shifted.argtypes = [
+        ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double ]
+
+def Math_q_gauss_cq(q):
+    assert q < float( 3 )
+    return st_Math_q_gauss_cq( ct.c_double(q) )
+
+def Math_q_gauss(x, q, sqrt_beta, mu=None):
+    assert q < float(3)
+    assert sqrt_beta > float(0)
+    q_arg = ct.c_double(q)
+    cq = st_Math_q_gauss_cq(q_arg)
+    if mu is None:
+        return st_Math_q_gauss( ct.c_double(x), q_arg, ct.c_double(sqrt_beta),
+                                ct.c_double(cq) )
+    else:
+        return st_Math_q_gauss_shifted( ct.c_double(x), q_arg, ct.c_double(sqrt_beta),
+            ct.c_double(cq), ct.c_double(mu) )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # TriCub related methods:
 
 st_TriCubData_p = ct.c_void_p
@@ -6389,6 +6440,7 @@ st_TriCub_data_addr_offset = sixtracklib.st_TriCub_data_addr_offset_ext
 st_TriCub_data_addr_offset.argtypes = [st_TriCub_p]
 st_TriCub_data_addr_offset.restype = st_arch_size_t
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Drift, multipole, rf multipole, cavity, xyshift, srotation, limit*
 
 st_Cavity_type_id = sixtracklib.st_Cavity_type_id_ext
@@ -6435,9 +6487,8 @@ st_XYShift_type_id = sixtracklib.st_XYShift_type_id_ext
 st_XYShift_type_id.argtypes = None
 st_XYShift_type_id.restype = st_object_type_id_t
 
-# SC related methods:
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SC related methods:
 
 st_BeamBeam4D_p = ct.c_void_p
 st_NullBeamBeam4D = ct.cast( 0, st_BeamBeam4D_p )
