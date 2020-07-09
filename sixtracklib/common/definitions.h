@@ -209,35 +209,35 @@
         #endif /* !defined( SIXTRL_FLOAT_T ) */
 
         #if !defined( SIXTRL_UINT64_T )
-            #define SIXTRL_UINT64_T  uint64_t
+            #define SIXTRL_UINT64_T  unsigned long long int
         #endif /* !defined( SIXTRL_UINT64_T ) */
 
         #if !defined( SIXTRL_INT64_T )
-            #define SIXTRL_INT64_T int64_t
+            #define SIXTRL_INT64_T long long int
         #endif /* !defined( SIXTRL_INT64_T ) */
 
         #if !defined( SIXTRL_UINT32_T )
-            #define SIXTRL_UINT32_T uint32_t
+            #define SIXTRL_UINT32_T unsigned int
         #endif /* !defined( SIXTRL_UINT32_T ) */
 
         #if !defined( SIXTRL_INT32_T )
-            #define SIXTRL_INT32_T int32_t
+            #define SIXTRL_INT32_T int
         #endif /* !defined( SIXTRL_INT32_T ) */
 
         #if !defined( SIXTRL_UINT16_T )
-            #define SIXTRL_UINT16_T uint16_t
+            #define SIXTRL_UINT16_T unsigned short int
         #endif /* !defined( SIXTRL_UINT32_T ) */
 
         #if !defined( SIXTRL_INT16_T )
-            #define SIXTRL_INT16_T int16_t
+            #define SIXTRL_INT16_T short int
         #endif /* !defined( SIXTRL_INT16_T ) */
 
         #if !defined( SIXTRL_UINT8_T )
-            #define SIXTRL_UINT8_T uint8_t
+            #define SIXTRL_UINT8_T unsigned char
         #endif /* !defined( SIXTRL_UINT32_T ) */
 
         #if !defined( SIXTRL_INT8_T )
-            #define SIXTRL_INT8_T int8_t
+            #define SIXTRL_INT8_T char
         #endif /* !defined( SIXTRL_INT8_T ) */
 
         #if !defined( SIXTRL_SIZE_T )
