@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # -------------------------------------------------------------------------
     # B) Init the particle set
     beam = st.ParticlesSet()
-    particles = beam.Particles(number_of_particles=100, p0c=6.5e12)
+    particles = beam.Particles(num_particles=100, p0c=6.5e12)
 
     # -------------------------------------------------------------------------
     # C) Build the lattice. We add three interpolated space charge elements
