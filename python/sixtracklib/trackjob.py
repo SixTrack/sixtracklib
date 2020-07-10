@@ -1469,12 +1469,16 @@ class TrackJob(object):
             self._ptr_c_output_buffer = st.st_NullBuffer
 
         if len(self._stored_buffers) > 0:
-            for buffer_id, _ptr_buffer in self._stored_buffers.items():
-                if _ptr_buffer != st.st_NullBuffer:
-                    st.st_Buffer_delete( _ptr_buffer )
-                    _ptr_buffer = st.st_NullBuffer
-            del self._stored_buffers
-            self._stored_buffers = None
+            stored_buffer_ids = [ ii for ii in self._stored_buffers.keys() ]
+            for buffer_id in stored_buffer_ids:
+                if self._stored_buffers.get( buffer_id ) is None or \
+                   isinstance( self._stored_buffers[ buffer_id ], Buffer ) or \
+                   isinstance( self._stored_buffers[ buffer_id ], CBuffer ) or \
+                   isinstance( self._stored_buffers[ buffer_id ], CObject ):
+                    self._stored_buffers.pop( buffer_id )
+            if len( self._stored_buffers ) > 0:
+                raise RuntimeWarning(
+                    f"remaining stored buffers at destruction of trackjob: {self._stored_buffers.keys()}" )
 
     @property
     def last_status(self):
