@@ -116,12 +116,21 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gauss_exp_q)(
 {
     SIXTRL_STATIC_VAR SIXTRL_REAL_T const ONE = ( SIXTRL_REAL_T )1;
     SIXTRL_REAL_T const one_minus_q = ONE - q;
+    SIXTRL_REAL_T const abs_one_minus_q = ( one_minus_q >= ( SIXTRL_REAL_T )0 )
+					? one_minus_q : -one_minus_q;
+
     SIXTRL_ASSERT( q < ( SIXTRL_REAL_T )3 );
 
-    return ( NS(abs)( one_minus_q ) >= SIXTRL_MATH_QGAUSSIAN_Q_EPS )
-        ? NS(pow_positive_base)( NS(max)( ( ONE + one_minus_q * x ),
-                ( SIXTRL_REAL_T )0 ), ONE / one_minus_q )
-        : NS(exp)( x );
+    if( abs_one_minus_q >= ( SIXTRL_REAL_T )SIXTRL_MATH_QGAUSSIAN_Q_EPS )
+    {
+        SIXTRL_REAL_T u_plus = ONE + one_minus_q * x;
+        if( u_plus < ( SIXTRL_REAL_T )0 ) u_plus = ( SIXTRL_REAL_T )0;
+        return NS(pow_positive_base)( u_plus,  ONE / one_minus_q );
+    }
+    else
+    {
+        return NS(exp)( x );
+    }
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(Math_q_gauss_cq)(
