@@ -413,9 +413,9 @@ SIXTRL_STATIC SIXTRL_FN void NS(BeamBeam6D_propagate_Sigma_matrix)(
         SIXTRL_ARGPTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT dS_sintheta_ptr);
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting: */
+/* SCCoasting: */
 
-typedef struct NS(SpaceChargeCoasting)
+typedef struct NS(SCCoasting)
 {
     SIXTRL_REAL_T   number_of_particles     SIXTRL_ALIGN( 8 );
     SIXTRL_REAL_T   circumference           SIXTRL_ALIGN( 8 );
@@ -427,131 +427,131 @@ typedef struct NS(SpaceChargeCoasting)
     SIXTRL_REAL_T   min_sigma_diff          SIXTRL_ALIGN( 8 );
     SIXTRL_UINT64_T enabled                 SIXTRL_ALIGN( 8 );
 }
-NS(SpaceChargeCoasting);
+NS(SCCoasting);
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_preset)( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_preset)( SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
     SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_clear)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t)
-    NS(SpaceChargeCoasting_type_id)( void ) SIXTRL_NOEXCEPT;
+    NS(SCCoasting_type_id)( void ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(SpaceChargeCoasting_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(SCCoasting_num_dataptrs)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(SCCoasting_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT sc_elem,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(SpaceChargeCoasting_number_of_particles)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+NS(SCCoasting_number_of_particles)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_circumference)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_circumference)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_sigma_x)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_sigma_x)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_sigma_y)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_sigma_y)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_length)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_length)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_x_co)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_x_co)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_y_co)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_y_co)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SpaceChargeCoasting_min_sigma_diff)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(SCCoasting_min_sigma_diff)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN bool NS(SpaceChargeCoasting_enabled)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN bool NS(SCCoasting_enabled)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT belem ) SIXTRL_NOEXCEPT;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_set_number_of_particles)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+NS(SCCoasting_set_number_of_particles)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_set_circumference)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+NS(SCCoasting_set_circumference)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const circumference ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_set_sigma_x)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+NS(SCCoasting_set_sigma_x)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const sigma_x ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_set_sigma_y)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_set_sigma_y)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const sigma_y ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_set_length)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_set_length)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const length ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_set_x_co)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_set_x_co)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const x_co ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_set_y_co)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_set_y_co)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const y_co ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_set_min_sigma_diff)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+NS(SCCoasting_set_min_sigma_diff)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     SIXTRL_REAL_T const min_sigma_diff ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_set_enabled)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT belem,
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_set_enabled)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT belem,
     bool const is_enabled ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const*
-NS(SpaceChargeCoasting_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const*
+NS(SCCoasting_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
     const NS(Object) *const SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
     NS(Object)* SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const*
-NS(SpaceChargeCoasting_const_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const*
+NS(SCCoasting_const_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
         unsigned char const* SIXTRL_RESTRICT buffer_begin,
     NS(buffer_size_t) const index,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
         unsigned char* SIXTRL_RESTRICT buffer_begin,
     NS(buffer_size_t) const index,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
@@ -559,59 +559,59 @@ NS(SpaceChargeCoasting_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
 #if !defined( _GPUCODE )
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
-NS(SpaceChargeCoasting_type_id_ext)( void ) SIXTRL_NOEXCEPT;
+NS(SCCoasting_type_id_ext)( void ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const*
-NS(SpaceChargeCoasting_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const*
+NS(SCCoasting_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
         const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
         NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_attributes_offsets)(
+NS(SCCoasting_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
     NS(buffer_size_t) const max_num_offsets,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting) *const
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_attributes_sizes)(
+NS(SCCoasting_attributes_sizes)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(SpaceChargeCoasting_attributes_counts)(
+NS(SCCoasting_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(SpaceChargeCoasting_can_be_added)(
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(SCCoasting_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)*
         SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT;
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
     SIXTRL_RESTRICT buffer );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_add)(
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_REAL_T const number_of_particles, SIXTRL_REAL_T const circumference,
     SIXTRL_REAL_T const sigma_x, SIXTRL_REAL_T const sigma_y,
@@ -619,17 +619,17 @@ NS(SpaceChargeCoasting_add)(
     SIXTRL_REAL_T const y_co, SIXTRL_REAL_T const min_sigma_diff,
     bool const enabled );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_add_copy)(
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SpaceChargeCoasting_copy)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT dest,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCCoasting_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT dest,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT src ) SIXTRL_NOEXCEPT;
 
 /* ************************************************************************* */
@@ -2386,54 +2386,54 @@ SIXTRL_INLINE void NS(BeamBeam6D_propagate_Sigma_matrix)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting: */
+/* SCCoasting: */
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_preset)( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_preset)( SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
     SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
-    if( sc_elem != SIXTRL_NULLPTR ) NS(SpaceChargeCoasting_clear)( sc_elem );
+    if( sc_elem != SIXTRL_NULLPTR ) NS(SCCoasting_clear)( sc_elem );
     return sc_elem;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_clear)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     typedef SIXTRL_REAL_T real_t;
 
-    NS(arch_status_t) status = NS(SpaceChargeCoasting_set_number_of_particles)(
+    NS(arch_status_t) status = NS(SCCoasting_set_number_of_particles)(
         sc_elem, ( real_t )0 );
-    status |= NS(SpaceChargeCoasting_set_circumference)( sc_elem, ( real_t )1 );
-    status |= NS(SpaceChargeCoasting_set_sigma_x)( sc_elem, ( real_t )1 );
-    status |= NS(SpaceChargeCoasting_set_sigma_y)( sc_elem, ( real_t )1 );
-    status |= NS(SpaceChargeCoasting_set_length)( sc_elem, ( real_t )0 );
-    status |= NS(SpaceChargeCoasting_set_x_co)( sc_elem, ( real_t )0 );
-    status |= NS(SpaceChargeCoasting_set_y_co)( sc_elem, ( real_t )0 );
-    status |= NS(SpaceChargeCoasting_set_min_sigma_diff)(
+    status |= NS(SCCoasting_set_circumference)( sc_elem, ( real_t )1 );
+    status |= NS(SCCoasting_set_sigma_x)( sc_elem, ( real_t )1 );
+    status |= NS(SCCoasting_set_sigma_y)( sc_elem, ( real_t )1 );
+    status |= NS(SCCoasting_set_length)( sc_elem, ( real_t )0 );
+    status |= NS(SCCoasting_set_x_co)( sc_elem, ( real_t )0 );
+    status |= NS(SCCoasting_set_y_co)( sc_elem, ( real_t )0 );
+    status |= NS(SCCoasting_set_min_sigma_diff)(
         sc_elem, ( real_t )1e-10 );
-    status |= NS(SpaceChargeCoasting_set_enabled)( sc_elem, true );
+    status |= NS(SCCoasting_set_enabled)( sc_elem, true );
 
     return status;
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE NS(object_type_id_t) NS(SpaceChargeCoasting_type_id)(
+SIXTRL_INLINE NS(object_type_id_t) NS(SCCoasting_type_id)(
     void ) SIXTRL_NOEXCEPT
 {
     return ( NS(object_type_id_t) )NS(OBJECT_TYPE_SC_COASTING);
 }
 
-SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeCoasting_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+SIXTRL_INLINE NS(buffer_size_t) NS(SCCoasting_num_dataptrs)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ) ) SIXTRL_NOEXCEPT
 {
     return ( NS(buffer_size_t) )0;
 }
 
-SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+SIXTRL_INLINE NS(buffer_size_t) NS(SCCoasting_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -2443,7 +2443,7 @@ SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
     {
         NS(buffer_size_t) const required_size =
             NS(ManagedBuffer_get_slot_based_length)(
-                sizeof( NS(SpaceChargeCoasting) ), slot_size );
+                sizeof( NS(SCCoasting) ), slot_size );
 
         num_slots = required_size / slot_size;
         if( num_slots * slot_size < required_size ) ++num_slots;
@@ -2454,72 +2454,72 @@ SIXTRL_INLINE NS(buffer_size_t) NS(SpaceChargeCoasting_num_slots)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_number_of_particles)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_number_of_particles)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->number_of_particles;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_circumference)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_circumference)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->circumference;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_sigma_x)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_sigma_x)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->sigma_x;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_sigma_y)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_sigma_y)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->sigma_y;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_length)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_length)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->length;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_x_co)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_x_co)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->x_co;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_y_co)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_y_co)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->y_co;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(SpaceChargeCoasting_min_sigma_diff)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE SIXTRL_REAL_T NS(SCCoasting_min_sigma_diff)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
     return sc_elem->min_sigma_diff;
 }
 
-SIXTRL_INLINE bool NS(SpaceChargeCoasting_enabled)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE bool NS(SCCoasting_enabled)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2528,8 +2528,8 @@ SIXTRL_INLINE bool NS(SpaceChargeCoasting_enabled)(
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_number_of_particles)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_number_of_particles)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const number_of_particles ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2537,8 +2537,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_number_of_particles)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_circumference)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_circumference)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const circumference ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2546,8 +2546,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_circumference)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_sigma_x)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_sigma_x)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const sigma_x ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2555,8 +2555,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_sigma_x)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_sigma_y)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_sigma_y)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const sigma_y ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2564,8 +2564,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_sigma_y)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_length)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_length)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const length ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2573,8 +2573,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_length)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_x_co)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_x_co)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const x_co ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2582,8 +2582,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_x_co)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_y_co)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_y_co)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const y_co ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2591,8 +2591,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_y_co)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_min_sigma_diff)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_min_sigma_diff)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     SIXTRL_REAL_T const min_sigma_diff ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2600,8 +2600,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_min_sigma_diff)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_enabled)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT sc_elem,
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_set_enabled)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT sc_elem,
     bool const is_enabled ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( sc_elem != SIXTRL_NULLPTR );
@@ -2612,49 +2612,49 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_set_enabled)(
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const*
-NS(SpaceChargeCoasting_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const*
+NS(SCCoasting_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
     const NS(Object) *const SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT
 {
     return (
         ( NS(Object_get_type_id)( obj ) == NS(OBJECT_TYPE_SC_COASTING) ) &&
-        ( NS(Object_get_size)( obj ) >= sizeof( NS(SpaceChargeCoasting) ) ) )
-        ? ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const* )( uintptr_t
+        ( NS(Object_get_size)( obj ) >= sizeof( NS(SCCoasting) ) ) )
+        ? ( SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const* )( uintptr_t
             )NS(Object_get_begin_addr)( obj )
         : SIXTRL_NULLPTR;
 }
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC
     NS(Object)* SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT
 {
-    return ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-        )NS(SpaceChargeCoasting_const_from_obj_index)( obj );
+    return ( SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+        )NS(SCCoasting_const_from_obj_index)( obj );
 }
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting) const*
-NS(SpaceChargeCoasting_const_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SCCoasting) const*
+NS(SCCoasting_const_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
         unsigned char const* SIXTRL_RESTRICT buffer_begin,
     NS(buffer_size_t) const index,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeCoasting_const_from_obj_index)(
+    return NS(SCCoasting_const_from_obj_index)(
         NS(ManagedBuffer_get_const_object)( buffer_begin, index, slot_size ) );
 }
 
-SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)*
-NS(SpaceChargeCoasting_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)*
+NS(SCCoasting_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC
         unsigned char* SIXTRL_RESTRICT buffer_begin,
     NS(buffer_size_t) const index,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
-   return NS(SpaceChargeCoasting_from_obj_index)(
+   return NS(SCCoasting_from_obj_index)(
         NS(ManagedBuffer_get_object)( buffer_begin, index, slot_size ) );
 }
 
-SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_copy)(
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeCoasting)* SIXTRL_RESTRICT dest,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_INLINE NS(arch_status_t) NS(SCCoasting_copy)(
+    SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* SIXTRL_RESTRICT dest,
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT src ) SIXTRL_NOEXCEPT
 {
     NS(arch_status_t) status = ( NS(arch_status_t)
@@ -2664,32 +2664,32 @@ SIXTRL_INLINE NS(arch_status_t) NS(SpaceChargeCoasting_copy)(
     {
         if( dest != src )
         {
-            status = NS(SpaceChargeCoasting_set_number_of_particles)( dest,
-                NS(SpaceChargeCoasting_number_of_particles)( src ) );
+            status = NS(SCCoasting_set_number_of_particles)( dest,
+                NS(SCCoasting_number_of_particles)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_circumference)( dest,
-                NS(SpaceChargeCoasting_circumference)( src ) );
+            status |= NS(SCCoasting_set_circumference)( dest,
+                NS(SCCoasting_circumference)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_sigma_x)( dest,
-                NS(SpaceChargeCoasting_sigma_x)( src ) );
+            status |= NS(SCCoasting_set_sigma_x)( dest,
+                NS(SCCoasting_sigma_x)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_sigma_y)( dest,
-                NS(SpaceChargeCoasting_sigma_y)( src ) );
+            status |= NS(SCCoasting_set_sigma_y)( dest,
+                NS(SCCoasting_sigma_y)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_length)( dest,
-                NS(SpaceChargeCoasting_length)( src ) );
+            status |= NS(SCCoasting_set_length)( dest,
+                NS(SCCoasting_length)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_x_co)( dest,
-                NS(SpaceChargeCoasting_x_co)( src ) );
+            status |= NS(SCCoasting_set_x_co)( dest,
+                NS(SCCoasting_x_co)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_y_co)( dest,
-                NS(SpaceChargeCoasting_y_co)( src ) );
+            status |= NS(SCCoasting_set_y_co)( dest,
+                NS(SCCoasting_y_co)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_min_sigma_diff)( dest,
-                NS(SpaceChargeCoasting_min_sigma_diff)( src ) );
+            status |= NS(SCCoasting_set_min_sigma_diff)( dest,
+                NS(SCCoasting_min_sigma_diff)( src ) );
 
-            status |= NS(SpaceChargeCoasting_set_enabled)( dest,
-                NS(SpaceChargeCoasting_enabled)( src ) );
+            status |= NS(SCCoasting_set_enabled)( dest,
+                NS(SCCoasting_enabled)( src ) );
         }
         else
         {
