@@ -7,7 +7,7 @@ from cobjects import CBuffer, CObject, CField
 
 from .trackjob import TrackJob
 from .cuda import CudaTrackJob
-from .beam_elements import Elements, SpaceChargeInterpolatedProfile
+from .beam_elements import Elements, SCInterpolatedProfile
 from .buffer import AssignAddressItem, get_cbuffer_from_obj, Buffer
 from .stcommon import (
     st_ARCH_STATUS_SUCCESS,
@@ -16,9 +16,9 @@ from .stcommon import (
     st_LineDensityProfileData_p,
     st_LineDensityProfileData_type_id,
     st_NullLineDensityProfileData,
-    st_NullSpaceChargeInterpolatedProfile,
-    st_SpaceChargeInterpolatedProfile_type_id,
-    st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset,
+    st_NullSCInterpolatedProfile,
+    st_SCInterpolatedProfile_type_id,
+    st_SCInterpolatedProfile_interpol_data_addr_offset,
     st_LineDensityProfileData_values_offset,
     st_LineDensityProfileData_derivatives_offset,
     st_LineDensityProfileData_prepare_interpolation,
@@ -131,11 +131,11 @@ def LineDensityProfileData_create_buffer_assignment(
     )
 
     _ptr_item = track_job.add_assign_address_item(
-        dest_elem_type_id=st_SpaceChargeInterpolatedProfile_type_id(),
+        dest_elem_type_id=st_SCInterpolatedProfile_type_id(),
         dest_buffer_id=dest_buffer_id,
         dest_elem_index=be_sc_index,
-        dest_pointer_offset=st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset(
-            st_NullSpaceChargeInterpolatedProfile
+        dest_pointer_offset=st_SCInterpolatedProfile_interpol_data_addr_offset(
+            st_NullSCInterpolatedProfile
         ),
         src_elem_type_id=st_LineDensityProfileData_type_id(),
         src_buffer_id=src_buffer_id,
