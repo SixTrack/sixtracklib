@@ -6491,104 +6491,126 @@ st_XYShift_type_id.restype = st_object_type_id_t
 # SC related methods:
 
 st_BeamBeam4D_p = ct.c_void_p
-st_NullBeamBeam4D = ct.cast( 0, st_BeamBeam4D_p )
+st_NullBeamBeam4D = ct.cast(0, st_BeamBeam4D_p)
 
 st_BeamBeam4D_type_id = sixtracklib.st_BeamBeam4D_type_id_ext
 st_BeamBeam4D_type_id.argtypes = None
 st_BeamBeam4D_type_id.restype = st_object_type_id_t
 
 st_BeamBeam4D_data_addr_offset = sixtracklib.st_BeamBeam4D_data_addr_offset_ext
-st_BeamBeam4D_data_addr_offset.argtypes = [st_BeamBeam4D_p,]
+st_BeamBeam4D_data_addr_offset.argtypes = [
+    st_BeamBeam4D_p,
+]
 st_BeamBeam4D_data_addr_offset.restype = st_buffer_size_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 st_BeamBeam6D_p = ct.c_void_p
-st_NullBeamBeam6D = ct.cast( 0, st_BeamBeam6D_p )
+st_NullBeamBeam6D = ct.cast(0, st_BeamBeam6D_p)
 
 st_BeamBeam6D_type_id = sixtracklib.st_BeamBeam6D_type_id_ext
 st_BeamBeam6D_type_id.argtypes = None
 st_BeamBeam6D_type_id.restype = st_object_type_id_t
 
 st_BeamBeam6D_data_addr_offset = sixtracklib.st_BeamBeam6D_data_addr_offset_ext
-st_BeamBeam6D_data_addr_offset.argtypes = [st_BeamBeam6D_p,]
+st_BeamBeam6D_data_addr_offset.argtypes = [
+    st_BeamBeam6D_p,
+]
 st_BeamBeam6D_data_addr_offset.restype = st_buffer_size_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-st_SpaceChargeCoasting_p = ct.c_void_p
-st_NullSpaceChargeCoasting = ct.cast( 0, st_SpaceChargeCoasting_p )
+st_SCCoasting_p = ct.c_void_p
+st_NullSCCoasting = ct.cast(0, st_SCCoasting_p)
 
-st_SpaceChargeCoasting_type_id = sixtracklib.st_SpaceChargeCoasting_type_id_ext
-st_SpaceChargeCoasting_type_id.argtypes = None
-st_SpaceChargeCoasting_type_id.restype = st_object_type_id_t
+st_SCCoasting_type_id = sixtracklib.st_SCCoasting_type_id_ext
+st_SCCoasting_type_id.argtypes = None
+st_SCCoasting_type_id.restype = st_object_type_id_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-st_SpaceChargeQGaussianProfile_p = ct.c_void_p
-st_NullSpaceChargeQGaussianProfile = ct.cast(
-    0, st_SpaceChargeQGaussianProfile_p )
+st_SCQGaussProfile_p = ct.c_void_p
+st_NullSCQGaussProfile = ct.cast(0, st_SCQGaussProfile_p)
 
-st_SpaceChargeQGaussianProfile_type_id = \
-    sixtracklib.st_SpaceChargeQGaussianProfile_type_id_ext
-st_SpaceChargeQGaussianProfile_type_id.argtypes = None
-st_SpaceChargeQGaussianProfile_type_id.restype = st_object_type_id_t
+st_SCQGaussProfile_type_id = sixtracklib.st_SCQGaussProfile_type_id_ext
+st_SCQGaussProfile_type_id.argtypes = None
+st_SCQGaussProfile_type_id.restype = st_object_type_id_t
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 st_LineDensityProfileData_p = ct.c_void_p
-st_NullLineDensityProfileData = ct.cast(
-    0, st_LineDensityProfileData_p )
+st_NullLineDensityProfileData = ct.cast(0, st_LineDensityProfileData_p)
 
-st_LineDensityProfileData_type_id = \
+st_LineDensityProfileData_type_id = (
     sixtracklib.st_LineDensityProfileData_type_id_ext
+)
 st_LineDensityProfileData_type_id.argtypes = None
 st_LineDensityProfileData_type_id.restype = st_object_type_id_t
 
-st_LineDensityProfileData_values_offset = \
+st_LineDensityProfileData_values_offset = (
     sixtracklib.st_LineDensityProfileData_values_offset_ext
+)
 st_LineDensityProfileData_values_offset.argtypes = [st_LineDensityProfileData_p]
 st_LineDensityProfileData_values_offset.restype = st_buffer_size_t
 
-st_LineDensityProfileData_derivatives_offset = \
+st_LineDensityProfileData_derivatives_offset = (
     sixtracklib.st_LineDensityProfileData_derivatives_offset_ext
-st_LineDensityProfileData_derivatives_offset.argtypes = [st_LineDensityProfileData_p]
+)
+st_LineDensityProfileData_derivatives_offset.argtypes = [
+    st_LineDensityProfileData_p
+]
 st_LineDensityProfileData_derivatives_offset.restype = st_buffer_size_t
 
-st_LineDensityProfileData_prepare_interpolation = \
+st_LineDensityProfileData_prepare_interpolation = (
     sixtracklib.st_LineDensityProfileData_prepare_interpolation_ext
-st_LineDensityProfileData_prepare_interpolation.argtypes = [st_LineDensityProfileData_p]
+)
+st_LineDensityProfileData_prepare_interpolation.argtypes = [
+    st_LineDensityProfileData_p
+]
 st_LineDensityProfileData_prepare_interpolation.restype = st_arch_status_t
 
-st_LineDensityProfileData_interpolate_value = \
+st_LineDensityProfileData_interpolate_value = (
     sixtracklib.st_LineDensityProfileData_interpolate_value_ext
-st_LineDensityProfileData_interpolate_value.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+)
+st_LineDensityProfileData_interpolate_value.argtypes = [
+    st_LineDensityProfileData_p,
+    ct.c_double,
+]
 st_LineDensityProfileData_interpolate_value.restype = ct.c_double
 
-st_LineDensityProfileData_interpolate_1st_derivative = \
+st_LineDensityProfileData_interpolate_1st_derivative = (
     sixtracklib.st_LineDensityProfileData_interpolate_1st_derivative_ext
-st_LineDensityProfileData_interpolate_1st_derivative.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+)
+st_LineDensityProfileData_interpolate_1st_derivative.argtypes = [
+    st_LineDensityProfileData_p,
+    ct.c_double,
+]
 st_LineDensityProfileData_interpolate_1st_derivative.restype = ct.c_double
 
-st_LineDensityProfileData_interpolate_2nd_derivative = \
+st_LineDensityProfileData_interpolate_2nd_derivative = (
     sixtracklib.st_LineDensityProfileData_interpolate_1st_derivative_ext
-st_LineDensityProfileData_interpolate_2nd_derivative.argtypes = [st_LineDensityProfileData_p, ct.c_double]
+)
+st_LineDensityProfileData_interpolate_2nd_derivative.argtypes = [
+    st_LineDensityProfileData_p,
+    ct.c_double,
+]
 st_LineDensityProfileData_interpolate_2nd_derivative.restype = ct.c_double
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-st_SpaceChargeInterpolatedProfile_p = ct.c_void_p
-st_NullSpaceChargeInterpolatedProfile = ct.cast(
-    0, st_SpaceChargeInterpolatedProfile_p )
+st_SCInterpolatedProfile_p = ct.c_void_p
+st_NullSCInterpolatedProfile = ct.cast(0, st_SCInterpolatedProfile_p)
 
-st_SpaceChargeInterpolatedProfile_type_id = \
-    sixtracklib.st_SpaceChargeInterpolatedProfile_type_id_ext
-st_SpaceChargeInterpolatedProfile_type_id.argtypes = None
-st_SpaceChargeInterpolatedProfile_type_id.restype = st_object_type_id_t
+st_SCInterpolatedProfile_type_id = (
+    sixtracklib.st_SCInterpolatedProfile_type_id_ext
+)
+st_SCInterpolatedProfile_type_id.argtypes = None
+st_SCInterpolatedProfile_type_id.restype = st_object_type_id_t
 
-st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset = \
-    sixtracklib.st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset_ext
-st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.argtypes = \
-    [st_SpaceChargeInterpolatedProfile_p,]
-st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset.restype = \
-    st_object_type_id_t
+st_SCInterpolatedProfile_interpol_data_addr_offset = (
+    sixtracklib.st_SCInterpolatedProfile_interpol_data_addr_offset_ext
+)
+st_SCInterpolatedProfile_interpol_data_addr_offset.argtypes = [
+    st_SCInterpolatedProfile_p,
+]
+st_SCInterpolatedProfile_interpol_data_addr_offset.restype = st_object_type_id_t
