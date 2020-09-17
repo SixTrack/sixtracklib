@@ -12,19 +12,32 @@ from scipy.constants import e as qe
 from cobjects import CBuffer, CObject, CField
 from .mad_helper import madseq_to_generator
 
-from .stcommon import st_BeamBeam4D_type_id, st_BeamBeam4D_data_addr_offset, \
-    st_BeamBeam6D_type_id, st_BeamBeam6D_data_addr_offset, \
-    st_BeamMonitor_type_id, st_Cavity_type_id, st_DipoleEedge_type_id, \
-    st_Drift_type_id, st_DriftExact_type_id, \
-    st_LimitRect_type_id, st_LimitEllipse_type_id, \
-    st_LimitRectEllipse_type_id, st_Multipole_type_id, st_RFMultipole_type_id, \
-    st_SpaceChargeCoasting_type_id, \
-    Math_q_gauss_cq, \
-    st_SpaceChargeQGaussianProfile_type_id, st_LineDensityProfileData_type_id, \
-    st_NullSpaceChargeInterpolatedProfile, \
-    st_SpaceChargeInterpolatedProfile_type_id, \
-    st_SpaceChargeInterpolatedProfile_interpol_data_addr_offset, \
-    st_SRotation_type_id, st_XYShift_type_id
+from .stcommon import (
+    st_BeamBeam4D_type_id,
+    st_BeamBeam4D_data_addr_offset,
+    st_BeamBeam6D_type_id,
+    st_BeamBeam6D_data_addr_offset,
+    st_BeamMonitor_type_id,
+    st_Cavity_type_id,
+    st_DipoleEedge_type_id,
+    st_Drift_type_id,
+    st_DriftExact_type_id,
+    st_LimitRect_type_id,
+    st_LimitEllipse_type_id,
+    st_LimitRectEllipse_type_id,
+    st_Multipole_type_id,
+    st_RFMultipole_type_id,
+    st_SCCoasting_type_id,
+    Math_q_gauss_cq,
+    st_SCQGaussProfile_type_id,
+    st_LineDensityProfileData_type_id,
+    st_NullSCInterpolatedProfile,
+    st_SCInterpolatedProfile_type_id,
+    st_SCInterpolatedProfile_interpol_data_addr_offset,
+    st_SRotation_type_id,
+    st_XYShift_type_id,
+)
+
 
 class Drift(CObject):
     _typeid = st_Drift_type_id()
@@ -90,9 +103,7 @@ class Multipole(CObject):
             kwargs["bal"] = bal
             kwargs["order"] = order
 
-        elif (
-            bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0)
-        ):
+        elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0):
             kwargs["bal"] = bal
             kwargs["order"] = (len(bal) - 2) / 2
 
@@ -123,7 +134,7 @@ class RFMultipole(CObject):
     voltage = CField(1, "real", default=0.0)
     frequency = CField(2, "real", default=0.0)
     lag = CField(3, "real", default=0.0)
-    bal = CField( 4, "real", pointer=True, length="2*order+2", default=0.0)
+    bal = CField(4, "real", pointer=True, length="2*order+2", default=0.0)
     phase = CField(5, "real", pointer=True, length="2*order+2", default=0.0)
 
     def __init__(
@@ -455,6 +466,7 @@ class LimitEllipse(CObject):
         self.a_b_squ = a_squ * b_squ
         return self
 
+
 class BeamBeam4D(CObject):
     _typeid = st_BeamBeam4D_type_id()
     size = CField(0, "uint64", const=True, default=0)
@@ -488,7 +500,6 @@ class BeamBeam6D(CObject):
 
     def __init__(self, **kwargs):
         if "x_bb_co" in kwargs:
-
             import pysixtrack
 
             params = kwargs
@@ -532,8 +543,8 @@ class BeamBeam6D(CObject):
             super().__init__(**kwargs)
 
 
-class SpaceChargeCoasting(CObject):
-    _typeid = st_SpaceChargeCoasting_type_id()
+class SCCoasting(CObject):
+    _typeid = st_SCCoasting_type_id()
     number_of_particles = CField(0, "float64", default=0.0)
     circumference = CField(1, "float64", default=1.0)
     sigma_x = CField(2, "float64", default=1.0)
@@ -548,14 +559,14 @@ class SpaceChargeCoasting(CObject):
         super().__init__(**kwargs)
 
 
-class SpaceChargeQGaussianProfile(CObject):
-    _typeid = st_SpaceChargeQGaussianProfile_type_id()
+class SCQGaussProfile(CObject):
+    _typeid = st_SCQGaussProfile_type_id()
     number_of_particles = CField(0, "float64", default=0.0)
     bunchlength_rms = CField(1, "float64", default=1.0)
     sigma_x = CField(2, "float64", default=1.0)
     sigma_y = CField(3, "float64", default=1.0)
     length = CField(4, "float64", default=0.0)
-    x_co = CField(5, "float64", default=0.0 )
+    x_co = CField(5, "float64", default=0.0)
     y_co = CField(6, "float64", default=0.0)
     min_sigma_diff = CField(7, "float64", default=1e-10)
     q_param = CField(8, "float64", default=1.0)
@@ -563,13 +574,14 @@ class SpaceChargeQGaussianProfile(CObject):
     enabled = CField(10, "uint64", default=1)
 
     def __init__(self, **kwargs):
-        q = kwargs.get( 'q_param', 1.0 )
-        kwargs[ 'cq' ] = Math_q_gauss_cq(q)
-        kwargs[ 'q_param'] = q
+        q = kwargs.get("q_param", 1.0)
+        kwargs["cq"] = Math_q_gauss_cq(q)
+        kwargs["q_param"] = q
         super().__init__(**kwargs)
 
-class SpaceChargeInterpolatedProfile(CObject):
-    _typeid = st_SpaceChargeInterpolatedProfile_type_id()
+
+class SCInterpolatedProfile(CObject):
+    _typeid = st_SCInterpolatedProfile_type_id()
     number_of_particles = CField(0, "float64", default=0.0)
     sigma_x = CField(1, "float64", default=1.0)
     sigma_y = CField(2, "float64", default=1.0)
@@ -675,9 +687,7 @@ class DipoleEdge(CObject):
 
             corr = np.float64(2.0) * h * hgap * fint
             r21 = h * np.tan(e1)
-            temp = (
-                corr / np.cos(e1) * (np.float64(1) + np.sin(e1) * np.sin(e1))
-            )
+            temp = corr / np.cos(e1) * (np.float64(1) + np.sin(e1) * np.sin(e1))
 
             # again, the argument to the tan calculation should be limited
             assert not np.isclose(np.absolute(np.cos(e1 - temp)), ZERO)
@@ -707,9 +717,9 @@ class Elements(object):
         "LimitRectEllipse": LimitRectEllipse,
         "BeamBeam4D": BeamBeam4D,
         "BeamBeam6D": BeamBeam6D,
-        "SpaceChargeCoasting": SpaceChargeCoasting,
-        "SpaceChargeQGaussianProfile": SpaceChargeQGaussianProfile,
-        "SpaceChargeInterpolatedProfile": SpaceChargeInterpolatedProfile,
+        "SCCoasting": SCCoasting,
+        "SCQGaussProfile": SCQGaussProfile,
+        "SCInterpolatedProfile": SCInterpolatedProfile,
         "LimitRect": LimitRect,
         "LimitEllipse": LimitEllipse,
         "LimitRectEllipse": LimitRectEllipse,
