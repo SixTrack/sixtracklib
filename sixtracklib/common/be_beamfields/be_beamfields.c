@@ -825,38 +825,38 @@ SIXTRL_BE_ARGPTR_DEC NS(SCCoasting)* NS(SCCoasting_add_copy)(
 }
 
 /* *************************************************************************  */
-/* NS(SpaceChargeQGaussianProfile): */
+/* NS(SCQGaussProfile): */
 
 NS(object_type_id_t)
-NS(SpaceChargeQGaussianProfile_type_id_ext)( void ) SIXTRL_NOEXCEPT
+NS(SCQGaussProfile_type_id_ext)( void ) SIXTRL_NOEXCEPT
 {
     return ( NS(object_type_id_t) )NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF);
 }
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile) const*
-NS(SpaceChargeQGaussianProfile_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
+SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile) const*
+NS(SCQGaussProfile_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
         const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeQGaussianProfile_const_from_obj_index)(
+    return NS(SCQGaussProfile_const_from_obj_index)(
         NS(Buffer_get_const_object)( buffer, index ) );
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
-NS(SpaceChargeQGaussianProfile_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
+SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
+NS(SCQGaussProfile_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
         NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeQGaussianProfile_from_obj_index)(
+    return NS(SCQGaussProfile_from_obj_index)(
         NS(Buffer_get_object)( buffer, index ) );
 }
 
-NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_offsets)(
+NS(arch_status_t) NS(SCQGaussProfile_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets,
     NS(buffer_size_t) const max_num_offsets,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCQGaussProfile) *const
         SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -872,10 +872,10 @@ NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_offsets)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_sizes)(
+NS(arch_status_t) NS(SCQGaussProfile_attributes_sizes)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile)
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -891,10 +891,10 @@ NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_sizes)(
     return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_counts)(
+NS(arch_status_t) NS(SCQGaussProfile_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeQGaussianProfile)
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT SIXTRL_UNUSED( sc_elem ),
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -912,7 +912,7 @@ NS(arch_status_t) NS(SpaceChargeQGaussianProfile_attributes_counts)(
 
 /* ------------------------------------------------------------------------- */
 
-bool NS(SpaceChargeQGaussianProfile_can_be_added)(
+bool NS(SCQGaussProfile_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
@@ -923,51 +923,51 @@ bool NS(SpaceChargeQGaussianProfile_can_be_added)(
     bool can_be_added = false;
 
     buf_size_t ndataptrs = ( buf_size_t )0u;
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile) sc_elem;
+    SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile) sc_elem;
     NS(arch_status_t) const status =
-        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
-    ndataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
+        NS(SCQGaussProfile_clear)( &sc_elem );
+    ndataptrs = NS(SCQGaussProfile_num_dataptrs)( &sc_elem );
 
     can_be_added = ( ( ndataptrs == ( buf_size_t )0 ) &&
         ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) &&
         ( NS(Buffer_can_add_object)( buffer,
-            sizeof( NS(SpaceChargeQGaussianProfile) ), ndataptrs,
+            sizeof( NS(SCQGaussProfile) ), ndataptrs,
                 SIXTRL_NULLPTR, SIXTRL_NULLPTR, ptr_requ_objects,
                     ptr_requ_slots, ptr_requ_dataptrs ) ) );
 
     return can_be_added;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
-NS(SpaceChargeQGaussianProfile_new)(
+SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
+NS(SCQGaussProfile_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     NS(buffer_size_t) ndataptrs = ( NS(buffer_size_t) )0u;
 
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile) sc_elem;
+    SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile) sc_elem;
     NS(arch_status_t) const status =
-        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
+        NS(SCQGaussProfile_clear)( &sc_elem );
 
-    ndataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
+    ndataptrs = NS(SCQGaussProfile_num_dataptrs)( &sc_elem );
 
     if( ( ndataptrs == ( NS(buffer_size_t) )0u ) &&
         ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) )
     {
-        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)* )(
         uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-            &sc_elem, sizeof( NS(SpaceChargeQGaussianProfile) ),
-                NS(SpaceChargeQGaussianProfile_type_id)(), ndataptrs,
+            &sc_elem, sizeof( NS(SCQGaussProfile) ),
+                NS(SCQGaussProfile_type_id)(), ndataptrs,
                     SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
     }
 
     return added_elem;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
-NS(SpaceChargeQGaussianProfile_add)(
+SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
+NS(SCQGaussProfile_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_REAL_T const number_of_particles, SIXTRL_REAL_T const bunchlength_rms,
     SIXTRL_REAL_T const sigma_x, SIXTRL_REAL_T const sigma_y,
@@ -976,69 +976,69 @@ NS(SpaceChargeQGaussianProfile_add)(
     SIXTRL_REAL_T const min_sigma_diff,
     SIXTRL_REAL_T const q_param, bool const enabled )
 {
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     NS(buffer_size_t) num_dataptrs = ( NS(buffer_size_t) )0u;
 
-    NS(SpaceChargeQGaussianProfile) sc_elem;
+    NS(SCQGaussProfile) sc_elem;
     NS(arch_status_t) status =
-        NS(SpaceChargeQGaussianProfile_clear)( &sc_elem );
+        NS(SCQGaussProfile_clear)( &sc_elem );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_number_of_particles)(
+    status |= NS(SCQGaussProfile_set_number_of_particles)(
         &sc_elem, number_of_particles );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_bunchlength_rms)(
+    status |= NS(SCQGaussProfile_set_bunchlength_rms)(
         &sc_elem, bunchlength_rms );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_sigma_x)( &sc_elem, sigma_x );
-    status |= NS(SpaceChargeQGaussianProfile_set_sigma_y)( &sc_elem, sigma_y );
-    status |= NS(SpaceChargeQGaussianProfile_set_length)( &sc_elem, length );
-    status |= NS(SpaceChargeQGaussianProfile_set_x_co)( &sc_elem, x_co );
-    status |= NS(SpaceChargeQGaussianProfile_set_y_co)( &sc_elem, y_co );
+    status |= NS(SCQGaussProfile_set_sigma_x)( &sc_elem, sigma_x );
+    status |= NS(SCQGaussProfile_set_sigma_y)( &sc_elem, sigma_y );
+    status |= NS(SCQGaussProfile_set_length)( &sc_elem, length );
+    status |= NS(SCQGaussProfile_set_x_co)( &sc_elem, x_co );
+    status |= NS(SCQGaussProfile_set_y_co)( &sc_elem, y_co );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_min_sigma_diff)(
+    status |= NS(SCQGaussProfile_set_min_sigma_diff)(
         &sc_elem, min_sigma_diff );
 
-    status |= NS(SpaceChargeQGaussianProfile_set_q_param)( &sc_elem, q_param );
-    status |= NS(SpaceChargeQGaussianProfile_set_enabled)( &sc_elem, enabled );
+    status |= NS(SCQGaussProfile_set_q_param)( &sc_elem, q_param );
+    status |= NS(SCQGaussProfile_set_enabled)( &sc_elem, enabled );
 
-    num_dataptrs = NS(SpaceChargeQGaussianProfile_num_dataptrs)( &sc_elem );
+    num_dataptrs = NS(SCQGaussProfile_num_dataptrs)( &sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( NS(buffer_size_t) )0u );
 
     if( ( buffer != SIXTRL_NULLPTR ) &&
         ( num_dataptrs == ( NS(buffer_size_t) )0 ) &&
         ( status == ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS ) )
     {
-        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)* )(
             uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
                 &sc_elem, sizeof( sc_elem ),
-                    NS(SpaceChargeQGaussianProfile_type_id)(), num_dataptrs,
+                    NS(SCQGaussProfile_type_id)(), num_dataptrs,
                         SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
     }
 
     return added_elem;
 }
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
-NS(SpaceChargeQGaussianProfile_add_copy)(
+SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
+NS(SCQGaussProfile_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(SCQGaussProfile) *const
         SIXTRL_RESTRICT orig ) SIXTRL_NOEXCEPT
 {
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     NS(buffer_size_t) const num_dataptrs =
-        NS(SpaceChargeQGaussianProfile_num_dataptrs)( orig );
+        NS(SCQGaussProfile_num_dataptrs)( orig );
 
     if( ( orig != SIXTRL_NULLPTR ) && ( buffer != SIXTRL_NULLPTR ) &&
         ( num_dataptrs == ( NS(buffer_size_t) )0 ) )
     {
-        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeQGaussianProfile)* )(
+        added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCQGaussProfile)* )(
             uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-                orig, sizeof( NS(SpaceChargeQGaussianProfile) ),
-                    NS(SpaceChargeQGaussianProfile_type_id)(), num_dataptrs,
+                orig, sizeof( NS(SCQGaussProfile) ),
+                    NS(SCQGaussProfile_type_id)(), num_dataptrs,
                         SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
     }
 
