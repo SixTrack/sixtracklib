@@ -109,11 +109,11 @@ void NS(BeamBeam6D_print)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting:  */
+/* SCCoasting:  */
 
-void NS(SpaceChargeCoasting_print)(
+void NS(SCCoasting_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const SIXTRL_RESTRICT e )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {
@@ -136,12 +136,12 @@ void NS(SpaceChargeCoasting_print)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeQGaussianProfile:  */
+/* SCQGaussProfile:  */
 
-void NS(SpaceChargeQGaussianProfile_print)(
+void NS(SCQGaussProfile_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BE_ARGPTR_DEC const
-        NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT e )
+        NS(SCQGaussProfile) *const SIXTRL_RESTRICT e )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {
@@ -166,7 +166,7 @@ void NS(SpaceChargeQGaussianProfile_print)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeInterpolatedProfile:  */
+/* SCInterpolatedProfile:  */
 
 void NS(LineDensityProfileData_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
@@ -273,12 +273,12 @@ void NS(LineDensityProfileData_print)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeInterpolatedProfile:  */
+/* SCInterpolatedProfile:  */
 
-void NS(SpaceChargeInterpolatedProfile_print)(
+void NS(SCInterpolatedProfile_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
     SIXTRL_BE_ARGPTR_DEC const
-        NS(SpaceChargeInterpolatedProfile) *const SIXTRL_RESTRICT e )
+        NS(SCInterpolatedProfile) *const SIXTRL_RESTRICT e )
 {
     if( ( fp != SIXTRL_NULLPTR ) && ( e != SIXTRL_NULLPTR ) )
     {

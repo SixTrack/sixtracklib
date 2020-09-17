@@ -72,60 +72,60 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(BeamBeam6D_print)(
 #endif /* !defined( _GPUCODE ) */
 
 /* ************************************************************************** */
-/* SpaceChargeCoasting: */
+/* SCCoasting: */
 
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN int NS(SCCoasting_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN int NS(SCCoasting_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeCoasting_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting)
+SIXTRL_STATIC SIXTRL_FN void NS(SCCoasting_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCCoasting)
         *const SIXTRL_RESTRICT e );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeCoasting_print)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SCCoasting_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting)
         *const SIXTRL_RESTRICT e );
 
 #endif /* !defined( _GPUCODE ) */
 
 /* ************************************************************************** */
-/* SpaceChargeQGaussianProfile: */
+/* SCQGaussProfile: */
 
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeQGaussianProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+SIXTRL_STATIC SIXTRL_FN int NS(SCQGaussProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN int
-NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+NS(SCQGaussProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeQGaussianProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeQGaussianProfile)
+SIXTRL_STATIC SIXTRL_FN void NS(SCQGaussProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT e );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeQGaussianProfile_print)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SCQGaussProfile_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT e );
 
 #endif /* !defined( _GPUCODE ) */
@@ -161,30 +161,30 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(LineDensityProfileData_print)(
 
 
 /* ************************************************************************** */
-/* SpaceChargeInterpolatedProfile: */
+/* SCInterpolatedProfile: */
 
-SIXTRL_STATIC SIXTRL_FN int NS(SpaceChargeInterpolatedProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+SIXTRL_STATIC SIXTRL_FN int NS(SCInterpolatedProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN int
-NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+NS(SCInterpolatedProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const treshold ) SIXTRL_NOEXCEPT;
 
-SIXTRL_STATIC SIXTRL_FN void NS(SpaceChargeInterpolatedProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+SIXTRL_STATIC SIXTRL_FN void NS(SCInterpolatedProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT e );
 
 #if !defined( _GPUCODE )
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SpaceChargeInterpolatedProfile_print)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(SCInterpolatedProfile_print)(
     SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT e );
 
 #endif /* !defined( _GPUCODE ) */
@@ -496,11 +496,11 @@ SIXTRL_INLINE void NS(BeamBeam6D_print_out)(
 }
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting: */
+/* SCCoasting: */
 
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const
+SIXTRL_INLINE int NS(SCCoasting_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
         SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -568,9 +568,9 @@ SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values)(
     return cmp_result;
 }
 
-SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT rhs,
+SIXTRL_INLINE int NS(SCCoasting_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const SIXTRL_RESTRICT rhs,
     SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -641,8 +641,8 @@ SIXTRL_INLINE int NS(SpaceChargeCoasting_compare_values_with_treshold)(
     return cmp_result;
 }
 
-SIXTRL_INLINE void NS(SpaceChargeCoasting_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT e )
+SIXTRL_INLINE void NS(SCCoasting_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const SIXTRL_RESTRICT e )
 {
     #if defined( _GPUCODE )
 
@@ -664,17 +664,17 @@ SIXTRL_INLINE void NS(SpaceChargeCoasting_print_out)(
 
     #else
 
-    NS(SpaceChargeCoasting_print)( stdout, e );
+    NS(SCCoasting_print)( stdout, e );
 
     #endif /* !defined( _GPUCODE ) */
 }
 
 /* ************************************************************************* */
-/* SpaceChargeQGaussianProfile: */
+/* SCQGaussProfile: */
 
-SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+SIXTRL_INLINE int NS(SCQGaussProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile) *const SIXTRL_RESTRICT lhs,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile) *const
         SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -747,10 +747,10 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values)(
     return cmp_result;
 }
 
-SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+SIXTRL_INLINE int NS(SCQGaussProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile) *const
         SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -834,8 +834,8 @@ SIXTRL_INLINE int NS(SpaceChargeQGaussianProfile_compare_values_with_treshold)(
     return cmp_result;
 }
 
-SIXTRL_INLINE void NS(SpaceChargeQGaussianProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeQGaussianProfile)
+SIXTRL_INLINE void NS(SCQGaussProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile)
         *const SIXTRL_RESTRICT e )
 {
     #if defined( _GPUCODE )
@@ -860,7 +860,7 @@ SIXTRL_INLINE void NS(SpaceChargeQGaussianProfile_print_out)(
 
     #else
 
-    NS(SpaceChargeQGaussianProfile_print)( stdout, e );
+    NS(SCQGaussProfile_print)( stdout, e );
 
     #endif /* !defined( _GPUCODE ) */
 }
@@ -1091,12 +1091,12 @@ SIXTRL_INLINE void NS(LineDensityProfileData_print_out)(
 }
 
 /* ************************************************************************** */
-/* SpaceChargeInterpolatedProfile: */
+/* SCInterpolatedProfile: */
 
-SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+SIXTRL_INLINE int NS(SCInterpolatedProfile_compare_values)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT rhs ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -1142,8 +1142,8 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values)(
                 ( lhs->interpol_data_addr != rhs->interpol_data_addr ) )
             {
                 cmp_result = NS(LineDensityProfileData_compare_values)(
-                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( lhs ),
-                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( rhs ) );
+                    NS(SCInterpolatedProfile_const_line_density_profile_data)( lhs ),
+                    NS(SCInterpolatedProfile_const_line_density_profile_data)( rhs ) );
             }
 
             if( cmp_result == 0 )
@@ -1173,10 +1173,10 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values)(
     return cmp_result;
 }
 
-SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+SIXTRL_INLINE int NS(SCInterpolatedProfile_compare_values_with_treshold)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT rhs, SIXTRL_REAL_T const ABS_TOL ) SIXTRL_NOEXCEPT
 {
     int cmp_result = -1;
@@ -1225,8 +1225,8 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold
                 ( lhs->interpol_data_addr != rhs->interpol_data_addr ) )
             {
                 cmp_result = NS(LineDensityProfileData_compare_values_with_treshold)(
-                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)( lhs ),
-                    NS(SpaceChargeInterpolatedProfile_const_line_density_profile_data)(
+                    NS(SCInterpolatedProfile_const_line_density_profile_data)( lhs ),
+                    NS(SCInterpolatedProfile_const_line_density_profile_data)(
                         rhs ), ABS_TOL );
             }
 
@@ -1257,8 +1257,8 @@ SIXTRL_INLINE int NS(SpaceChargeInterpolatedProfile_compare_values_with_treshold
     return cmp_result;
 }
 
-SIXTRL_INLINE void NS(SpaceChargeInterpolatedProfile_print_out)(
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeInterpolatedProfile) *const
+SIXTRL_INLINE void NS(SCInterpolatedProfile_print_out)(
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT e )
 {
     SIXTRL_ASSERT( e != SIXTRL_NULLPTR );
@@ -1272,16 +1272,16 @@ SIXTRL_INLINE void NS(SpaceChargeInterpolatedProfile_print_out)(
             "                 | line_density_fallback = %+20.12f\r\n"
             "                 | min_sigma_diff        = %+20.12f\r\n"
             "                 | enabled               = %20lu\r\n",
-            NS(SpaceChargeInterpolatedProfile_number_of_particles)( e ),
-            NS(SpaceChargeInterpolatedProfile_sigma_x)( e ),
-            NS(SpaceChargeInterpolatedProfile_sigma_y)( e ),
-            NS(SpaceChargeInterpolatedProfile_length)( e ),
-            NS(SpaceChargeInterpolatedProfile_x_co)( e ),
-            NS(SpaceChargeInterpolatedProfile_y_co)( e ),
-            ( uintptr_t )NS(SpaceChargeInterpolatedProfile_interpol_data_addr)(
+            NS(SCInterpolatedProfile_number_of_particles)( e ),
+            NS(SCInterpolatedProfile_sigma_x)( e ),
+            NS(SCInterpolatedProfile_sigma_y)( e ),
+            NS(SCInterpolatedProfile_length)( e ),
+            NS(SCInterpolatedProfile_x_co)( e ),
+            NS(SCInterpolatedProfile_y_co)( e ),
+            ( uintptr_t )NS(SCInterpolatedProfile_interpol_data_addr)(
                 e ),
-            NS(SpaceChargeInterpolatedProfile_line_density_prof_fallback)( e ),
-            NS(SpaceChargeInterpolatedProfile_min_sigma_diff)( e ),
+            NS(SCInterpolatedProfile_line_density_prof_fallback)( e ),
+            NS(SCInterpolatedProfile_min_sigma_diff)( e ),
             ( unsigned long )e->enabled );
 }
 

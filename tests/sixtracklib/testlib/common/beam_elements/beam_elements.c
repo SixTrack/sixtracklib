@@ -91,26 +91,26 @@ void NS(BeamElement_print)(
 
             case NS(OBJECT_TYPE_SC_COASTING):
             {
-                typedef NS(SpaceChargeCoasting) sc_elem_t;
+                typedef NS(SCCoasting) sc_elem_t;
                 typedef SIXTRL_BE_ARGPTR_DEC sc_elem_t const* ptr_t;
-                NS(SpaceChargeCoasting_print)( fp, ( ptr_t )( uintptr_t )addr );
+                NS(SCCoasting_print)( fp, ( ptr_t )( uintptr_t )addr );
                 break;
             }
 
             case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
-                typedef NS(SpaceChargeQGaussianProfile) sc_elem_t;
+                typedef NS(SCQGaussProfile) sc_elem_t;
                 typedef SIXTRL_BE_ARGPTR_DEC sc_elem_t const* ptr_t;
-                NS(SpaceChargeQGaussianProfile_print)(
+                NS(SCQGaussProfile_print)(
                     fp, ( ptr_t )( uintptr_t )addr );
                 break;
             }
 
             case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
             {
-                typedef NS(SpaceChargeInterpolatedProfile) sc_elem_t;
+                typedef NS(SCInterpolatedProfile) sc_elem_t;
                 typedef SIXTRL_BE_ARGPTR_DEC sc_elem_t const* ptr_t;
-                NS(SpaceChargeInterpolatedProfile_print)(
+                NS(SCInterpolatedProfile_print)(
                     fp, ( ptr_t )( uintptr_t )addr );
                 break;
             }

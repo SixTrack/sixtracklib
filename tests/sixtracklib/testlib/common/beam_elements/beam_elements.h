@@ -168,28 +168,28 @@ SIXTRL_INLINE void NS(BeamElement_print_out)(
 
             case NS(OBJECT_TYPE_SC_COASTING):
             {
-                typedef NS(SpaceChargeCoasting) beam_element_t;
+                typedef NS(SCCoasting) beam_element_t;
                 typedef SIXTRL_DATAPTR_DEC beam_element_t const* ptr_elem_t;
                 ptr_elem_t beam_element = ( ptr_elem_t )( uintptr_t )addr;
-                NS(SpaceChargeCoasting_print_out)( beam_element );
+                NS(SCCoasting_print_out)( beam_element );
                 break;
             }
 
             case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
-                typedef NS(SpaceChargeQGaussianProfile) beam_element_t;
+                typedef NS(SCQGaussProfile) beam_element_t;
                 typedef SIXTRL_DATAPTR_DEC beam_element_t const* ptr_elem_t;
                 ptr_elem_t beam_element = ( ptr_elem_t )( uintptr_t )addr;
-                NS(SpaceChargeQGaussianProfile_print_out)( beam_element );
+                NS(SCQGaussProfile_print_out)( beam_element );
                 break;
             }
 
             case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
             {
-                typedef NS(SpaceChargeInterpolatedProfile) beam_element_t;
+                typedef NS(SCInterpolatedProfile) beam_element_t;
                 typedef SIXTRL_DATAPTR_DEC beam_element_t const* ptr_elem_t;
                 ptr_elem_t beam_element = ( ptr_elem_t )( uintptr_t )addr;
-                NS(SpaceChargeInterpolatedProfile_print_out)( beam_element );
+                NS(SCInterpolatedProfile_print_out)( beam_element );
                 break;
             }
 
@@ -401,10 +401,10 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
 
                     case NS(OBJECT_TYPE_SC_COASTING):
                     {
-                        typedef NS(SpaceChargeCoasting) belem_t;
+                        typedef NS(SCCoasting) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeCoasting_compare_values)(
+                        compare_value = NS(SCCoasting_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -413,10 +413,10 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
 
                     case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
                     {
-                        typedef NS(SpaceChargeQGaussianProfile) belem_t;
+                        typedef NS(SCQGaussProfile) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeQGaussianProfile_compare_values)(
+                        compare_value = NS(SCQGaussProfile_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -425,10 +425,10 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects)(
 
                     case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
                     {
-                        typedef NS(SpaceChargeInterpolatedProfile) belem_t;
+                        typedef NS(SCInterpolatedProfile) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeInterpolatedProfile_compare_values)(
+                        compare_value = NS(SCInterpolatedProfile_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -644,10 +644,10 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                     case NS(OBJECT_TYPE_SC_COASTING):
                     {
-                        typedef NS(SpaceChargeCoasting) belem_t;
+                        typedef NS(SCCoasting) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeCoasting_compare_values)(
+                        compare_value = NS(SCCoasting_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
@@ -656,10 +656,10 @@ SIXTRL_INLINE int NS(BeamElements_compare_objects_with_treshold)(
 
                     case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
                     {
-                        typedef NS(SpaceChargeQGaussianProfile) belem_t;
+                        typedef NS(SCQGaussProfile) belem_t;
                         typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_belem_t;
 
-                        compare_value = NS(SpaceChargeQGaussianProfile_compare_values)(
+                        compare_value = NS(SCQGaussProfile_compare_values)(
                             ( ptr_belem_t )( uintptr_t )lhs_addr,
                             ( ptr_belem_t )( uintptr_t )rhs_addr );
 
