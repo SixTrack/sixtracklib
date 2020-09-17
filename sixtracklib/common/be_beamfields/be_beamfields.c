@@ -1558,47 +1558,47 @@ NS(LineDensityProfileData_add_copy)(
 }
 
 /* ************************************************************************* */
-/* NS(SpaceChargeInterpolatedProfile): */
+/* NS(SCInterpolatedProfile): */
 
-NS(object_type_id_t) NS(SpaceChargeInterpolatedProfile_type_id_ext)(
+NS(object_type_id_t) NS(SCInterpolatedProfile_type_id_ext)(
     void ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeInterpolatedProfile_type_id)();
+    return NS(SCInterpolatedProfile_type_id)();
 }
 
 NS(buffer_size_t)
-NS(SpaceChargeInterpolatedProfile_interpol_data_addr_offset_ext)(
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+NS(SCInterpolatedProfile_interpol_data_addr_offset_ext)(
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeInterpolatedProfile_interpol_data_addr_offset)(
+    return NS(SCInterpolatedProfile_interpol_data_addr_offset)(
         sc_elem );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile) const*
-NS(SpaceChargeInterpolatedProfile_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
+SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile) const*
+NS(SCInterpolatedProfile_const_from_buffer)( SIXTRL_BUFFER_ARGPTR_DEC
         const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeInterpolatedProfile_const_from_obj_index)(
+    return NS(SCInterpolatedProfile_const_from_obj_index)(
         NS(Buffer_get_const_object)( buffer, index ) );
 }
 
 SIXTRL_BE_ARGPTR_DEC
-NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_from_buffer)(
+NS(SCInterpolatedProfile)* NS(SCInterpolatedProfile_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    return NS(SpaceChargeInterpolatedProfile_from_obj_index)(
+    return NS(SCInterpolatedProfile_from_obj_index)(
         NS(Buffer_get_object)( buffer, index ) );
 }
 
-NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_offsets)(
+NS(arch_status_t) NS(SCInterpolatedProfile_attributes_offsets)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
     NS(buffer_size_t) const max_num_offsets, SIXTRL_BUFFER_DATAPTR_DEC const
-        NS(SpaceChargeInterpolatedProfile) *const SIXTRL_RESTRICT data,
+        NS(SCInterpolatedProfile) *const SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
@@ -1620,10 +1620,10 @@ NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_offsets)(
     return status;
 }
 
-NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_sizes)(
+NS(arch_status_t) NS(SCInterpolatedProfile_attributes_sizes)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
     NS(buffer_size_t) const max_num_sizes,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -1646,10 +1646,10 @@ NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_sizes)(
     return status;
 }
 
-NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_counts)(
+NS(arch_status_t) NS(SCInterpolatedProfile_attributes_counts)(
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
     NS(buffer_size_t) const max_num_counts,
-    SIXTRL_BUFFER_DATAPTR_DEC const NS(SpaceChargeInterpolatedProfile)
+    SIXTRL_BUFFER_DATAPTR_DEC const NS(SCInterpolatedProfile)
         *const SIXTRL_RESTRICT data,
     NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
 {
@@ -1674,7 +1674,7 @@ NS(arch_status_t) NS(SpaceChargeInterpolatedProfile_attributes_counts)(
 
 /* ------------------------------------------------------------------------- */
 
-bool NS(SpaceChargeInterpolatedProfile_can_be_added)(
+bool NS(SCInterpolatedProfile_can_be_added)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
@@ -1685,47 +1685,47 @@ bool NS(SpaceChargeInterpolatedProfile_can_be_added)(
     bool can_be_added = false;
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
-    NS(SpaceChargeInterpolatedProfile) sc_elem;
-    NS(SpaceChargeInterpolatedProfile_preset)( &sc_elem );
+    NS(SCInterpolatedProfile) sc_elem;
+    NS(SCInterpolatedProfile_preset)( &sc_elem );
 
-    num_dataptrs = NS(SpaceChargeInterpolatedProfile_num_dataptrs)( &sc_elem );
+    num_dataptrs = NS(SCInterpolatedProfile_num_dataptrs)( &sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
     can_be_added = NS(Buffer_can_add_object)( buffer, sizeof(
-        NS(SpaceChargeInterpolatedProfile) ), num_dataptrs, SIXTRL_NULLPTR,
+        NS(SCInterpolatedProfile) ), num_dataptrs, SIXTRL_NULLPTR,
             SIXTRL_NULLPTR, ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
 
     return can_be_added;
 }
 
 SIXTRL_BE_ARGPTR_DEC
-NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_new)(
+NS(SCInterpolatedProfile)* NS(SCInterpolatedProfile_new)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-    NS(SpaceChargeInterpolatedProfile) sc_elem;
-    NS(SpaceChargeInterpolatedProfile_preset)( &sc_elem );
+    NS(SCInterpolatedProfile) sc_elem;
+    NS(SCInterpolatedProfile_preset)( &sc_elem );
 
-    num_dataptrs = NS(SpaceChargeInterpolatedProfile_num_dataptrs)(
+    num_dataptrs = NS(SCInterpolatedProfile_num_dataptrs)(
         &sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
             &sc_elem, sizeof( sc_elem ),
-                NS(SpaceChargeInterpolatedProfile_type_id)(), num_dataptrs,
+                NS(SCInterpolatedProfile_type_id)(), num_dataptrs,
                     SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
 }
 
 SIXTRL_BE_ARGPTR_DEC
-NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add)(
+NS(SCInterpolatedProfile)* NS(SCInterpolatedProfile_add)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
     SIXTRL_REAL_T const number_of_particles,
     SIXTRL_REAL_T const sigma_x, SIXTRL_REAL_T const sigma_y,
@@ -1736,61 +1736,61 @@ NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add)(
     SIXTRL_REAL_T const min_sigma_diff, bool const enabled )
 {
     typedef NS(buffer_size_t) buf_size_t;
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     buf_size_t num_dataptrs = ( buf_size_t )0u;
 
-    NS(SpaceChargeInterpolatedProfile) sc_elem;
-    NS(SpaceChargeInterpolatedProfile_preset)( &sc_elem );
-    NS(SpaceChargeInterpolatedProfile_set_number_of_particles)(
+    NS(SCInterpolatedProfile) sc_elem;
+    NS(SCInterpolatedProfile_preset)( &sc_elem );
+    NS(SCInterpolatedProfile_set_number_of_particles)(
         &sc_elem, number_of_particles );
 
-    NS(SpaceChargeInterpolatedProfile_set_sigma_x)( &sc_elem, sigma_x );
-    NS(SpaceChargeInterpolatedProfile_set_sigma_y)( &sc_elem, sigma_y );
-    NS(SpaceChargeInterpolatedProfile_set_length)( &sc_elem, length );
-    NS(SpaceChargeInterpolatedProfile_set_x_co)( &sc_elem, x_co );
-    NS(SpaceChargeInterpolatedProfile_set_y_co)( &sc_elem, y_co );
-    NS(SpaceChargeInterpolatedProfile_set_enabled)( &sc_elem, enabled );
+    NS(SCInterpolatedProfile_set_sigma_x)( &sc_elem, sigma_x );
+    NS(SCInterpolatedProfile_set_sigma_y)( &sc_elem, sigma_y );
+    NS(SCInterpolatedProfile_set_length)( &sc_elem, length );
+    NS(SCInterpolatedProfile_set_x_co)( &sc_elem, x_co );
+    NS(SCInterpolatedProfile_set_y_co)( &sc_elem, y_co );
+    NS(SCInterpolatedProfile_set_enabled)( &sc_elem, enabled );
 
-    NS(SpaceChargeInterpolatedProfile_set_interpol_data_addr)(
+    NS(SCInterpolatedProfile_set_interpol_data_addr)(
         &sc_elem, interpol_data_addr );
 
-    NS(SpaceChargeInterpolatedProfile_set_line_density_prof_fallback)(
+    NS(SCInterpolatedProfile_set_line_density_prof_fallback)(
         &sc_elem, line_density_prof_fallback );
 
-    NS(SpaceChargeInterpolatedProfile_set_min_sigma_diff)(
+    NS(SCInterpolatedProfile_set_min_sigma_diff)(
         &sc_elem, min_sigma_diff );
 
-    num_dataptrs = NS(SpaceChargeInterpolatedProfile_num_dataptrs)( &sc_elem );
+    num_dataptrs = NS(SCInterpolatedProfile_num_dataptrs)( &sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-        &sc_elem, sizeof( sc_elem ), NS(SpaceChargeInterpolatedProfile_type_id)(),
+        &sc_elem, sizeof( sc_elem ), NS(SCInterpolatedProfile_type_id)(),
             num_dataptrs, SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
 }
 
 SIXTRL_BE_ARGPTR_DEC
-NS(SpaceChargeInterpolatedProfile)* NS(SpaceChargeInterpolatedProfile_add_copy)(
+NS(SCInterpolatedProfile)* NS(SCInterpolatedProfile_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC const NS(SpaceChargeInterpolatedProfile) *const
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
         SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
     typedef NS(buffer_size_t) buf_size_t;
-    SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         added_elem = SIXTRL_NULLPTR;
 
     buf_size_t num_dataptrs =
-        NS(SpaceChargeInterpolatedProfile_num_dataptrs)( sc_elem );
+        NS(SCInterpolatedProfile_num_dataptrs)( sc_elem );
     SIXTRL_ASSERT( num_dataptrs == ( buf_size_t )0u );
 
-    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SpaceChargeInterpolatedProfile)*
+    added_elem = ( SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)*
         )( uintptr_t )NS(Object_get_begin_addr)( NS(Buffer_add_object)( buffer,
-        sc_elem, sizeof( NS(SpaceChargeInterpolatedProfile) ),
-            NS(SpaceChargeInterpolatedProfile_type_id)(), num_dataptrs,
+        sc_elem, sizeof( NS(SCInterpolatedProfile) ),
+            NS(SCInterpolatedProfile_type_id)(), num_dataptrs,
                 SIXTRL_NULLPTR, SIXTRL_NULLPTR, SIXTRL_NULLPTR ) );
 
     return added_elem;
