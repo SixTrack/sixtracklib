@@ -516,7 +516,7 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
                 ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
-            typedef NS(SpaceChargeCoasting)   belem_t;
+            typedef NS(SCCoasting)   belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
@@ -542,7 +542,7 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
             #if !defined( SIXTRL_TRACK_SPACECHARGE ) || \
                 ( SIXTRL_TRACK_SPACECHARGE == SIXTRL_TRACK_MAP_ENABLED )
 
-            typedef NS(SpaceChargeQGaussianProfile) belem_t;
+            typedef NS(SCQGaussProfile) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
@@ -553,7 +553,7 @@ NS(Track_particle_beam_element_obj_dispatcher_aperture_check)(
 
         case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
         {
-            typedef NS(SpaceChargeInterpolatedProfile) belem_t;
+            typedef NS(SCInterpolatedProfile) belem_t;
             typedef SIXTRL_BE_ARGPTR_DEC belem_t const* ptr_to_belem_t;
             ptr_to_belem_t belem = ( ptr_to_belem_t )( uintptr_t )begin_addr;
 
