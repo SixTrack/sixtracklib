@@ -191,7 +191,7 @@ NS(output_buffer_flag_t) NS(OutputBuffer_required_for_tracking_detailed)(
                         ( ptr_monitor_t )( uintptr_t )addr;
 
                     if( ( be_monitor != SIXTRL_NULLPTR ) &&
-                        ( NS(BeamMonitor_get_num_stores)( be_monitor ) > 0 ) )
+                        ( NS(BeamMonitor_num_stores)( be_monitor ) > 0 ) )
                     {
                         flags |= NS(OUTPUT_BUFFER_BEAM_MONITORS);
                         break;

@@ -42,7 +42,7 @@ TEST( C99_OpenCL_ClArgumentUpdateRegionTest, BasicUsage )
     for( size_t ii = size_t{ 0 } ; ii < num_beam_elements ; ++ii )
     {
         cavity_t const* ptr_cavity =
-            ::NS(BeamElements_buffer_get_const_cavity)( lattice, ii );
+            ::NS(Cavity_const_from_buffer)( lattice, ii );
 
         if( ptr_cavity != nullptr )
         {
@@ -85,7 +85,7 @@ TEST( C99_OpenCL_ClArgumentUpdateRegionTest, BasicUsage )
         {
             size_t const idx = cavity_indices[ ii ];
             cavity_t const* ptr_orig_cavity =
-                ::NS(BeamElements_buffer_get_const_cavity)( lattice, idx );
+                ::NS(Cavity_const_from_buffer)( lattice, idx );
             ASSERT_TRUE( ptr_orig_cavity != nullptr );
 
             cavity_t* ptr_cavity = &cavities[ ii ];
@@ -115,7 +115,7 @@ TEST( C99_OpenCL_ClArgumentUpdateRegionTest, BasicUsage )
         {
             size_t const idx = cavity_indices[ ii ];
             cavity_t const* ptr_orig_cavity =
-                NS(BeamElements_buffer_get_const_cavity)( lattice, idx );
+                NS(Cavity_const_from_buffer)( lattice, idx );
             ASSERT_TRUE( ptr_orig_cavity != nullptr );
 
             cavity_t* ptr_cavity = &cavities[ ii ];
@@ -149,7 +149,7 @@ TEST( C99_OpenCL_ClArgumentUpdateRegionTest, BasicUsage )
         {
             size_t const idx = cavity_indices[ ii ];
             cavity_t const* ptr_orig_cavity =
-                ::NS(BeamElements_buffer_get_const_cavity)( lattice, idx );
+                ::NS(Cavity_const_from_buffer)( lattice, idx );
             ASSERT_TRUE( ptr_orig_cavity != nullptr );
 
             cavity_t* ptr_cavity = &cavities[ ii ];

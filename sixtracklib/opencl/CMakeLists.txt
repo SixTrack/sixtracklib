@@ -5,6 +5,12 @@ message( STATUS "---- processing sixtracklib/opencl/CMakeLists.txt" )
 
 set( C99_HEADERS_INSTALL_PATH "include/sixtracklib/opencl" )
 set( CXX_HEADERS_INSTALL_PATH ${C99_HEADERS_INSTALL_PATH}  )
+set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS "" )
+
+if( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS )
+    set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS
+         "${SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS}" )
+endif()
 
 set( CL_H_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/cl.h.template" )
 set( CL_H_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cl.h" )
@@ -53,17 +59,15 @@ set( SIXTRACKLIB_OPENCL_KERNEL_SOURCES
      kernels/track_particles_optimized_priv_particles_debug.cl
      kernels/be_monitors_assign_out_buffer.cl
      kernels/be_monitors_assign_out_buffer_debug.cl
+     kernels/assign_address_item.cl
 )
 
 add_library( sixtrack_opencl OBJECT
-             ${SIXTRACKLIB_OPENCL_HEADERS}
-             ${SIXTRACKLIB_OPENCL_SOURCES}
-)
+    ${SIXTRACKLIB_OPENCL_HEADERS} ${SIXTRACKLIB_OPENCL_SOURCES} )
 
 target_include_directories( sixtrack_opencl
     PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}>
-)
+    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
 
 set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE C
     POSITION_INDEPENDENT_CODE True CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON )
@@ -72,7 +76,8 @@ target_compile_definitions( sixtrack_opencl PUBLIC
         ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
 
 target_compile_options( sixtrack_opencl BEFORE PUBLIC
-        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS} )
+        ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS}
+        ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_opencl as a module for sixtracklib:

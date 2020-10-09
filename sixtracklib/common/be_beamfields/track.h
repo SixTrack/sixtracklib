@@ -5,6 +5,9 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/track/definitions.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
+    #include "sixtracklib/common/internal/math_constants.h"
+    #include "sixtracklib/common/internal/math_functions.h"
+    #include "sixtracklib/common/internal/physics_constants.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/particles.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -14,35 +17,45 @@ extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
 struct NS(BeamBeam4D);
-struct NS(SpaceChargeCoasting);
-struct NS(SpaceChargeBunched);
+struct NS(SCCoasting);
+struct NS(SCQGaussProfile);
+struct NS(SCInterpolatedProfile);
 struct NS(BeamBeam6D);
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_beam_beam_4d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam4D) *const SIXTRL_RESTRICT bb );
-
-SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
-NS(Track_particle_space_charge_coasting)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeCoasting) *const
-        SIXTRL_RESTRICT sc );
-
-SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
-NS(Track_particle_space_charge_bunched)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(SpaceChargeBunched) *const
-        SIXTRL_RESTRICT sc );
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
 NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t)  const particle_index,
+    NS(particle_num_elements_t)  const ii,
     SIXTRL_BE_ARGPTR_DEC const struct NS(BeamBeam6D) *const SIXTRL_RESTRICT bb );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_space_charge_coasting)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCCoasting) *const
+        SIXTRL_RESTRICT sc_elem )  SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_space_charge_qgaussian_profile)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCQGaussProfile) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
+NS(Track_particle_space_charge_interpolated_profile)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const struct NS(SCInterpolatedProfile) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT;
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -63,6 +76,7 @@ NS(Track_particle_beam_beam_6d)(
     #include "sixtracklib/common/constants.h"
     #include "sixtracklib/common/particles.h"
     #include "sixtracklib/common/be_beamfields/be_beamfields.h"
+    #include "sixtracklib/common/internal/math_qgauss.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -73,14 +87,14 @@ extern "C" {
 /* BeamBeam4D: */
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_4d)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT p,
+    NS(particle_num_elements_t) const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam4D) *const SIXTRL_RESTRICT bb )
 {
     typedef SIXTRL_REAL_T real_t;
     typedef SIXTRL_BE_DATAPTR_DEC NS(BB4D_data)* data_ptr_t;
 
-    data_ptr_t bb4ddata = ( data_ptr_t )NS(BeamBeam4D_get_const_data)( bb );
+    data_ptr_t bb4ddata = ( data_ptr_t )NS(BeamBeam4D_const_data)( bb );
 
     /*
     // Test data transfer
@@ -96,25 +110,25 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_4d)(
     printf("4D: Dpy_sub = %e\n",bb4ddata->Dpy_sub);
     printf("4D: enabled = %ld\n",bb4ddata->enabled); */
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
+    SIXTRL_ASSERT( NS(Particles_get_state_value)( p, ii )
+        == ( NS(particle_num_elements_t) )1 );
 
     if (bb4ddata->enabled > 0.) {
 
-        real_t px = NS(Particles_get_px_value)( particles, particle_index );
-        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+        real_t px = NS(Particles_get_px_value)( p, ii );
+        real_t py = NS(Particles_get_py_value)( p, ii );
 
         real_t qratio = 1.;// To be generalized for multi-ion!
-        real_t charge = qratio*NS(Particles_get_q0_value)( particles, particle_index )*SIXTRL_QELEM;
+        real_t charge = qratio*NS(Particles_get_q0_value)( p, ii )*SIXTRL_QELEM;
 
-        real_t x = NS(Particles_get_x_value)( particles, particle_index ) - bb4ddata->Delta_x;
-        real_t y = NS(Particles_get_y_value)( particles, particle_index ) - bb4ddata->Delta_y;
+        real_t x = NS(Particles_get_x_value)( p, ii ) - bb4ddata->Delta_x;
+        real_t y = NS(Particles_get_y_value)( p, ii ) - bb4ddata->Delta_y;
 
-        real_t chi = NS(Particles_get_chi_value)( particles, particle_index );
+        real_t chi = NS(Particles_get_chi_value)( p, ii );
 
-        real_t beta = NS(Particles_get_beta0_value)( particles, particle_index ) \
-                        /NS(Particles_get_rvv_value)( particles, particle_index );
-        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )*SIXTRL_QELEM;
+        real_t beta = NS(Particles_get_beta0_value)( p, ii ) \
+                        /NS(Particles_get_rvv_value)( p, ii );
+        real_t p0c = NS(Particles_get_p0c_value)( p, ii )*SIXTRL_QELEM;
 
         real_t Ex, Ey, Gx, Gy;
         NS(get_Ex_Ey_Gx_Gy_gauss)(x, y, bb4ddata->sigma_x, bb4ddata->sigma_y,
@@ -127,152 +141,199 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_4d)(
         px += (fact_kick*Ex - bb4ddata->Dpx_sub);
         py += (fact_kick*Ey - bb4ddata->Dpy_sub);
 
-        NS(Particles_set_px_value)( particles, particle_index, px );
-        NS(Particles_set_py_value)( particles, particle_index, py );
+        NS(Particles_set_px_value)( p, ii, px );
+        NS(Particles_set_py_value)( p, ii, py );
     }
 
     return SIXTRL_TRACK_SUCCESS;
 }
 
 /* ************************************************************************* */
-/* SpaceChargeCoasting: */
+/* NS(SCCoasting): */
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_coasting)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeCoasting) *const SIXTRL_RESTRICT sc )
+    NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCCoasting) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
-     typedef SIXTRL_REAL_T real_t;
-     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeCoasting_data)* data_ptr_t;
+    typedef SIXTRL_REAL_T real_t;
 
+    SIXTRL_ARGPTR_DEC real_t Ex;
+    SIXTRL_ARGPTR_DEC real_t Ey;
+    SIXTRL_ARGPTR_DEC real_t Gx;
+    SIXTRL_ARGPTR_DEC real_t Gy;
 
-    data_ptr_t scdata = ( data_ptr_t )NS(SpaceChargeCoasting_get_const_data)( sc );
+    real_t const charge = NS(PhysConst_charge0_si)() *
+        NS(Particles_get_q0_value)( particles, ii );
 
-    /*
-    // Test data transfer
-    printf("SCC: line_density = %e\n",scdata->line_density);
-    printf("SCC: sigma_x = %e\n",scdata->sigma_x);
-    printf("SCC: sigma_y = %e\n",scdata->sigma_y);
-    printf("SCC: length = %e\n",scdata->length);
-    printf("SCC: x_co = %e\n",scdata->x_co);
-    printf("SCC: y_co = %e\n",scdata->y_co);
-    printf("SCC: min_sigma_diff = %e\n",scdata->min_sigma_diff);
-    printf("SCC: enabled = %e\n",scdata->enabled);
-    */
+    real_t const beta0 = NS(Particles_get_beta0_value)( particles, ii );
+    real_t const pc0   = NS(Particles_get_p0c_value)( particles, ii ) *
+                         NS(PhysConst_charge0_si)();
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
+    real_t fact_kick =
+        NS(SCCoasting_number_of_particles)( sc_elem ) *
+        NS(SCCoasting_length)( sc_elem ) *
+        NS(Particles_get_chi_value)( particles, ii ) *
+        NS(Particles_get_charge_ratio_value)( particles, ii ) *
+        charge * charge * ( ( real_t )1 - beta0 * beta0 );
 
-    if (scdata->enabled > 0.) {
+    fact_kick /= NS(SCCoasting_circumference)( sc_elem ) *
+                 pc0 * beta0 * NS(Particles_get_rvv_value)( particles, ii );
 
-        real_t px = NS(Particles_get_px_value)( particles, particle_index );
-        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+    NS(get_Ex_Ey_Gx_Gy_gauss)(
+        NS(Particles_get_x_value)( particles, ii ) -
+            NS(SCCoasting_x_co)( sc_elem ),
+        NS(Particles_get_y_value)( particles, ii ) -
+            NS(SCCoasting_y_co)( sc_elem ),
+        NS(SCCoasting_sigma_x)( sc_elem ),
+        NS(SCCoasting_sigma_y)( sc_elem ),
+        NS(SCCoasting_min_sigma_diff)( sc_elem ),
+        ( int )1, &Ex, &Ey, &Gx, &Gy );
 
-        real_t qratio = 1.;// To be generalized for multi-ion!
-        real_t charge =
-	   qratio*NS(Particles_get_q0_value)( particles, particle_index )*SIXTRL_QELEM;
+    NS(Particles_add_to_px_value)( particles, ii, fact_kick * Ex );
+    NS(Particles_add_to_py_value)( particles, ii, fact_kick * Ey );
 
-        real_t x = NS(Particles_get_x_value)( particles, particle_index )
-	       	- scdata->x_co;
-        real_t y = NS(Particles_get_y_value)( particles, particle_index )
-		- scdata->y_co;
-
-	real_t chi = NS(Particles_get_chi_value)( particles, particle_index );
-
-        real_t beta0 = NS(Particles_get_beta0_value)( particles, particle_index );
-        real_t beta = beta0 / NS(Particles_get_rvv_value)( particles, particle_index );
-        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )
-		*SIXTRL_QELEM;
-
-        real_t Ex, Ey, Gx, Gy;
-        NS(get_Ex_Ey_Gx_Gy_gauss)(x, y, scdata->sigma_x, scdata->sigma_y,
-                scdata->min_sigma_diff, 1,
-                &Ex, &Ey, &Gx, &Gy);
-
-	real_t fact_kick = chi * charge * charge * (1. - beta0 * beta) / (p0c * beta)
-		* scdata->line_density * scdata->length;
-        px += (fact_kick*Ex);
-        py += (fact_kick*Ey);
-
-        NS(Particles_set_px_value)( particles, particle_index, px );
-        NS(Particles_set_py_value)( particles, particle_index, py );
-    }
-
-    return SIXTRL_TRACK_SUCCESS;
-
+    return ( NS(track_status_t) )SIXTRL_TRACK_SUCCESS;
 }
 
 /* ************************************************************************* */
-/* SpaceChargeBunched: */
+/* NS(SCQGaussProfile) */
 
-SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_bunched)(
-    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const NS(SpaceChargeBunched) *const SIXTRL_RESTRICT sc )
+SIXTRL_INLINE NS(track_status_t)
+NS(Track_particle_space_charge_qgaussian_profile)( SIXTRL_PARTICLE_ARGPTR_DEC
+        NS(Particles)* SIXTRL_RESTRICT p, NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCQGaussProfile) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
 {
-     typedef SIXTRL_REAL_T real_t;
-     typedef SIXTRL_BE_DATAPTR_DEC NS(SpaceChargeBunched_data)* data_ptr_t;
+    typedef SIXTRL_REAL_T real_t;
 
+    SIXTRL_ARGPTR_DEC real_t Ex;
+    SIXTRL_ARGPTR_DEC real_t Ey;
+    SIXTRL_ARGPTR_DEC real_t Gx;
+    SIXTRL_ARGPTR_DEC real_t Gy;
 
-    data_ptr_t scdata = ( data_ptr_t )NS(SpaceChargeBunched_get_const_data)( sc );
+    real_t const charge = NS(PhysConst_charge0_si)() *
+        NS(Particles_get_q0_value)( p, ii );
 
-    /*
-    // Test data transfer
-    printf("SCB: number_of_particles = %e\n",scdata->number_of_particles);
-    printf("SCB: bunchlength_rms = %e\n",scdata->bunchlength_rms);
-    printf("SCB: sigma_x = %e\n",scdata->sigma_x);
-    printf("SCB: sigma_y = %e\n",scdata->sigma_y);
-    printf("SCB: length = %e\n",scdata->length);
-    printf("SCB: x_co = %e\n",scdata->x_co);
-    printf("SCB: y_co = %e\n",scdata->y_co);
-    printf("SCB: min_sigma_diff = %e\n",scdata->min_sigma_diff);
-    printf("SCB: enabled = %e\n",scdata->enabled);
-    */
+    real_t const beta0 = NS(Particles_get_beta0_value)( p, ii );
+    real_t const beta  = beta0 * NS(Particles_get_rvv_value)( p, ii );
+    real_t const pc0   = NS(Particles_get_p0c_value)( p, ii ) *
+                         NS(PhysConst_charge0_si)();
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
+    real_t const z = NS(Particles_get_zeta_value)( p, ii ) /
+                     NS(Particles_get_rvv_value)( p, ii );
 
-    if (scdata->enabled > 0.) {
+    real_t const bunchlength_rms =
+        NS(SCQGaussProfile_bunchlength_rms)( sc_elem );
 
-        real_t px = NS(Particles_get_px_value)( particles, particle_index );
-        real_t py = NS(Particles_get_py_value)( particles, particle_index );
+    real_t fact_kick =
+        NS(Particles_get_chi_value)( p, ii ) *
+        NS(Particles_get_charge_ratio_value)( p, ii ) *
+        NS(SCQGaussProfile_length)( sc_elem ) *
+        charge * charge * ( ( real_t )1 - beta0 * beta );
 
-        real_t qratio = 1.;// To be generalized for multi-ion!
-        real_t charge =
-	   qratio*NS(Particles_get_q0_value)( particles, particle_index )*SIXTRL_QELEM;
+    SIXTRL_ASSERT( NS(Type_comp_all_more)(
+        NS(Particles_get_rvv_value)( p, ii ), ( real_t )0 ) );
 
-        real_t x = NS(Particles_get_x_value)( particles, particle_index )
-	       	- scdata->x_co;
-        real_t y = NS(Particles_get_y_value)( particles, particle_index )
-		- scdata->y_co;
-        real_t zeta = NS(Particles_get_zeta_value)( particles, particle_index );
+    SIXTRL_ASSERT( NS(Type_comp_all_more)(
+        NS(Particles_get_beta0_value)( p, ii ), ( real_t )0 ) );
 
-	real_t chi = NS(Particles_get_chi_value)( particles, particle_index );
+    SIXTRL_ASSERT( NS(Type_comp_all_less_or_equal)(
+        NS(Particles_get_beta0_value)( p, ii ), ( real_t )1 ) );
 
-        real_t beta0 = NS(Particles_get_beta0_value)( particles, particle_index );
-        real_t beta = beta0 / NS(Particles_get_rvv_value)( particles, particle_index );
-        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index )
-		*SIXTRL_QELEM;
+    fact_kick *=
+        NS(SCQGaussProfile_number_of_particles)( sc_elem );
 
-        real_t Ex, Ey, Gx, Gy;
-        NS(get_Ex_Ey_Gx_Gy_gauss)(x, y, scdata->sigma_x, scdata->sigma_y,
-                scdata->min_sigma_diff, 1,
-                &Ex, &Ey, &Gx, &Gy);
+    fact_kick *= NS(Math_q_gauss)( z,
+        NS(SCQGaussProfile_q_param)( sc_elem ),
+        NS(Math_q_gauss_sqrt_beta_from_gauss_sigma)( bunchlength_rms ),
+        NS(SCQGaussProfile_cq)( sc_elem ) );
 
-	real_t fact_kick = chi * charge * charge * (1. - beta0 * beta) / (p0c * beta)
-		* scdata->length * scdata->number_of_particles
-		/ (scdata -> bunchlength_rms * sqrt(2*SIXTRL_PI))
-		* exp(-0.5*(zeta /scdata->bunchlength_rms)
-				*(zeta /scdata->bunchlength_rms));
-        px += (fact_kick*Ex);
-        py += (fact_kick*Ey);
+    fact_kick /= pc0 * beta;
+    NS(get_Ex_Ey_Gx_Gy_gauss)(
+            NS(Particles_get_x_value)( p, ii ) -
+                NS(SCQGaussProfile_x_co)( sc_elem ),
+            NS(Particles_get_y_value)( p, ii ) -
+                NS(SCQGaussProfile_y_co)( sc_elem ),
+            NS(SCQGaussProfile_sigma_x)( sc_elem ),
+            NS(SCQGaussProfile_sigma_y)( sc_elem ),
+            NS(SCQGaussProfile_min_sigma_diff)( sc_elem ),
+            ( int )1, &Ex, &Ey, &Gx, &Gy );
 
-        NS(Particles_set_px_value)( particles, particle_index, px );
-        NS(Particles_set_py_value)( particles, particle_index, py );
+    NS(Particles_add_to_px_value)( p, ii, fact_kick * Ex );
+    NS(Particles_add_to_py_value)( p, ii, fact_kick * Ey );
+
+    return ( NS(track_status_t) )SIXTRL_TRACK_SUCCESS;
+}
+
+/* ************************************************************************* */
+/* NS(SCInterpolatedProfile) */
+
+SIXTRL_INLINE NS(track_status_t)
+NS(Track_particle_space_charge_interpolated_profile)(
+    SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
+    NS(particle_num_elements_t) const ii,
+    SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile) *const
+        SIXTRL_RESTRICT sc_elem ) SIXTRL_NOEXCEPT
+{
+    typedef SIXTRL_REAL_T real_t;
+
+    SIXTRL_ARGPTR_DEC real_t Ex;
+    SIXTRL_ARGPTR_DEC real_t Ey;
+    SIXTRL_ARGPTR_DEC real_t Gx;
+    SIXTRL_ARGPTR_DEC real_t Gy;
+
+    real_t const charge = NS(PhysConst_charge0_si)() *
+        NS(Particles_get_q0_value)( particles, ii );
+
+    real_t const beta0 = NS(Particles_get_beta0_value)( particles, ii );
+    real_t const beta  = beta0 * NS(Particles_get_rvv_value)( particles, ii );
+    real_t const pc0   = NS(Particles_get_p0c_value)( particles, ii ) *
+                         NS(PhysConst_charge0_si)();
+
+    real_t fact_kick =
+        NS(Particles_get_chi_value)( particles, ii ) *
+        NS(Particles_get_charge_ratio_value)( particles, ii ) *
+        NS(SCInterpolatedProfile_length)( sc_elem ) *
+        NS(SCInterpolatedProfile_number_of_particles)( sc_elem ) *
+        charge * charge * ( ( real_t )1 - beta0 * beta );
+
+    SIXTRL_BUFFER_DATAPTR_DEC NS(LineDensityProfileData) const* interpol =
+        NS(SCInterpolatedProfile_const_line_density_profile_data)(
+            sc_elem );
+
+    if( ( interpol != SIXTRL_NULLPTR ) &&
+        ( NS(LineDensityProfileData_method)( interpol ) !=
+          NS(MATH_INTERPOL_NONE) ) &&
+        ( NS(LineDensityProfileData_num_values)( interpol ) >
+          ( NS(math_abscissa_idx_t) )0 ) )
+    {
+        fact_kick *= NS(LineDensityProfileData_interpolate_value)(
+            interpol, NS(Particles_get_zeta_value)( particles, ii ) );
+    }
+    else
+    {
+        fact_kick *=
+        NS(SCInterpolatedProfile_line_density_prof_fallback)( sc_elem );
     }
 
-    return SIXTRL_TRACK_SUCCESS;
+    fact_kick /= ( pc0 * beta );
 
+    NS(get_Ex_Ey_Gx_Gy_gauss)(
+            NS(Particles_get_x_value)( particles, ii ) -
+                NS(SCInterpolatedProfile_x_co)( sc_elem ),
+            NS(Particles_get_y_value)( particles, ii ) -
+                NS(SCInterpolatedProfile_y_co)( sc_elem ),
+            NS(SCInterpolatedProfile_sigma_x)( sc_elem ),
+            NS(SCInterpolatedProfile_sigma_y)( sc_elem ),
+            NS(SCInterpolatedProfile_min_sigma_diff)( sc_elem ),
+            ( int )1, &Ex, &Ey, &Gx, &Gy );
+
+    NS(Particles_add_to_px_value)( particles, ii, fact_kick * Ex );
+    NS(Particles_add_to_py_value)( particles, ii, fact_kick * Ey );
+
+    return ( NS(track_status_t) )SIXTRL_TRACK_SUCCESS;
 }
 
 /* ************************************************************************* */
@@ -280,7 +341,7 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_space_charge_bunched)(
 
 SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
-    NS(particle_num_elements_t)  const particle_index,
+    NS(particle_num_elements_t)  const ii,
     SIXTRL_BE_ARGPTR_DEC const NS(BeamBeam6D) *const SIXTRL_RESTRICT bb )
 {
     typedef SIXTRL_REAL_T real_t;
@@ -289,10 +350,10 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
     int i_slice;
 
     // Start Gianni's part
-    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_get_const_data)( bb );
+    data_ptr_t bb6ddata = ( data_ptr_t )NS(BeamBeam6D_const_data)( bb );
 
-    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, particle_index )
-        == ( NS(particle_index_t) )1 );
+    SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, ii )
+        == ( NS(particle_num_elements_t) )1 );
 
     if (bb6ddata->enabled > 0.) {
 
@@ -321,15 +382,15 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
         printf("sigma_slices_star[1]=%e\n",sigma_slices_star[1]);
         */
 
-        real_t x = NS(Particles_get_x_value)( particles, particle_index );
-        real_t px = NS(Particles_get_px_value)( particles, particle_index );
-        real_t y = NS(Particles_get_y_value)( particles, particle_index );
-        real_t py = NS(Particles_get_py_value)( particles, particle_index );
-        real_t zeta = NS(Particles_get_zeta_value)( particles, particle_index );
-        real_t delta = NS(Particles_get_delta_value)( particles, particle_index );
+        real_t x = NS(Particles_get_x_value)( particles, ii );
+        real_t px = NS(Particles_get_px_value)( particles, ii );
+        real_t y = NS(Particles_get_y_value)( particles, ii );
+        real_t py = NS(Particles_get_py_value)( particles, ii );
+        real_t zeta = NS(Particles_get_zeta_value)( particles, ii );
+        real_t delta = NS(Particles_get_delta_value)( particles, ii );
 
-        real_t q0 = SIXTRL_QELEM*NS(Particles_get_q0_value)( particles, particle_index );
-        real_t p0c = NS(Particles_get_p0c_value)( particles, particle_index ); // eV
+        real_t q0 = SIXTRL_QELEM*NS(Particles_get_q0_value)( particles, ii );
+        real_t p0c = NS(Particles_get_p0c_value)( particles, ii ); // eV
 
         real_t P0 = p0c/SIXTRL_C_LIGHT*SIXTRL_QELEM;
 
@@ -434,12 +495,12 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
         delta = delta_star + bb6ddata->delta_CO                    - bb6ddata->Ddelta_sub;
 
 
-        NS(Particles_set_x_value)( particles, particle_index, x );
-        NS(Particles_set_px_value)( particles, particle_index, px );
-        NS(Particles_set_y_value)( particles, particle_index, y );
-        NS(Particles_set_py_value)( particles, particle_index, py );
-        NS(Particles_set_zeta_value)( particles, particle_index, zeta );
-        NS(Particles_update_delta_value)( particles, particle_index, delta );
+        NS(Particles_set_x_value)( particles, ii, x );
+        NS(Particles_set_px_value)( particles, ii, px );
+        NS(Particles_set_y_value)( particles, ii, y );
+        NS(Particles_set_py_value)( particles, ii, py );
+        NS(Particles_set_zeta_value)( particles, ii, zeta );
+        NS(Particles_update_delta_value)( particles, ii, delta );
     }
 
     return SIXTRL_TRACK_SUCCESS;
@@ -448,8 +509,4 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_beam_beam_6d)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
-
 #endif /* SIXTRACKLIB_COMMON_BE_BEAMFIELDS_TRACK_BEAMFIELDS_H__ */
-
-/* end: sixtracklib/common/be_beamfields/track.h */

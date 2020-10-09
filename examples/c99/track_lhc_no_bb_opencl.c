@@ -176,6 +176,7 @@ int main( int argc, char* argv[] )
     NS(ClContext_assign_particles_arg)( ctx, particles_arg );
     NS(ClContext_assign_particle_set_arg)( ctx, 0u, NUM_PARTICLES );
     NS(ClContext_assign_beam_elements_arg)( ctx, beam_elements_arg );
+    NS(ClContext_assign_slot_size_arg)( ctx, NS(Buffer_get_slot_size)( pb ) );
 
     NS(ClContext_track_until)( ctx, NUM_TURNS );
 

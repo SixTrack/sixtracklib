@@ -44,11 +44,11 @@ SIXTRL_STATIC void NS( MemPool_set_buffer )(
     SIXTRL_GLOBAL_DEC unsigned char* new_buffer );
 
 SIXTRL_STATIC void NS( MemPool_set_begin_pos )(
-    NS( MemPool )* SIXTRL_RESTRICT SIXTRL_RESTRICT pool,
+    NS( MemPool )* SIXTRL_RESTRICT pool,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT begin_pos );
 
 SIXTRL_STATIC void NS( MemPool_set_begin_offset )(
-    NS( MemPool )* SIXTRL_RESTRICT SIXTRL_RESTRICT pool,
+    NS( MemPool )* SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const begin_offset );
 
 /* ========================================================================= */
@@ -281,7 +281,7 @@ void NS( MemPool_set_buffer )( NS( MemPool ) * SIXTRL_RESTRICT pool,
 /* -------------------------------------------------------------------------- */
 
 void NS( MemPool_set_begin_pos )(
-    NS( MemPool )* SIXTRL_RESTRICT SIXTRL_RESTRICT pool,
+    NS( MemPool )* SIXTRL_RESTRICT pool,
     SIXTRL_GLOBAL_DEC unsigned char* SIXTRL_RESTRICT begin_pos )
 {
     if( pool != 0 ) pool->begin_pos = begin_pos;
@@ -290,8 +290,7 @@ void NS( MemPool_set_begin_pos )(
 
 /* -------------------------------------------------------------------------- */
 
-void NS( MemPool_set_begin_offset )(
-    NS( MemPool )* SIXTRL_RESTRICT SIXTRL_RESTRICT pool,
+void NS( MemPool_set_begin_offset )( NS( MemPool )* SIXTRL_RESTRICT pool,
     SIXTRL_UINT64_T const begin_offset )
 {
     if( pool != 0 ) pool->begin_offset = begin_offset;

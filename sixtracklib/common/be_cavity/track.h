@@ -53,10 +53,10 @@ SIXTRL_INLINE int NS(Track_particle_cavity)(
     real_t         rvv    = NS(Particles_get_rvv_value)(          particles, index );
     real_t const   tau    = zeta / ( beta0 * rvv );
 
-    real_t const   phase  = DEG2RAD  * NS(Cavity_get_lag)( cavity ) -
-                            K_FACTOR * NS(Cavity_get_frequency)( cavity ) * tau;
+    real_t const   phase  = DEG2RAD  * NS(Cavity_lag)( cavity ) -
+                            K_FACTOR * NS(Cavity_frequency)( cavity ) * tau;
 
-    real_t const energy   = q * NS(Cavity_get_voltage)( cavity ) * sin( phase );
+    real_t const energy   = q * NS(Cavity_voltage)( cavity ) * sin( phase );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, index ) ==
                    ( NS(particle_index_t) )1 );

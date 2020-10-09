@@ -15,7 +15,7 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/testlib.h"
 
-TEST( C99_CommonBufferArrayObjectTests, BasicUsage )
+TEST( C99_Common_Buffer_BufferArrayObjectTests, BasicUsage )
 {
     using buffer_t   = ::NS(Buffer)*;
     using buf_size_t = ::NS(buffer_size_t);
@@ -24,7 +24,7 @@ TEST( C99_CommonBufferArrayObjectTests, BasicUsage )
     using object_t   = ::NS(Object);
     using type_id_t  = ::NS(object_type_id_t);
 
-    buffer_t buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
+    buffer_t  buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
 
     buf_size_t const arr1_max_num_elements = buf_size_t{ 10 };
     buf_size_t const arr1_capacity = buf_size_t{ 1 << 12 };
@@ -50,4 +50,4 @@ TEST( C99_CommonBufferArrayObjectTests, BasicUsage )
     buffer = nullptr;
 }
 
-/* end: tests/sixtracklib/common/test_buffer_array_object_c99.cpp */
+/* end: tests/sixtracklib/common/buffer/test_buffer_array_object_c99.cpp */

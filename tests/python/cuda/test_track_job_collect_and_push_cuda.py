@@ -1,7 +1,7 @@
 import sys
 import os
 import numpy as np
-import sixtracklib as pyst
+import sixtracklib as st
 import sixtracklib_test as testlib
 
 from sixtracklib.stcommon import \
@@ -28,7 +28,16 @@ from cobjects import CBuffer
 if __name__ == '__main__':
     EPS = np.finfo(float).eps
 
-    line = pyst.Elements()
+    try:
+        num_nodes = st.CudaController.NUM_AVAILABLE_NODES()
+    except RuntimeError as e:
+        num_nodes = 0
+
+    if num_nodes <= 0:
+        print("No CUDA nodes available -> skip test")
+        sys.exit(0)
+
+    line = st.Elements()
     line.Drift(length=1.0)
     line.Cavity(voltage=100e3, frequency=400e6, lag=0.0)
     line.Drift(length=3.0)
@@ -44,14 +53,14 @@ if __name__ == '__main__':
                      is_turn_ordered=False)
 
     NUM_PARTICLES = 100
-    pb = pyst.ParticlesSet()
+    pb = st.ParticlesSet()
     pb.Particles(num_particles=100)
 
     ptr_pb = st_Buffer_new_mapped_on_cbuffer(pb.cbuffer)
     ptr_particles = st_Particles_cbuffer_get_particles(pb.cbuffer, 0)
     assert ptr_particles != st_NullParticles
 
-    job = pyst.CudaTrackJob(line, pb)
+    job = st.CudaTrackJob(line, pb)
     assert job.arch_str == 'cuda'
     assert job.requires_collecting
     assert job.has_output_buffer
@@ -111,37 +120,37 @@ if __name__ == '__main__':
         assert st_Particles_compare_values(ptr_init_be_mon_output,
                                            ptr_be_mon_output) != 0
 
-    drift1 = line.cbuffer.get_object(0, cls=pyst.Drift)
+    drift1 = line.cbuffer.get_object(0, cls=st.Drift)
     assert abs(drift1.length - 1.0) < EPS
     drift1.length *= 0.5
 
-    cavity2 = line.cbuffer.get_object(1, cls=pyst.Cavity)
+    cavity2 = line.cbuffer.get_object(1, cls=st.Cavity)
     assert abs(cavity2.voltage - 100e3) < EPS
     assert abs(cavity2.frequency - 400e6) < EPS
     assert abs(cavity2.lag - 0.0) < EPS
     cavity2.voltage *= 1.10
     cavity2.lag = 2.0
 
-    drift3 = line.cbuffer.get_object(2, cls=pyst.Drift)
+    drift3 = line.cbuffer.get_object(2, cls=st.Drift)
     assert abs(drift3.length - 3.0) < EPS
     drift3.length = 0.0
 
-    limit4 = line.cbuffer.get_object(3, cls=pyst.LimitRect)
+    limit4 = line.cbuffer.get_object(3, cls=st.LimitRect)
     assert abs(limit4.min_x + 1.0) < EPS
     assert abs(limit4.max_x - 1.0) < EPS
     limit4.min_x = -2.0
     limit4.max_x = 0.0
 
-    bemon6 = line.cbuffer.get_object(5, cls=pyst.BeamMonitor)
+    bemon6 = line.cbuffer.get_object(5, cls=st.BeamMonitor)
     assert bemon6.out_address != 42
     bemon6.out_address = 42
 
-    limit8 = line.cbuffer.get_object(7, cls=pyst.LimitEllipse)
+    limit8 = line.cbuffer.get_object(7, cls=st.LimitEllipse)
     assert abs(limit8.a_squ - 0.5 * 0.5) < EPS
     assert abs(limit8.b_squ - 0.35 * 0.35) < EPS
     limit8.set_half_axes(1.0, 1.0)
 
-    bemon9 = line.cbuffer.get_object(8, cls=pyst.BeamMonitor)
+    bemon9 = line.cbuffer.get_object(8, cls=st.BeamMonitor)
     assert bemon9.out_address != 137
     bemon9.out_address = 137
 
@@ -179,25 +188,25 @@ if __name__ == '__main__':
     assert st_Particles_compare_values(ptr_particles, ptr_saved_particles) != 0
     assert st_Particles_compare_values(ptr_particles, ptr_init_particles) == 0
 
-    line.cbuffer.get_object(0, cls=pyst.Drift).length = 1.0
+    line.cbuffer.get_object(0, cls=st.Drift).length = 1.0
 
-    cavity2 = line.cbuffer.get_object(1, cls=pyst.Cavity)
+    cavity2 = line.cbuffer.get_object(1, cls=st.Cavity)
     cavity2_saved_voltage = cavity2.voltage
     cavity2.voltage /= 1.10
     cavity2.lag = 0.0
 
-    line.cbuffer.get_object(2, cls=pyst.Drift).length = 3.0
+    line.cbuffer.get_object(2, cls=st.Drift).length = 3.0
 
-    limit4 = line.cbuffer.get_object(3, cls=pyst.LimitRect)
+    limit4 = line.cbuffer.get_object(3, cls=st.LimitRect)
     limit4.min_x = -1.0
     limit4.max_x = 1.0
 
-    line.cbuffer.get_object(5, cls=pyst.BeamMonitor).out_address = 0
+    line.cbuffer.get_object(5, cls=st.BeamMonitor).out_address = 0
 
     line.cbuffer.get_object(
-        7, cls=pyst.LimitEllipse).set_half_axes(0.5, 0.35)
+        7, cls=st.LimitEllipse).set_half_axes(0.5, 0.35)
 
-    line.cbuffer.get_object(8, cls=pyst.BeamMonitor).out_address = 0
+    line.cbuffer.get_object(8, cls=st.BeamMonitor).out_address = 0
 
     for ii in range(0, job.num_beam_monitors):
         ptr_be_mon_output = st_Particles_cbuffer_get_particles(
@@ -231,29 +240,29 @@ if __name__ == '__main__':
 
     job.collect_beam_elements()
 
-    drift1 = line.cbuffer.get_object(0, cls=pyst.Drift)
+    drift1 = line.cbuffer.get_object(0, cls=st.Drift)
     assert abs(drift1.length - 0.5) < EPS
 
-    cavity2 = line.cbuffer.get_object(1, cls=pyst.Cavity)
+    cavity2 = line.cbuffer.get_object(1, cls=st.Cavity)
     assert abs(cavity2.voltage - cavity2_saved_voltage) < EPS
     assert abs(cavity2.frequency - 400e6) < EPS
     assert abs(cavity2.lag - 2.0) < EPS
 
-    drift3 = line.cbuffer.get_object(2, cls=pyst.Drift)
+    drift3 = line.cbuffer.get_object(2, cls=st.Drift)
     assert abs(drift3.length) < EPS
 
-    limit4 = line.cbuffer.get_object(3, cls=pyst.LimitRect)
+    limit4 = line.cbuffer.get_object(3, cls=st.LimitRect)
     assert abs(limit4.min_x + 2.0) < EPS
     assert abs(limit4.max_x) < EPS
 
-    bemon6 = line.cbuffer.get_object(5, cls=pyst.BeamMonitor)
+    bemon6 = line.cbuffer.get_object(5, cls=st.BeamMonitor)
     assert bemon6.out_address == 42
 
-    limit8 = line.cbuffer.get_object(7, cls=pyst.LimitEllipse)
+    limit8 = line.cbuffer.get_object(7, cls=st.LimitEllipse)
     assert abs(limit8.a_squ - 1.0) < EPS
     assert abs(limit8.b_squ - 1.0) < EPS
 
-    bemon9 = line.cbuffer.get_object(8, cls=pyst.BeamMonitor)
+    bemon9 = line.cbuffer.get_object(8, cls=st.BeamMonitor)
     assert bemon9.out_address == 137
 
     job.collect_output()

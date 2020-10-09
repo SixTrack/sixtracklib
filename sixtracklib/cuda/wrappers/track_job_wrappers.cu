@@ -17,6 +17,7 @@
 #include "sixtracklib/cuda/kernels/extract_particles_addr.cuh"
 #include "sixtracklib/cuda/kernels/be_monitors_assign_out_buffer.cuh"
 #include "sixtracklib/cuda/kernels/elem_by_elem_assign_out_buffer.cuh"
+#include "sixtracklib/cuda/kernels/assign_address_item.cuh"
 #include "sixtracklib/cuda/kernels/track_particles.cuh"
 
 void NS(Track_particles_until_turn_cuda_wrapper)(
@@ -93,7 +94,8 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
     NS(CudaArgument)* SIXTRL_RESTRICT particles_arg,
     NS(buffer_size_t) const pset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT beam_elem_arg,
-    NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
+    NS(CudaArgument)* SIXTRL_RESTRICT config_buffer_arg,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(buffer_size_t) const until_turn_elem_by_elem,
     NS(CudaArgument)* SIXTRL_RESTRICT dbg_register_arg )
 {
@@ -128,30 +130,30 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
         SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
             beam_elem_arg ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( elem_by_elem_config_arg != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Argument_get_arch_id)( elem_by_elem_config_arg ) ==
+        SIXTRL_ASSERT( config_buffer_arg != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Argument_get_arch_id)( config_buffer_arg ) ==
                    NS(ARCHITECTURE_CUDA) );
 
-        SIXTRL_ASSERT( NS(Argument_uses_raw_argument)(
-            elem_by_elem_config_arg ) );
-
-        SIXTRL_ASSERT( NS(Argument_get_ptr_raw_argument)(
-            elem_by_elem_config_arg ) != SIXTRL_NULLPTR );
-
-        SIXTRL_ASSERT( NS(Argument_get_size)( elem_by_elem_config_arg ) >
-            ( NS(buffer_size_t) )0u );
+        SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( config_buffer_arg ) );
+        SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
+            config_buffer_arg ) != SIXTRL_NULLPTR );
 
         SIXTRL_ASSERT(
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) ==
             NS(Argument_get_cobjects_buffer_slot_size)( beam_elem_arg ) );
+
+        SIXTRL_ASSERT(
+            NS(Argument_get_cobjects_buffer_slot_size)( config_buffer_arg ) ==
+            NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) );
 
         NS(Track_track_elem_by_elem_until_turn_cuda)<<< *ptr_blocks, *ptr_threads >>>(
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 particles_arg ), pset_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 beam_elem_arg ),
-            NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ), until_turn_elem_by_elem,
+            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+                config_buffer_arg ), elem_by_elem_config_index,
+            until_turn_elem_by_elem,
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ) );
     }
     else if( ( ptr_blocks != SIXTRL_NULLPTR ) &&
@@ -165,8 +167,9 @@ void NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
                 particles_arg ), pset_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 beam_elem_arg ),
-            NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ), until_turn_elem_by_elem,
+            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+                config_buffer_arg ), elem_by_elem_config_index,
+            until_turn_elem_by_elem,
             NS(Argument_get_cobjects_buffer_slot_size)( particles_arg ),
             NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
                 dbg_register_arg ) );
@@ -323,7 +326,8 @@ void NS(BeamMonitor_assign_out_buffer_from_offset_cuda_wrapper)(
 
 void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
-    NS(CudaArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg,
+    NS(CudaArgument)* SIXTRL_RESTRICT config_buffer_arg,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(CudaArgument)* SIXTRL_RESTRICT output_arg,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(CudaArgument)* SIXTRL_RESTRICT dbg_register_arg )
@@ -351,18 +355,17 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
         SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
             output_arg ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( elem_by_elem_config_arg != SIXTRL_NULLPTR );
-        SIXTRL_ASSERT( NS(Argument_get_arch_id)( elem_by_elem_config_arg ) ==
+        SIXTRL_ASSERT( config_buffer_arg != SIXTRL_NULLPTR );
+        SIXTRL_ASSERT( NS(Argument_get_arch_id)( config_buffer_arg ) ==
                    NS(ARCHITECTURE_CUDA) );
 
-        SIXTRL_ASSERT( NS(Argument_uses_raw_argument)(
-            elem_by_elem_config_arg ) );
+        SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( config_buffer_arg ) );
+        SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
+            config_buffer_arg ) != SIXTRL_NULLPTR );
 
-        SIXTRL_ASSERT( NS(Argument_get_ptr_raw_argument)(
-            elem_by_elem_config_arg ) != SIXTRL_NULLPTR );
-
-        SIXTRL_ASSERT( NS(Argument_get_size)( elem_by_elem_config_arg ) >
-            ( NS(buffer_size_t) )0u );
+        SIXTRL_ASSERT(
+            NS(Argument_get_cobjects_buffer_slot_size)( config_buffer_arg ) ==
+            NS(Argument_get_cobjects_buffer_slot_size)( output_arg ) );
 
         SIXTRL_ASSERT( out_buffer_offset_index <
             NS(Buffer_get_num_of_objects)(
@@ -373,8 +376,8 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
 
         NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda)<<<
             *ptr_blocks, *ptr_threads >>>(
-            NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ),
+            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+                config_buffer_arg ), elem_by_elem_config_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 output_arg ), out_buffer_offset_index,
             NS(Argument_get_cobjects_buffer_slot_size)( output_arg ) );
@@ -389,14 +392,84 @@ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
     {
         NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)<<<
             *ptr_blocks, *ptr_threads >>>(
-            NS(CudaArgument_get_cuda_arg_buffer_as_elem_by_elem_config_begin)(
-                elem_by_elem_config_arg ),
+            NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+                config_buffer_arg ), elem_by_elem_config_index,
             NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
                 output_arg ), out_buffer_offset_index,
             NS(Argument_get_cobjects_buffer_slot_size)( output_arg ),
             NS(CudaArgument_get_cuda_arg_buffer_as_debugging_register_begin)(
                 dbg_register_arg ) );
     }
+}
+
+void NS(AssignAddressItem_process_managed_buffer_cuda_wrapper)(
+    const NS(CudaKernelConfig) *const SIXTRL_RESTRICT kernel_config,
+    NS(CudaArgument)* SIXTRL_RESTRICT assign_buffer_arg,
+    NS(CudaArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(CudaArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    NS(buffer_size_t) const src_buffer_id )
+{
+    dim3 const* ptr_blocks =
+        NS(CudaKernelConfig_get_ptr_const_blocks)( kernel_config );
+
+    dim3 const* ptr_threads =
+        NS(CudaKernelConfig_get_ptr_const_threads_per_block)( kernel_config );
+
+    NS(buffer_size_t) const assign_slot_size =  NS(Buffer_get_slot_size)(
+        NS(Argument_get_const_cobjects_buffer)( dest_buffer_arg ) );
+
+    NS(buffer_size_t) const dest_slot_size = NS(Buffer_get_slot_size)(
+        NS(Argument_get_const_cobjects_buffer)( dest_buffer_arg ) );
+
+    NS(buffer_size_t) const src_slot_size = NS(Buffer_get_slot_size)(
+        NS(Argument_get_const_cobjects_buffer)( src_buffer_arg ) );
+
+    SIXTRL_ASSERT( ptr_blocks  != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( ptr_threads != SIXTRL_NULLPTR );
+
+    SIXTRL_ASSERT( !NS(KernelConfig_needs_update)( kernel_config ) );
+    SIXTRL_ASSERT( NS(KernelConfig_get_arch_id)( kernel_config ) ==
+        NS(ARCHITECTURE_CUDA) );
+
+    SIXTRL_ASSERT( assign_buffer_arg != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( NS(Argument_get_arch_id)( assign_buffer_arg ) ==
+               NS(ARCHITECTURE_CUDA) );
+
+    SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( assign_buffer_arg ) );
+    SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
+        assign_buffer_arg ) != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( assign_slot_size > ( NS(buffer_size_t) )0 );
+
+    SIXTRL_ASSERT( dest_buffer_arg != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( NS(Argument_get_arch_id)( dest_buffer_arg ) ==
+               NS(ARCHITECTURE_CUDA) );
+    SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( dest_buffer_arg ) );
+    SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
+        dest_buffer_arg ) != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( dest_slot_size > ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( dest_buffer_id != (
+        NS(buffer_size_t) )SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
+
+    SIXTRL_ASSERT( src_buffer_arg != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( NS(Argument_get_arch_id)( src_buffer_arg ) ==
+               NS(ARCHITECTURE_CUDA) );
+
+    SIXTRL_ASSERT( NS(Argument_uses_cobjects_buffer)( src_buffer_arg ) );
+    SIXTRL_ASSERT( NS(Argument_get_const_cobjects_buffer)(
+        src_buffer_arg ) != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( src_slot_size > ( NS(buffer_size_t) )0u );
+    SIXTRL_ASSERT( src_buffer_id != (
+        NS(buffer_size_t) )SIXTRL_ARCH_ILLEGAL_BUFFER_ID );
+
+    NS(AssignAddressItem_process_managed_buffer_cuda)<<< *ptr_blocks,
+        *ptr_threads >>>(
+        NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+            assign_buffer_arg ), assign_slot_size,
+        NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+            dest_buffer_arg ), dest_slot_size, dest_buffer_id,
+        NS(CudaArgument_get_cuda_arg_buffer_as_cobject_buffer_begin)(
+            src_buffer_arg ), src_slot_size, src_buffer_id );
 }
 
 void NS(Particles_buffer_store_all_addresses_cuda_wrapper)(

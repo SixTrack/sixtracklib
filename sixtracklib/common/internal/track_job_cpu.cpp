@@ -398,6 +398,14 @@ namespace SIXTRL_CXX_NAMESPACE
             size_t const slot_size  = ::NS(Buffer_get_slot_size)(
                     job.ptrCParticlesBuffer() );
 
+            _this_t::c_buffer_t* elem_by_elem_config_buffer =
+                job.buffer_by_buffer_id( st::ARCH_ELEM_BY_ELEM_CONFIG_BUFFER_ID );
+
+            unsigned char* elem_by_elem_config_buffer_begin =
+                ::NS(Buffer_get_data_begin)( elem_by_elem_config_buffer );
+
+            size_t const elem_by_elem_config_index = size_t{ 0 };
+
             if( job.numParticleSets() == size_t{ 1 } )
             {
                 SIXTRL_ASSERT( job.particleSetIndicesBegin() != nullptr );
@@ -406,7 +414,9 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
                     *job.particleSetIndicesBegin(), pindex_t{ 0 }, pindex_t{ 1 },
                     ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),
-                    job.ptrElemByElemConfig(), _until_turn_num, slot_size );
+                        elem_by_elem_config_buffer_begin,
+                            elem_by_elem_config_index, _until_turn_num,
+                                slot_size );
             }
             else if( job.numParticleSets() > size_t{ 1 } )
             {
@@ -428,7 +438,9 @@ namespace SIXTRL_CXX_NAMESPACE
                         *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
                         ::NS(Buffer_get_data_begin)(
                             job.ptrCBeamElementsBuffer() ),
-                        job.ptrElemByElemConfig(), _until_turn_num, slot_size );
+                                elem_by_elem_config_buffer_begin,
+                                    elem_by_elem_config_index,
+                                        _until_turn_num, slot_size );
                 }
             }
         }
@@ -472,7 +484,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
             for( ; pset_it != pset_end ; ++pset_it )
             {
-                status |= status = NS(Track_particles_line_kernel_impl)(
+                status |= NS(Track_particles_line_kernel_impl)(
                 ::NS(Buffer_get_data_begin)( job.ptrCParticlesBuffer() ),
                 *pset_it, pindex_t{ 0 }, pindex_t{ 1 },
                 ::NS(Buffer_get_data_begin)( job.ptrCBeamElementsBuffer() ),

@@ -837,7 +837,7 @@ TEST( C99_TrackJobCpuTests, TrackParticles )
 
     SIXTRL_ASSERT( ret == 0 );
 
-    ::NS(BeamMonitor_clear_all)( eb );
+    ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
     /* -------------------------------------------------------------------- */
     /* perform tracking using a track_job: */

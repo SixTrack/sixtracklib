@@ -46,8 +46,8 @@ NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)(
     NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_stride,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(particle_index_t) const until_turn, NS(buffer_size_t) const slot_size );
 
 SIXTRL_STATIC SIXTRL_FN NS(track_status_t)
@@ -57,8 +57,8 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
     NS(particle_num_elements_t) particle_idx,
     NS(particle_num_elements_t) const particle_idx_stride,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(particle_index_t) const until_turn, NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags );
 
@@ -326,8 +326,8 @@ NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)(
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) pidx, NS(particle_num_elements_t) const stride,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(particle_index_t) const until_turn, NS(buffer_size_t) const slot_size )
 {
     typedef NS(particle_num_elements_t) nelements_t;
@@ -336,6 +336,8 @@ NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)(
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const*  be_iter_t;
     typedef NS(particle_real_t) real_t;
     typedef NS(particle_index_t) index_t;
+    typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig) const*
+            ptr_elem_by_elem_config_t;
 
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles) particles;
 
@@ -370,6 +372,10 @@ NS(Track_particles_elem_by_elem_until_turn_opt_kernel_impl)(
 
     be_iter_t belem_end = NS(ManagedBuffer_get_const_objects_index_end)(
         belem_buffer, slot_size );
+
+    ptr_elem_by_elem_config_t elem_by_elem_config =
+        NS(ElemByElemConfig_const_from_managed_buffer)(
+            config_buffer, elem_by_elem_config_index, slot_size );
 
     NS(track_status_t) status = SIXTRL_TRACK_SUCCESS;
 
@@ -413,8 +419,8 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
     NS(buffer_size_t) const particle_set_index,
     NS(particle_num_elements_t) pidx, NS(particle_num_elements_t) const stride,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT belem_buffer,
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC const NS(ElemByElemConfig) *const
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(particle_index_t) const until_turn, NS(buffer_size_t) const slot_size,
     SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flags )
 {
@@ -424,6 +430,8 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
     typedef SIXTRL_BUFFER_OBJ_ARGPTR_DEC  NS(Object) const* be_iter_t;
     typedef NS(particle_real_t) real_t;
     typedef NS(particle_index_t) index_t;
+    typedef SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig) const*
+            ptr_elem_by_elem_config_t;
 
     NS(track_status_t)  status = SIXTRL_TRACK_STATUS_GENERAL_FAILURE;
     NS(arch_debugging_t) flags = SIXTRL_ARCH_DEBUGGING_MIN_FLAG;
@@ -443,7 +451,7 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
 
     if( ( pbuffer != SIXTRL_NULLPTR ) && ( belem_buffer != SIXTRL_NULLPTR ) &&
         ( slot_size > ( SIXTRL_UINT64_T )0u ) &&
-        ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
+        ( config_buffer != SIXTRL_NULLPTR ) &&
         ( pidx >= ( nelements_t )0u ) && ( stride > ( nelements_t )0u ) )
     {
         pset_iter_t pset_it = NS(ManagedBuffer_get_object)(
@@ -462,6 +470,10 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
 
         be_iter_t belem_end = NS(ManagedBuffer_get_const_objects_index_end)(
             belem_buffer, slot_size );
+
+        ptr_elem_by_elem_config_t elem_by_elem_config =
+            NS(ElemByElemConfig_const_from_managed_buffer)(
+                config_buffer, elem_by_elem_config_index, slot_size );
 
         if( ( !NS(ManagedBuffer_needs_remapping)( pbuffer, slot_size ) ) &&
             ( !NS(ManagedBuffer_needs_remapping)( belem_buffer, slot_size ) ) &&
@@ -533,7 +545,7 @@ NS(Track_particles_elem_by_elem_until_turn_debug_opt_kernel_impl)(
         if( pidx < ( nelements_t )0u )       flags |= PARTICLE_IDX_ILLEGAL_FLAG;
         if( stride <= ( nelements_t )0u )    flags |= PARTICLE_IDX_ILLEGAL_FLAG;
 
-        if( elem_by_elem_config == SIXTRL_NULLPTR )
+        if( config_buffer == SIXTRL_NULLPTR )
                 flags |= ELEM_BY_ELEM_CONFIG_ILLEGAL_FLAG;
     }
 

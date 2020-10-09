@@ -1,23 +1,14 @@
 # =============================================================================
 # end: sixtracklib/common/be_dipedge/CMakeLitst.txt
 
-set( SIXTRL_COMMON_BE_DIPEDGE_CXX_HEADERS 
-     be_dipedge.hpp
-)
-
-set( SIXTRL_COMMON_BE_DIPEDGE_C99_HEADERS 
-     be_dipedge.h
-     track.h
-)
-set( SIXTRL_COMMON_BE_DIPEDGE_C99_SOURCES 
-     be_dipedge.c
-)
+set( SIXTRL_COMMON_BE_DIPEDGE_CXX_HEADERS be_dipedge.hpp )
+set( SIXTRL_COMMON_BE_DIPEDGE_C99_HEADERS be_dipedge.h track.h )
+set( SIXTRL_COMMON_BE_DIPEDGE_C99_SOURCES be_dipedge.c )
 
 add_library( sixtrack_common_be_dipedge OBJECT
     ${SIXTRL_COMMON_BE_DIPEDGE_C99_HEADERS}
     ${SIXTRL_COMMON_BE_DIPEDGE_CXX_HEADERS}
-    ${SIXTRL_COMMON_BE_DIPEDGE_C99_SOURCES}
-)
+    ${SIXTRL_COMMON_BE_DIPEDGE_C99_SOURCES} )
 
 target_include_directories( sixtrack_common_be_dipedge PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> $<INSTALL_INTERFACE:include> )
@@ -27,7 +18,8 @@ set_target_properties( sixtrack_common_be_dipedge PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_be_dipedge PRIVATE
-    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_be_beambeam as a module for sixtracklib:

@@ -157,6 +157,38 @@ NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
     return status;
 }
 
+NS(arch_status_t) NS(CudaKernelConfig_configure_assign_address_kernel)(
+    NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info )
+{
+    NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
+
+     if( ( kernel_config != SIXTRL_NULLPTR ) &&
+         ( node_info != SIXTRL_NULLPTR ) )
+    {
+        NS(buffer_size_t) const threads_per_block = ( NS(buffer_size_t) )1u;
+        NS(buffer_size_t) const num_blocks = ( NS(buffer_size_t) )1u;
+
+        NS(buffer_size_t) const warp_size =
+            NS(CudaNodeInfo_get_warp_size)( node_info );
+
+        if( ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_num_work_items_1d)(
+                kernel_config, num_blocks ) ) &&
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_work_group_sizes_1d)(
+                kernel_config, threads_per_block ) ) &&
+            ( NS(ARCH_STATUS_SUCCESS) ==
+              NS(KernelConfig_set_preferred_work_group_multiple_1d)(
+                kernel_config, warp_size ) ) )
+        {
+            status = NS(KernelConfig_update)( kernel_config );
+        }
+    }
+
+    return status;
+}
+
 /* ========================================================================= */
 
 NS(arch_status_t) NS(CudaKernelConfig_configure_generic_track_kernel)(

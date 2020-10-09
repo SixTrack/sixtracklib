@@ -17,7 +17,8 @@ from sixtracklib.stcommon import \
     st_Track_all_particles_element_by_element_until_turn, st_NullBuffer, \
     st_BeamMonitor_assign_output_buffer, st_Buffer_new_mapped_on_cbuffer, \
     st_Particles_cbuffer_get_particles, \
-    st_Particles_buffer_get_particles, st_particle_index_t
+    st_Particles_buffer_get_particles, st_particle_index_t, \
+    st_TRACK_SUCCESS, st_ARCH_STATUS_SUCCESS
 
 from sixtracklib_test.stcommon import st_Particles_print_out, \
     st_Particles_compare_values_with_treshold,\
@@ -138,17 +139,15 @@ if __name__ == '__main__':
     assert job.has_elem_by_elem_output
     assert job.has_beam_monitor_output
 
-    status = job.track_elem_by_elem(until_turn_elem_by_elem)
-    assert status == 0
+    job.track_elem_by_elem(until_turn_elem_by_elem)
+    assert job.last_track_status == st_TRACK_SUCCESS.value
     print("elem by elem tracking finished")
 
-    status = job.track_until(until_turn)
-    assert status == 0
-
+    job.track_until(until_turn)
+    assert job.last_track_status == st_TRACK_SUCCESS.value
     print("tracking finished")
 
     job.collect()
-
     print("collect finished")
 
     output_buffer = job.output_buffer
@@ -161,7 +160,7 @@ if __name__ == '__main__':
     assert cmp_output_buffer.base != output_buffer.base
 
     nn = cmp_output_buffer.n_objects
-    ABS_DIFF = 2e-14
+    ABS_DIFF = 5e-11
 
     for ii in range(nn):
         _cmp_particles = cmp_output_buffer.get_object(ii, cls=st.Particles)
@@ -214,7 +213,8 @@ if __name__ == '__main__':
                 and begin_idx + num_elem_per_part \
                 or num_beam_elements
 
-            status = job.track_line(begin_idx, end_idx, is_last_in_turn)
+            job.track_line(begin_idx, end_idx, is_last_in_turn)
+            assert job.last_track_status == st_TRACK_SUCCESS.value
 
     job.collect()
 

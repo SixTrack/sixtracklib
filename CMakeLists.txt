@@ -106,6 +106,7 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 
 include(CheckLanguage)
 
+include( SetupFeatures )
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )

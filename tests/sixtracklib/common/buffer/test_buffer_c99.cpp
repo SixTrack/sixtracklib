@@ -36,7 +36,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 /* ************************************************************************* */
 
-TEST( C99_CommonBufferTests, InitOnExistingFlatMemory)
+TEST( CXX_Common_Buffer_BufferTests, InitOnExistingFlatMemory)
 {
     std::vector< unsigned char > too_small( 36u, uint8_t{ 0 } );
     std::vector< unsigned char > data_buffer( ( 1u << 20u ), uint8_t{ 0 } );
@@ -57,7 +57,7 @@ TEST( C99_CommonBufferTests, InitOnExistingFlatMemory)
     ASSERT_TRUE( success == 0 );
 }
 
-TEST( C99_CommonBufferTests, NewOnExistingFlatMemory)
+TEST( CXX_Common_Buffer_BufferTests, NewOnExistingFlatMemory)
 {
     std::vector< unsigned char > raw_buffer( 1u << 20u );
 
@@ -69,7 +69,7 @@ TEST( C99_CommonBufferTests, NewOnExistingFlatMemory)
     ASSERT_TRUE( !::NS(Buffer_owns_datastore)( buffer ) );
     ASSERT_TRUE(  ::NS(Buffer_get_num_of_dataptrs)( buffer ) == 0u );
     ASSERT_TRUE(  ::NS(Buffer_get_num_of_garbage_ranges)( buffer ) == 0u );
-    ASSERT_TRUE(  ::NS(Buffer_get_size)( buffer ) > ::st_buffer_size_t{ 0 } );
+    ASSERT_TRUE(  ::NS(Buffer_get_size)( buffer ) > ::NS(buffer_size_t){ 0 } );
 
     ::NS(Buffer_delete)( buffer );
     buffer = nullptr;
@@ -77,7 +77,7 @@ TEST( C99_CommonBufferTests, NewOnExistingFlatMemory)
 
 /* ************************************************************************* */
 
-TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
+TEST( CXX_Common_Buffer_BufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 {
     namespace sixtrl = SIXTRL_CXX_NAMESPACE::tests;
 
@@ -110,8 +110,8 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
     buf_size_t attr_counts[ NUM_DATAPTRS ] =
     {
-        st_buffer_size_t{ 0 },
-        st_buffer_size_t{ 0 }
+        ::NS(buffer_size_t){ 0 },
+        ::NS(buffer_size_t){ 0 }
     };
 
     ::NS(Buffer) buffer;
@@ -584,7 +584,7 @@ TEST( C99_CommonBufferTests, InitFlatMemoryDataStoreAddObjectsRemapAndCompare )
 
 /* ************************************************************************* */
 
-TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
+TEST( CXX_Common_Buffer_BufferTests, ReconstructFromCObjectFile )
 {
     namespace sixtrl = SIXTRL_CXX_NAMESPACE::tests;
 
@@ -617,8 +617,8 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
 
     buf_size_t attr_counts[ NUM_DATAPTRS ] =
     {
-        st_buffer_size_t{ 0 },
-        st_buffer_size_t{ 0 }
+        ::NS(buffer_size_t){ 0 },
+        ::NS(buffer_size_t){ 0 }
     };
 
     constexpr buf_size_t num_d_values = 4;
@@ -711,9 +711,9 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
 
         buf_size_t const cnt = std::fwrite( ( unsigned char const* )(
             uintptr_t )::NS(Buffer_get_data_begin_addr)( &buffer ),
-            ::NS(Buffer_get_size)( &buffer ), st_buffer_size_t{ 1 }, fp );
+            ::NS(Buffer_get_size)( &buffer ), ::NS(buffer_size_t){ 1 }, fp );
 
-        ASSERT_TRUE( cnt == st_buffer_size_t{ 1 } );
+        ASSERT_TRUE( cnt == ::NS(buffer_size_t){ 1 } );
 
         std::fclose( fp );
         fp = nullptr;
@@ -768,8 +768,8 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
     ASSERT_TRUE( ::NS(Buffer_get_size)( &buffer ) == buffer_size );
     ASSERT_TRUE( ::NS(Buffer_get_num_of_objects)( &buffer ) == 2u );
 
-    st_Object const* obj_it  = ::NS(Buffer_get_const_objects_begin)(&buffer);
-    st_Object const* obj_end = ::NS(Buffer_get_const_objects_end)( &buffer );
+    ::NS(Object) const* obj_it  = ::NS(Buffer_get_const_objects_begin)(&buffer);
+    ::NS(Object) const* obj_end = ::NS(Buffer_get_const_objects_end)( &buffer );
 
     my_obj_t const* cmp_obj_it = &cmp_my_obj[ 0 ];
 
@@ -791,7 +791,7 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
                      ::NS(Object_get_type_id)( obj_it ) );
 
         ASSERT_TRUE( ptr_my_obj->a == cmp_obj_it->a );
-        ASSERT_TRUE( std::abs( ( ptr_my_obj->b - cmp_obj_it->b ) < EPS ) );
+        ASSERT_TRUE( std::abs( ptr_my_obj->b - cmp_obj_it->b ) < EPS );
 
         for( std::size_t ii = 0u ; ii < 4u ; ++ii )
         {
@@ -804,8 +804,8 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
 
         for( std::size_t ii = 0u ; ii < 4u ; ++ii )
         {
-            ASSERT_TRUE( std::abs( ( ptr_my_obj->d[ ii ] -
-                cmp_obj_it->d[ ii ] ) < EPS ) );
+            ASSERT_TRUE( std::abs( ptr_my_obj->d[ ii ] -
+                cmp_obj_it->d[ ii ] ) < EPS );
         }
 
         ASSERT_TRUE( ptr_my_obj->e != nullptr );
@@ -817,7 +817,7 @@ TEST( C99_CommonBufferTests, ReconstructFromCObjectFile )
     ::NS(Buffer_free)( &buffer );
 }
 
-TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
+TEST( CXX_Common_Buffer_BufferTests, NewBufferAndGrowingWithinCapacity )
 {
     namespace sixtrl = SIXTRL_CXX_NAMESPACE::tests;
 
@@ -1046,7 +1046,7 @@ TEST( C99_CommonBufferTests, NewBufferAndGrowingWithinCapacity )
     buffer = nullptr;
 }
 
-TEST( C99_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
+TEST( CXX_Common_Buffer_BufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
 {
     using buf_size_t    = ::NS(buffer_size_t);
     using type_id_t     = ::NS(object_type_id_t);
@@ -1118,7 +1118,7 @@ TEST( C99_CommonBufferTests, AddGenericObjectsTestAutoGrowingOfBuffer )
     ::NS(Buffer_delete)( buffer );
 }
 
-TEST( C99_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
+TEST( CXX_Common_Buffer_BufferTests, WriteBufferNormalizedAddrRestoreVerify )
 {
     using prng_seed_t   = unsigned long long;
     using buf_size_t    = ::NS(buffer_size_t);
@@ -1300,7 +1300,7 @@ TEST( C99_CommonBufferTests, WriteBufferNormalizedAddrRestoreVerify )
     ::NS(Buffer_delete)( restored_buffer );
 }
 
-TEST( C99_CommonBufferTests, CreateNewOnDataAddObjects )
+TEST( CXX_Common_Buffer_BufferTests, CreateNewOnDataAddObjects )
 {
     using gen_obj_t  = ::NS(GenericObj);
     using buf_size_t = ::NS(buffer_size_t);
@@ -1684,10 +1684,8 @@ TEST( C99_CommonBufferTests, CreateNewOnDataAddObjects )
     ASSERT_TRUE( ::NS(Buffer_get_num_of_garbage_ranges)( ext_buffer ) ==
         buf_size_t{ 0 } );
 
-    ::NS(Object) const* it  =
-        ::NS(Buffer_get_const_objects_begin)( ext_buffer );
-
-    ::NS(Object) const* end  =
+    ::NS(Object) const* it = ::NS(Buffer_get_const_objects_begin)( ext_buffer );
+    ::NS(Object) const* end =
         ::NS(Buffer_get_const_objects_end)( ext_buffer );
 
     ASSERT_TRUE( ( it != nullptr ) && ( end != nullptr ) );
@@ -1732,4 +1730,4 @@ TEST( C99_CommonBufferTests, CreateNewOnDataAddObjects )
     ext_buffer = nullptr;
 }
 
-/* end: tests/sixtracklib/common/test_buffer_c99.cpp */
+/* end: tests/sixtracklib/common/buffer/test_buffer_c99.cpp */

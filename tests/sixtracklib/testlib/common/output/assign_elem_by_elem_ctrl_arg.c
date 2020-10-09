@@ -20,8 +20,9 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
     NS(buffer_size_t) const num_particle_sets,
     NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer,
-    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
+    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg,
+    NS(Buffer)* SIXTRL_RESTRICT elem_by_elem_config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t)* SIXTRL_RESTRICT ptr_output_buffer_index_offset,
@@ -34,8 +35,12 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
         ( num_particle_sets > ( NS(buffer_size_t) )0u ) &&
         ( pset_indices_begin != SIXTRL_NULLPTR ) &&
         ( beam_elements_buffer != SIXTRL_NULLPTR ) &&
-        ( elem_by_elem_config_arg != SIXTRL_NULLPTR ) &&
-        ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
+        ( elem_by_elem_config_buffer_arg != SIXTRL_NULLPTR ) &&
+        ( elem_by_elem_config_buffer != SIXTRL_NULLPTR ) &&
+        ( ( NS(Buffer_get_num_of_objects)( elem_by_elem_config_buffer ) ==
+            ( NS(buffer_size_t) )0u ) ||
+          ( NS(Buffer_get_num_of_objects)( elem_by_elem_config_buffer ) >
+            elem_by_elem_config_index ) ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
         ( ( NS(Buffer_is_particles_buffer)( output_buffer ) ) ||
@@ -55,6 +60,10 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
         buf_size_t output_buffer_index_offset = ( buf_size_t )0u;
         buf_size_t beam_monitor_output_offset = ( buf_size_t )0u;
         pindex_t   max_elem_by_elem_turn_id   = ( pindex_t )-1;
+
+        NS(ElemByElemConfig)* elem_by_elem_config =
+            NS(ElemByElemConfig_from_buffer)(
+                elem_by_elem_config_buffer, elem_by_elem_config_index );
 
         status = NS(OutputBuffer_get_min_max_attributes_on_particle_sets)(
             particles_buffer, num_particle_sets, pset_indices_begin,
@@ -79,6 +88,8 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
             *ptr_output_buffer_index_offset = output_buffer_index_offset;
         }
 
+
+
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
             status = NS(ElemByElemConfig_init_detailed)( elem_by_elem_config,
@@ -89,8 +100,8 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
         {
-            status = NS(Argument_send_raw_argument)( elem_by_elem_config_arg,
-                elem_by_elem_config, sizeof( NS(ElemByElemConfig) ) );
+            status = NS(Argument_send_buffer)(
+                elem_by_elem_config_buffer_arg, elem_by_elem_config_buffer );
         }
 
         if( status == NS(ARCH_STATUS_SUCCESS) )
@@ -120,8 +131,9 @@ NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
 }
 
 NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
-    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
+    NS(ArgumentBase)* SIXTRL_RESTRICT elem_by_elem_config_buffer_arg,
+    NS(Buffer)* SIXTRL_RESTRICT elem_by_elem_config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     NS(ArgumentBase)* SIXTRL_RESTRICT output_arg,
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const output_buffer_index_offset,
@@ -134,14 +146,18 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
     buf_size_t const nn = output_buffer_index_offset + ( buf_size_t )1u;
 
-    if( ( elem_by_elem_config_arg != SIXTRL_NULLPTR ) &&
-        ( elem_by_elem_config != SIXTRL_NULLPTR ) &&
+    if( ( elem_by_elem_config_buffer_arg != SIXTRL_NULLPTR ) &&
+        ( elem_by_elem_config_buffer != SIXTRL_NULLPTR ) &&
         ( output_arg != SIXTRL_NULLPTR ) &&
         ( output_buffer != SIXTRL_NULLPTR ) &&
+        ( NS(Buffer_get_num_of_objects)( elem_by_elem_config_buffer ) >
+            elem_by_elem_config_index ) &&
         ( NS(Buffer_get_num_of_objects)( output_buffer ) >
             output_buffer_index_offset ) &&
         ( NS(Buffer_is_particles_buffer)( output_buffer ) ) )
     {
+        NS(ElemByElemConfig)* elem_by_elem_config = SIXTRL_NULLPTR;
+
         NS(Particles) const* cmp_particles =
             NS(Particles_buffer_get_const_particles)( output_buffer,
                 output_buffer_index_offset );
@@ -157,15 +173,17 @@ NS(arch_status_t) NS(TestElemByElemConfigCtrlArg_evaluate_assign_output_buffer)(
 
         SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0u );
 
-        status = NS(Argument_receive_raw_argument)(
-            elem_by_elem_config_arg, elem_by_elem_config,
-                sizeof( NS(ElemByElemConfig) ) );
+        status = NS(Argument_receive_buffer)(
+            elem_by_elem_config_buffer_arg, elem_by_elem_config_buffer );
 
         if( ( result_arg != SIXTRL_NULLPTR ) &&
             ( status == NS(ARCH_STATUS_SUCCESS) ) )
         {
             NS(arch_debugging_t) result_register =
                 SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+
+            elem_by_elem_config = NS(ElemByElemConfig_from_buffer)(
+                    elem_by_elem_config_buffer, elem_by_elem_config_index );
 
             status = NS(Argument_receive_raw_argument)(
                 result_arg, &result_register, sizeof( result_register ) );

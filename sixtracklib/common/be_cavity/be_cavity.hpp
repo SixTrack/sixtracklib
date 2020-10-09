@@ -505,19 +505,19 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE TCavity< SIXTRL_REAL_T >::value_type
     TCavity< SIXTRL_REAL_T >::getVoltage() const SIXTRL_NOEXCEPT
     {
-        return ::NS(Cavity_get_voltage)( this->getCApiPtr() );
+        return ::NS(Cavity_voltage)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE TCavity< SIXTRL_REAL_T >::value_type
     TCavity< SIXTRL_REAL_T >::getFrequency() const SIXTRL_NOEXCEPT
     {
-        return ::NS(Cavity_get_frequency)( this->getCApiPtr() );
+        return ::NS(Cavity_frequency)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE TCavity< SIXTRL_REAL_T >::value_type
     TCavity< SIXTRL_REAL_T >::getLag() const SIXTRL_NOEXCEPT
     {
-        return ::NS(Cavity_get_lag)( this->getCApiPtr() );
+        return ::NS(Cavity_lag)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE void TCavity< SIXTRL_REAL_T >::preset() SIXTRL_NOEXCEPT

@@ -15,6 +15,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
+    #include "sixtracklib/common/internal/math_functions.h"
     #include "sixtracklib/common/be_srotation/be_srotation.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -462,7 +463,8 @@ namespace SIXTRL_CXX_NAMESPACE
         TSRotation< SIXTRL_REAL_T >::value_type const angle )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*;
-        return static_cast< ptr_t >( ::NS(SRotation_add)( &buffer, angle ) );
+        return static_cast< ptr_t >( ::NS(SRotation_add)( &buffer,
+            NS(cos)( angle ), NS(sin)( angle ) ) );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC TSRotation< SIXTRL_REAL_T >*
@@ -517,25 +519,25 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE TSRotation< SIXTRL_REAL_T >::value_type
     TSRotation< SIXTRL_REAL_T >::getCosAngle() const SIXTRL_NOEXCEPT
     {
-        return ::NS(SRotation_get_cos_angle)( this->getCApiPtr() );
+        return ::NS(SRotation_cos_angle)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE TSRotation< SIXTRL_REAL_T >::value_type
     TSRotation< SIXTRL_REAL_T >::getSinAngle() const SIXTRL_NOEXCEPT
     {
-        return ::NS(SRotation_get_sin_angle)( this->getCApiPtr() );
+        return ::NS(SRotation_sin_angle)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE TSRotation< SIXTRL_REAL_T >::value_type
     TSRotation< SIXTRL_REAL_T >::getAngle() const SIXTRL_NOEXCEPT
     {
-        return ::NS(SRotation_get_angle)( this->getCApiPtr() );
+        return ::NS(SRotation_angle)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE TSRotation< SIXTRL_REAL_T >::value_type
     TSRotation< SIXTRL_REAL_T >::getAngleDeg() const SIXTRL_NOEXCEPT
     {
-        return ::NS(SRotation_get_angle_deg)( this->getCApiPtr() );
+        return ::NS(SRotation_angle_deg)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE void TSRotation< SIXTRL_REAL_T >::preset() SIXTRL_NOEXCEPT
@@ -578,8 +580,8 @@ namespace SIXTRL_CXX_NAMESPACE
         Buffer& buffer, SRotation::value_type const angle )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC SRotation*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_add)( buffer.getCApiPtr(), angle ) );
+        return static_cast< ptr_t >( ::NS(SRotation_add)( buffer.getCApiPtr(),
+            NS(cos)( angle ), NS(sin)( angle ) ) );
     }
 
     SIXTRL_ARGPTR_DEC SRotation* SRotation_add(
@@ -587,15 +589,15 @@ namespace SIXTRL_CXX_NAMESPACE
         SRotation::value_type const angle )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC SRotation*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_add)( ptr_buf, angle ) );
+        return static_cast< ptr_t >( ::NS(SRotation_add)( ptr_buf,
+            NS(cos)( angle ), NS(sin)( angle ) ) );
     }
 
     SIXTRL_ARGPTR_DEC SRotation* SRotation_add( Buffer& buffer,
         SRotation::value_type const cos_z, SRotation::value_type const sin_z )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC SRotation*;
-        return static_cast< ptr_t >( ::NS(SRotation_add_detailed)(
+        return static_cast< ptr_t >( ::NS(SRotation_add)(
             buffer.getCApiPtr(), cos_z, sin_z ) );
 
     }
@@ -606,13 +608,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SRotation::value_type const sin_z )
     {
         using ptr_t = SIXTRL_ARGPTR_DEC SRotation*;
-        return static_cast< ptr_t >(
-            ::NS(SRotation_add_detailed)( ptr_buffer, cos_z, sin_z ) );
+        return static_cast< ptr_t >( ::NS(SRotation_add)(
+            ptr_buffer, cos_z, sin_z ) );
     }
 }
 
 #endif /* defined( __cplusplus ) */
-
 #endif /* CXX_SIXTRACKLIB_COMMON_BE_SROTATION_BEAM_ELEM_BE_SROTATION_HPP__ */
-
-/* end: sixtracklib/common/be_srotation/be_srotation.hpp */

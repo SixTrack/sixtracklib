@@ -95,7 +95,8 @@ set_target_properties( sixtrack PROPERTIES
     DEBUG_POSTFIX d C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack PRIVATE
-    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # provide a copy of the library to the python module if it is defined!

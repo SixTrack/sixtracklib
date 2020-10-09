@@ -12,7 +12,7 @@
 #include "sixtracklib/common/beam_elements.hpp"
 #include "sixtracklib/common/particles.hpp"
 
-TEST( CXX_TrackJobClCollectPushTests, TestCollectAndPush )
+TEST( CXXTrackJobClCollectPush, TestCollectAndPush )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 

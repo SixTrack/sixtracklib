@@ -213,7 +213,7 @@ NS(arch_status_t) NS(TestBeamMonitorCtrlArg_evaluate_assign_output_buffer)(
                     be_monitor = ( ptr_be_monitor_t )( uintptr_t
                         )NS(Object_get_begin_addr)( be_it );
 
-                    be_out_addr = NS(BeamMonitor_get_out_address)( be_monitor );
+                    be_out_addr = NS(BeamMonitor_out_address)( be_monitor );
 
                     cmp_out_addr = ( address_t )( uintptr_t
                         )NS(Particles_buffer_get_const_particles)(

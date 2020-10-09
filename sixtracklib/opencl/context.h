@@ -12,6 +12,8 @@
 
     #if defined( __cplusplus )
         #include <algorithm>
+        #include <string>
+        #include <map>
     #endif /* !defined( __cplusplus ) */
 
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -56,15 +58,19 @@ namespace SIXTRL_CXX_NAMESPACE
         using  track_status_t        = SIXTRL_CXX_NAMESPACE::track_status_t;
         using  elem_by_elem_config_t = ::NS(ElemByElemConfig);
         using  num_turns_t           = ::NS(particle_index_t);
+        using  feature_flag_t        = uint16_t;
 
         static constexpr size_type MIN_NUM_TRACK_UNTIL_ARGS   = size_type{ 5 };
         static constexpr size_type MIN_NUM_TRACK_LINE_ARGS    = size_type{ 7 };
-        static constexpr size_type MIN_NUM_TRACK_ELEM_ARGS    = size_type{ 6 };
+        static constexpr size_type MIN_NUM_TRACK_ELEM_ARGS    = size_type{ 7 };
         static constexpr size_type MIN_NUM_ASSIGN_BE_MON_ARGS = size_type{ 5 };
         static constexpr size_type MIN_NUM_CLEAR_BE_MON_ARGS  = size_type{ 2 };
         static constexpr size_type MIN_NUM_ASSIGN_ELEM_ARGS   = size_type{ 4 };
         static constexpr size_type MIN_NUM_FETCH_PARTICLES_ADDR_ARGS =
             size_type{ 3 };
+
+        static constexpr size_type
+            DEFAULT_ELEM_BY_ELEM_CONFIG_INDEX = size_type{ 0 };
 
         explicit ClContext(
             const char *const SIXTRL_RESTRICT config_str = nullptr );
@@ -93,20 +99,23 @@ namespace SIXTRL_CXX_NAMESPACE
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         status_t assign_particles_arg(
-            ClArgument& SIXTRL_RESTRICT_REF particles_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF particles_arg );
 
         status_t assign_particle_set_arg(
             size_type const particle_set_index,
             size_type const num_particles_in_set );
 
         status_t assign_beam_elements_arg(
-            ClArgument& SIXTRL_RESTRICT_REF beam_elements_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF beam_elements_arg );
 
         status_t assign_output_buffer_arg(
-            ClArgument& SIXTRL_RESTRICT_REF output_buffer_arg );
+            cl_argument_t& SIXTRL_RESTRICT_REF output_buffer_arg );
 
-        status_t assign_elem_by_elem_config_arg(
-            cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg );
+        status_t assign_elem_by_elem_config_buffer_arg(
+            cl_argument_t& SIXTRL_RESTRICT_REF elem_by_elem_config_buffer_arg );
+
+        status_t assign_elem_by_elem_config_index_arg(
+            size_type const elem_by_elem_config_index );
 
         status_t assign_particles_addr_buffer_arg(
             ClArgument& SIXTRL_RESTRICT_REF particles_addr_arg );
@@ -182,6 +191,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+        bool has_assign_addresses_kernel() const SIXTRL_NOEXCEPT;
+        kernel_id_t assign_addresses_kernel_id() const SIXTRL_NOEXCEPT;
+        status_t set_assign_addresses_kernel_id( kernel_id_t const kernel_id );
+
+        status_t assign_addresses(
+            cl_argument_t& SIXTRL_RESTRICT_REF assign_items_arg,
+            cl_argument_t& SIXTRL_RESTRICT_REF dest_buffer_arg,
+            size_type const dest_buffer_id,
+            cl_argument_t& SIXTRL_RESTRICT_REF src_buffer_arg,
+            size_type const src_buffer_id );
+
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
         size_type selected_particle_set() const SIXTRL_NOEXCEPT;
         size_type num_particles_in_selected_set() const SIXTRL_NOEXCEPT;
 
@@ -193,36 +215,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-        bool is_beam_beam_tracking_enabled() const SIXTRL_NOEXCEPT;
+        bool is_beam_beam_tracking_enabled() const;
         void enable_beam_beam_tracking();
         void disable_beam_beam_tracking();
-
-        /* ----------------------------------------------------------------- */
-
-        std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >
-        create_elem_by_elem_config_arg();
-
-        void delete_elem_by_elem_config_arg(
-            std::unique_ptr< SIXTRL_CXX_NAMESPACE::ClContext::cl_buffer_t >&& );
-
-        status_t init_elem_by_elem_config_arg(
-            cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-            elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config,
-            const ::NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
-            size_type const num_particle_sets,
-            size_type const* SIXTRL_RESTRICT pset_indices_begin,
-            const ::NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-            size_type const until_turn_elem_by_elem,
-            particle_index_t const start_elem_id = particle_index_t{ 0 } );
-
-        status_t collect_elem_by_elem_config_arg(
-            cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-            elem_by_elem_config_t& SIXTRL_RESTRICT_REF elem_by_elem_config );
-
-        status_t push_elem_by_elem_config_arg(
-            cl_buffer_t& SIXTRL_RESTRICT_REF elem_by_elem_config_arg,
-            elem_by_elem_config_t const& SIXTRL_RESTRICT_REF
-                elem_by_elem_config );
+        void skip_beam_beam_tracking();
 
         /* ----------------------------------------------------------------- */
 
@@ -235,8 +231,12 @@ namespace SIXTRL_CXX_NAMESPACE
         protected:
 
         bool doSelectNode( size_type node_index ) override;
+        status_t doInitDefaultFeatureFlags() override;
         bool doInitDefaultPrograms() override;
         bool doInitDefaultKernels()  override;
+
+        virtual status_t doAssignElemByElemConfigIndexArg(
+            size_type const elem_by_elem_config_index );
 
         status_t doAssignStatusFlagsArg(
             cl::Buffer& SIXTRL_RESTRICT_REF status_flags_arg ) override;
@@ -247,6 +247,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         bool doInitDefaultProgramsPrivImpl();
         bool doInitDefaultKernelsPrivImpl();
+        status_t doInitDefaultFeatureFlagsPrivImpl();
+
+        status_t doAssignElemByElemConfigIndexArgPrivImpl(
+            size_type const elem_by_elem_config_index );
 
         status_t doAssignStatusFlagsArgPrivImpl(
             cl::Buffer& SIXTRL_RESTRICT_REF status_flags_arg );
@@ -256,6 +260,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         size_type    m_num_particles_in_pset;
         size_type    m_pset_index;
+        size_type    m_elem_by_elem_config_index;
 
         program_id_t m_track_until_turn_program_id;
         program_id_t m_track_elem_by_elem_program_id;
@@ -264,6 +269,7 @@ namespace SIXTRL_CXX_NAMESPACE
         program_id_t m_assign_be_mon_out_buffer_program_id;
         program_id_t m_fetch_particles_addr_program_id;
         program_id_t m_clear_be_mon_program_id;
+        program_id_t m_assign_addr_program_id;
 
         kernel_id_t  m_track_until_turn_kernel_id;
         kernel_id_t  m_track_elem_by_elem_kernel_id;
@@ -272,9 +278,10 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t  m_assign_be_mon_out_buffer_kernel_id;
         kernel_id_t  m_fetch_particles_addr_kernel_id;
         kernel_id_t  m_clear_be_mon_kernel_id;
+        kernel_id_t  m_assign_addr_kernel_id;
 
         bool         m_use_optimized_tracking;
-        bool         m_enable_beam_beam;
+
     };
 }
 
@@ -331,8 +338,14 @@ NS(ClContext_assign_output_buffer_arg)( NS(ClContext)* SIXTRL_RESTRICT ctx,
     NS(ClArgument)* SIXTRL_RESTRICT_REF out_buffer_arg );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
-NS(ClContext_assign_elem_by_elem_config_arg)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg  );
+NS(ClContext_assign_elem_by_elem_config_buffer_arg)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(ClArgument)* SIXTRL_RESTRICT elem_by_elem_config_arg );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ClContext_assign_elem_by_elem_config_index_arg)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(buffer_size_t) const elem_by_elem_config_index );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(ClContext_assign_slot_size_arg)(
@@ -414,7 +427,8 @@ NS(ClContext_track_elem_by_elem)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(track_status_t)
 NS(ClContext_track_elem_by_elem_for_particle_set)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(buffer_size_t) const until_turn,
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(context_num_turns_t) const until_turn,
     NS(buffer_size_t) const particle_set_index,
     NS(buffer_size_t) const num_particles_in_set,
     bool const restore_particle_set_index );
@@ -477,6 +491,27 @@ NS(ClContext_set_clear_beam_monitor_output_kernel_id)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(ClContext_clear_beam_monitor_output)( NS(ClContext)*  SIXTRL_RESTRICT ctx );
 
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(ClContext_has_assign_addresses_kernel)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(ctrl_kernel_id_t)
+NS(ClContext_assign_addresses_kernel_id)(
+    const NS(ClContext) *const SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(ClContext_set_assign_addresses_kernel_id)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx, NS(ctrl_kernel_id_t) const kernel_id );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t) NS(ClContext_assign_addresses)(
+    NS(ClContext)* SIXTRL_RESTRICT ctx,
+    NS(ClArgument)* SIXTRL_RESTRICT assign_items_arg,
+    NS(ClArgument)* SIXTRL_RESTRICT dest_buffer_arg,
+    NS(buffer_size_t) const dest_buffer_id,
+    NS(ClArgument)* SIXTRL_RESTRICT src_buffer_arg,
+    NS(buffer_size_t) const src_buffer_id );
+
 /* ========================================================================= */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(buffer_size_t)
@@ -509,35 +544,8 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_enable_beam_beam_tracking)(
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_disable_beam_beam_tracking)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
 
-/* ------------------------------------------------------------------------- */
-
-cl_mem NS(ClContext_create_elem_by_elem_config_arg)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContext_skip_beam_beam_tracking)(
     NS(ClContext)* SIXTRL_RESTRICT ctx );
-
-void NS(ClContext_delete_elem_by_elem_config_arg)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx, cl_mem elem_by_elem_config_arg );
-
-NS(arch_status_t) NS(ClContext_init_elem_by_elem_config_arg)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    cl_mem elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config,
-    const NS(Buffer) *const SIXTRL_RESTRICT particles_buffer,
-    NS(buffer_size_t) const num_particle_sets,
-    NS(buffer_size_t) const* SIXTRL_RESTRICT pset_indices_begin,
-    const NS(Buffer) *const SIXTRL_RESTRICT beam_elements_buffer,
-    NS(buffer_size_t) const until_turn_elem_by_elem,
-    NS(particle_index_t) const start_elem_id );
-
-NS(arch_status_t) NS(ClContext_collect_elem_by_elem_config_arg)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    cl_mem elem_by_elem_config_arg,
-    NS(ElemByElemConfig)* SIXTRL_RESTRICT elem_by_elem_config );
-
-NS(arch_status_t) NS(ClContext_push_elem_by_elem_config_arg)(
-    NS(ClContext)* SIXTRL_RESTRICT ctx,
-    cl_mem elem_by_elem_config_arg,
-    const NS(ElemByElemConfig) *const SIXTRL_RESTRICT elem_by_elem_config );
-
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }

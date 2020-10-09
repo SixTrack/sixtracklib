@@ -103,7 +103,7 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     bool NodeControllerBase::isNodeAvailable(
-        NodeControllerBase::node_index_t const idx ) const SIXTRL_RESTRICT
+        NodeControllerBase::node_index_t const idx ) const SIXTRL_NOEXCEPT
     {
         return ( ( idx != NodeId::UNDEFINED_INDEX ) &&
             ( idx <  this->numAvailableNodes() ) &&

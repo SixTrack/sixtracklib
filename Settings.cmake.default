@@ -33,6 +33,20 @@ option( SIXTRACKL_ENABLE_PROGRAMM_TESTS  "Enable programmatic unit-tests" OFF )
 option( SIXTRACKL_ENABLE_BENCHMARK_TESTS "Enable benchmark tests"         OFF )
 
 # ------------------------------------------------------------------------------
+# ---- SixTrackLib Features:
+
+# Track features: allowed values are enabled, disabled, or skip:
+
+set( SIXTRACKL_TRACK_BEAMBEAM4D             "enabled"  CACHE STRING "" )
+set( SIXTRACKL_TRACK_BEAMBEAM6D             "enabled"  CACHE STRING "" )
+set( SIXTRACKL_TRACK_SPACECHARGE            "enabled"  CACHE STRING "" )
+set( SIXTRACKL_TRACK_TRICUB                 "disabled" CACHE STRING "" )
+
+# Aperture check features: allowed values are always, never, conditional
+
+set( SIXTRACKL_APERTURE_CHECK_AT_DRIFT      "always"  CACHE STRING "" )
+
+# ------------------------------------------------------------------------------
 # CPU/System architecture settings:
 
 set( SIXTRACKL_CPU_ARCH "sse2" CACHE STRING "CPU/System architecture" )
@@ -47,24 +61,15 @@ set( SIXTRACKL_DEFAULT_C99_FLAGS
 set( SIXTRACKL_DEFAULT_CXX_FLAGS
      "-Wall -Werror -pedantic -ansi -fno-fast-math" )
 
-# ------------------------------------------------------------------------------
-# ---- SixTrackLib Features:
-
-option( SIXTRACKL_ENABLE_APERTURE_CHECK   "Enable xy - aperture check" ON )
-
-
 # ==============================================================================
 # ====  Detailed settings:
 
 # ------------------------------------------------------------------------------
 # ---- SixTrackLib detailed features settings:
 
-set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperture check x limit" FORCE )
-
-set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0"
-     CACHE STRING "Aperture check y limit" FORCE )
-
+set( SIXTRACKL_APERTURE_X_LIMIT_VALUE "1.0" CACHE STRING "" )
+set( SIXTRACKL_APERTURE_Y_LIMIT_VALUE "1.0" CACHE STRING "" )
+set( SIXTRACKL_APERTURE_CHECK_MIN_DRIFT_LENGTH "0.0" CACHE STRING "" )
 
 # ------------------------------------------------------------------------------
 # Installation detailed setings
@@ -117,6 +122,9 @@ endif()
 # OpenCL 1.x related detailed settings
 
 if( SIXTRACKL_ENABLE_OPENCL )
+    set( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS "-w -Werror" CACHE STRING
+         "Default run-time compiler options for OpenCL" )
+
     set( SIXTRACKL_MIN_OPENCL_VERSION "110" CACHE STRING
         "Minimal expected OpenCL 1.x version" )
 
@@ -161,7 +169,6 @@ set( SIXTRACKL_CXX_NAMESPACE "sixtrack" CACHE STRING
 
 set( SIXTRACKL_C_NAMESPACE_PREFIX "st_" CACHE STRING
      "SixTrackLib C-Namespace prefix (default: st_)" )
-
 
 # ==============================================================================
 # end: Settings.cmake.default | Settings.cmake

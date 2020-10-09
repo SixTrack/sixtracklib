@@ -15,13 +15,13 @@
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/testlib.h"
 
-TEST( C99_CommonBufferStringObjectTests, BasicUsage )
+TEST( C99_Common_Buffer_BufferStringObjectTests, BasicUsage )
 {
-    using buffer_t     = ::NS(Buffer)*;
-    using buf_size_t   = ::NS(buffer_size_t);
-    using addr_t       = ::NS(buffer_addr_t);
-    using strobj_t     = ::NS(BufferStringObj)*;
-    using object_t     = ::NS(Object);
+    using buffer_t   = ::NS(Buffer)*;
+    using buf_size_t = ::NS(buffer_size_t);
+    using addr_t     = ::NS(buffer_addr_t);
+    using strobj_t   = ::NS(BufferStringObj)*;
+    using object_t   = ::NS(Object);
 
     buffer_t buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
 
@@ -204,4 +204,4 @@ TEST( C99_CommonBufferStringObjectTests, BasicUsage )
     buffer = nullptr;
 }
 
-/* end: tests/sixtracklib/common/test_buffer_string_object_c99.cpp */
+/* end: tests/sixtracklib/common/buffer/test_buffer_string_object_c99.cpp */
