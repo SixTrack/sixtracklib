@@ -1850,6 +1850,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
 
     st_status_t tjob_t::doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
         tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
@@ -1938,7 +1939,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
     }
 
     st_status_t tjob_t::doSetTrackUntilKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
@@ -1976,7 +1977,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
     }
 
     st_status_t tjob_t::doSetTrackLineKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
@@ -2013,7 +2014,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
     }
 
     st_status_t tjob_t::doSetTrackElemByElemKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
@@ -2051,7 +2052,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
     }
 
     st_status_t tjob_t::doSetFetchParticlesAddressesKernelIdCudaImpl(
-            tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+            tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
@@ -2100,7 +2101,7 @@ s        using _base_t = tjob_t::_base_track_job_t;
     }
 
     st_status_t tjob_t::do_set_assign_addresses_kernel_id_cuda_impl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;

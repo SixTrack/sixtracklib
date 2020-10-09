@@ -494,30 +494,26 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN status_t
         doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN status_t
         doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t
-        doSetTrackUntilKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+        SIXTRL_HOST_FN status_t doSetTrackUntilKernelIdCudaImpl(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t
-        doSetTrackLineKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+        SIXTRL_HOST_FN status_t doSetTrackLineKernelIdCudaImpl(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t
-        doSetTrackElemByElemKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+        SIXTRL_HOST_FN status_t doSetTrackElemByElemKernelIdCudaImpl(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_HOST_FN status_t
-        doSetFetchParticlesAddressesKernelIdCudaImpl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+        SIXTRL_HOST_FN status_t doSetFetchParticlesAddressesKernelIdCudaImpl(
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN status_t do_set_assign_addresses_kernel_id_cuda_impl(
-            kernel_id_t const id ) SIXTRL_HOST_FN;
+            kernel_id_t const id ) SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
