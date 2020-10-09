@@ -19,7 +19,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/be_limit/track.h"
 
-TEST( C99CommonBeamElementLimitEllipseTests, BasicUsage )
+TEST( C99CommonBeamElementLimitEllipse, BasicUsage )
 {
     using be_limit_t   = ::NS(LimitEllipse);
     using buffer_t     = ::NS(Buffer);
@@ -40,21 +40,21 @@ TEST( C99CommonBeamElementLimitEllipseTests, BasicUsage )
     be_limit_t* l2 = ::NS(LimitEllipse_new)( eb );
     ASSERT_TRUE( l2 != nullptr );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_half_axis)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_x_half_axis)( l2 ) -
         ::NS(LIMIT_DEFAULT_X_HALF_AXIS) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_half_axis)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_y_half_axis)( l2 ) -
         ::NS(LIMIT_DEFAULT_Y_HALF_AXIS) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_half_axis_squ)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_x_half_axis_squ)( l2 ) -
         ::NS(LIMIT_DEFAULT_X_HALF_AXIS) *
         ::NS(LIMIT_DEFAULT_X_HALF_AXIS) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_half_axis_squ)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_y_half_axis_squ)( l2 ) -
         ::NS(LIMIT_DEFAULT_Y_HALF_AXIS) *
         ::NS(LIMIT_DEFAULT_Y_HALF_AXIS) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_half_axes_product_squ)( l2 )
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_half_axes_product_squ)( l2 )
         - ::NS(LIMIT_DEFAULT_X_HALF_AXIS) * ::NS(LIMIT_DEFAULT_X_HALF_AXIS) *
           ::NS(LIMIT_DEFAULT_Y_HALF_AXIS) * ::NS(LIMIT_DEFAULT_Y_HALF_AXIS) )
         < EPS );
@@ -67,10 +67,10 @@ TEST( C99CommonBeamElementLimitEllipseTests, BasicUsage )
     be_limit_t* l3 = ::NS(LimitEllipse_add)( eb, X_HALF_AXIS, Y_HALF_AXIS );
     ASSERT_TRUE( l3 != nullptr );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_x_half_axis)( l3 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_x_half_axis)( l3 ) -
         X_HALF_AXIS ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_get_y_half_axis)( l3 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitEllipse_y_half_axis)( l3 ) -
         Y_HALF_AXIS ) < EPS );
 
     be_limit_t* l4 = ::NS(LimitEllipse_add_copy)( eb, &limit );
@@ -81,8 +81,8 @@ TEST( C99CommonBeamElementLimitEllipseTests, BasicUsage )
     real_t const TRESHOLD = real_t{ 9e-4 };
 
     ::NS(LimitEllipse_set_half_axes_squ)( l4,
-        ::NS(LimitEllipse_get_x_half_axis_squ)( l4 ) + TRESHOLD,
-        ::NS(LimitEllipse_get_y_half_axis_squ)( l4 ) );
+        ::NS(LimitEllipse_x_half_axis_squ)( l4 ) + TRESHOLD,
+        ::NS(LimitEllipse_y_half_axis_squ)( l4 ) );
 
     ASSERT_TRUE( 0 != ::NS(LimitEllipse_compare_values)( l4, &limit ) );
 
@@ -97,7 +97,7 @@ TEST( C99CommonBeamElementLimitEllipseTests, BasicUsage )
 }
 
 
-TEST( C99CommonBeamElementLimitRectTests, ApertureCheck )
+TEST( C99CommonBeamElementLimitRect, ApertureCheck )
 {
     using be_limit_t  = ::NS(LimitEllipse);
     using buffer_t    = ::NS(Buffer);
@@ -267,5 +267,3 @@ TEST( C99CommonBeamElementLimitRectTests, ApertureCheck )
 
     ::NS(Buffer_delete)( pb );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_c99.cpp */

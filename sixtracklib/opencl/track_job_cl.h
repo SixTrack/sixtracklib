@@ -116,10 +116,10 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const until_turn_elem_by_elem = size_type{ 0 },
             std::string const& SIXTRL_RESTRICT_REF config_str = std::string{} );
 
-        SIXTRL_HOST_FN TrackJobCl( TrackJobCl const& other ) = default;
+        SIXTRL_HOST_FN TrackJobCl( TrackJobCl const& other ) = delete;
         SIXTRL_HOST_FN TrackJobCl( TrackJobCl&& other ) = default;
 
-        SIXTRL_HOST_FN TrackJobCl& operator=( TrackJobCl const& rhs ) = default;
+        SIXTRL_HOST_FN TrackJobCl& operator=( TrackJobCl const& rhs ) = delete;
         SIXTRL_HOST_FN TrackJobCl& operator=( TrackJobCl&& rhs ) = default;
 
         SIXTRL_HOST_FN virtual ~TrackJobCl() SIXTRL_NOEXCEPT;

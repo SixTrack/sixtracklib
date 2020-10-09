@@ -40,11 +40,11 @@ SIXTRL_INLINE NS(track_status_t) NS(Track_particle_dipedge)(
     SIXTRL_BE_ARGPTR_DEC const NS(DipoleEdge) *const SIXTRL_RESTRICT dipedge )
 {
     NS(Particles_add_to_px_value)( particles, particle_idx,
-       NS(DipoleEdge_get_r21)( dipedge ) * 
+       NS(DipoleEdge_r21)( dipedge ) *
        NS(Particles_get_x_value)( particles, particle_idx ) );
-    
+
     NS(Particles_add_to_py_value)( particles, particle_idx,
-       NS(DipoleEdge_get_r43)( dipedge ) * 
+       NS(DipoleEdge_r43)( dipedge ) *
        NS(Particles_get_y_value)( particles, particle_idx ) );
 
     return SIXTRL_TRACK_SUCCESS;

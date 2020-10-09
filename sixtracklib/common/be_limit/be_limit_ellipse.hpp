@@ -15,6 +15,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.hpp"
     #include "sixtracklib/common/be_limit/be_limit_ellipse.h"
+    #include "sixtracklib/common/internal/compiler_attributes.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
@@ -32,17 +33,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X =
-             value_type{ SIXTRL_LIMIT_DEFAULT_MAX_X };
+        static constexpr value_type DEFAULT_X_HALF_AXIS =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_X };
-
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_Y =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MAX_Y };
-
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_Y =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_Y };
+        static constexpr value_type DEFAULT_Y_HALF_AXIS =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS );
 
         /* ----------------------------------------------------------------- */
 
@@ -136,8 +131,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        SIXTRL_FN void setHalfAxes( 
-            const_reference x_half_axis, 
+        SIXTRL_FN void setHalfAxes(
+            const_reference x_half_axis,
             const_reference y_half_axis ) SIXTRL_NOEXCEPT;
 
         SIXTRL_FN void setHalfAxesSqu(
@@ -150,6 +145,14 @@ namespace SIXTRL_CXX_NAMESPACE
         value_type  b_squ;
         value_type  a_b_squ;
     };
+
+    template< typename T > constexpr typename TLimitEllipse< T >::value_type
+        TLimitEllipse< T >::DEFAULT_X_HALF_AXIS;
+
+    template< typename T > constexpr typename TLimitEllipse< T >::value_type
+        TLimitEllipse< T >::DEFAULT_Y_HALF_AXIS;
+
+    /* --------------------------------------------------------------------- */
 
     template< typename T > struct ObjectTypeTraits<
         SIXTRL_CXX_NAMESPACE::TLimitEllipse< T > >
@@ -209,17 +212,11 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_X;
+        static constexpr value_type DEFAULT_X_HALF_AXIS =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_X;
-
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_Y =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_Y;
-
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_Y =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_Y;
+        static constexpr value_type DEFAULT_Y_HALF_AXIS =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS );
 
         /* ----------------------------------------------------------------- */
 
@@ -349,7 +346,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_haxis, 
+        LimitEllipse::value_type const x_haxis,
         LimitEllipse::value_type const y_haxis );
 
     SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add_copy(
@@ -367,7 +364,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
 namespace SIXTRL_CXX_NAMESPACE
 {
-    template< typename T > typename TLimitEllipse< T >::value_type 
+    template< typename T > typename TLimitEllipse< T >::value_type
     TLimitEllipse< T >::getXHalfAxis() const SIXTRL_NOEXCEPT
     {
         return std::sqrt( this->a_squ );
@@ -477,17 +474,17 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T > SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
     TLimitEllipse< T >::AddToBuffer(
         typename TLimitEllipse< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference x_half_axis, 
+        typename TLimitEllipse< T >::const_reference x_half_axis,
         typename TLimitEllipse< T >::const_reference y_half_axis )
     {
-        return TLimitEllipse< T >::AddToBuffer( 
+        return TLimitEllipse< T >::AddToBuffer(
             *buffer.getCApiPtr(), x_half_axis, y_half_axis );
     }
 
     template< typename T > SIXTRL_INLINE SIXTRL_ARGPTR_DEC TLimitEllipse< T >*
     TLimitEllipse< T >::AddToBuffer(
         typename TLimitEllipse< T >::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TLimitEllipse< T >::const_reference x_half_axis, 
+        typename TLimitEllipse< T >::const_reference x_half_axis,
         typename TLimitEllipse< T >::const_reference y_half_axis )
     {
         using _this_t = SIXTRL_CXX_NAMESPACE::TLimitEllipse< T >;
@@ -566,20 +563,18 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE typename TLimitEllipse< T >::size_type
     TLimitEllipse< T >::RequiredNumDataPtrs(
         typename TLimitEllipse< T >::buffer_t const& SIXTRL_RESTRICT_REF
-            buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(LimitEllipse_num_dataptrs)( nullptr );
     }
 
     template< typename T >
     SIXTRL_INLINE typename TLimitEllipse< T >::size_type
     TLimitEllipse< T >::RequiredNumDataPtrs(
         SIXTRL_BUFFER_ARGPTR_DEC const c_buffer_t *const SIXTRL_RESTRICT
-            ptr_buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_required_num_dataptrs)(
-            ptr_buffer, nullptr );
+        return ::NS(LimitEllipse_num_dataptrs)( nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -587,16 +582,9 @@ namespace SIXTRL_CXX_NAMESPACE
     template< typename T >
     void TLimitEllipse< T >::preset() SIXTRL_NOEXCEPT
     {
-        using _this_t = TLimitEllipse< T >;
-        using  real_t = typename _this_t::value_type;
-
-        real_t const x_half_axis = real_t{ 0.5 } * (
-            _this_t::DEFAULT_MAX_X - _this_t::DEFAULT_MIN_X );
-
-        real_t const y_half_axis = real_t{ 0.5 } * (
-            _this_t::DEFAULT_MAX_Y - _this_t::DEFAULT_MIN_Y );
-        
-        this->setHalfAxes( x_half_axis, y_half_axis );
+        using this_t = TLimitEllipse< T >;
+        this->setHalfAxes( this_t::DEFAULT_X_HALF_AXIS,
+                           this_t::DEFAULT_Y_HALF_AXIS );
     }
 
     template< typename T >
@@ -608,9 +596,9 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename T >
-    void TLimitEllipse< T >::setHalfAxes( 
-        typename TLimitEllipse< T >::const_reference x_half_axis, 
-        typename TLimitEllipse< T >::const_reference y_half_axis 
+    void TLimitEllipse< T >::setHalfAxes(
+        typename TLimitEllipse< T >::const_reference x_half_axis,
+        typename TLimitEllipse< T >::const_reference y_half_axis
     ) SIXTRL_NOEXCEPT
     {
         this->setHalfAxesSqu( x_half_axis * x_half_axis,
@@ -624,10 +612,10 @@ namespace SIXTRL_CXX_NAMESPACE
         ) SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT( x_half_axis_squ >=
-                       typename TLimitEllipse< T >::real_t{ 0 } );
+                       typename TLimitEllipse< T >::value_type{ 0 } );
 
         SIXTRL_ASSERT( y_half_axis_squ >=
-                       typename TLimitEllipse< T >::real_t{ 0 } );
+                       typename TLimitEllipse< T >::value_type{ 0 } );
 
         this->a_squ = x_half_axis_squ;
         this->b_squ = y_half_axis_squ;
@@ -640,31 +628,30 @@ namespace SIXTRL_CXX_NAMESPACE
 
     LimitEllipse::value_type LimitEllipse::getXHalfAxis() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_x_half_axis)( this->getCApiPtr() );
+        return ::NS(LimitEllipse_x_half_axis)( this->getCApiPtr() );
     }
 
     LimitEllipse::value_type LimitEllipse::getYHalfAxis() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_y_half_axis)( this->getCApiPtr() );
+        return ::NS(LimitEllipse_y_half_axis)( this->getCApiPtr() );
     }
 
     LimitEllipse::value_type
     LimitEllipse::getXHalfAxisSqu() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_x_half_axis_squ)( this->getCApiPtr() );
+        return ::NS(LimitEllipse_x_half_axis_squ)( this->getCApiPtr() );
     }
 
     LimitEllipse::value_type
     LimitEllipse::getYHalfAxisSqu() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_y_half_axis_squ)( this->getCApiPtr() );
+        return ::NS(LimitEllipse_y_half_axis_squ)( this->getCApiPtr() );
     }
 
     LimitEllipse::value_type
     LimitEllipse::getHalfAxesProductSqu() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_half_axes_product_squ)(
-            this->getCApiPtr() );
+        return ::NS(LimitEllipse_half_axes_product_squ)( this->getCApiPtr() );
     }
 
     /* --------------------------------------------------------------------- */
@@ -712,18 +699,18 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse*
     LimitEllipse::AddToBuffer(
         LimitEllipse::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_half_axis, 
+        LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitEllipse* >(
-            ::NS(LimitEllipse_add)( 
+            ::NS(LimitEllipse_add)(
                 buffer.getCApiPtr(), x_half_axis, y_half_axis ) );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse*
     LimitEllipse::AddToBuffer(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_half_axis, 
+        LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis )
     {
         return static_cast< SIXTRL_ARGPTR_DEC LimitEllipse* >(
@@ -774,18 +761,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
     SIXTRL_INLINE LimitEllipse::size_type LimitEllipse::RequiredNumDataPtrs(
         LimitEllipse::buffer_t const& SIXTRL_RESTRICT_REF
-            buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(LimitEllipse_num_dataptrs)( nullptr );
     }
 
     SIXTRL_INLINE LimitEllipse::size_type LimitEllipse::RequiredNumDataPtrs(
         SIXTRL_BUFFER_ARGPTR_DEC const LimitEllipse::c_buffer_t *const
-            SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_RESTRICT SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitEllipse_get_required_num_dataptrs)(
-            ptr_buffer, nullptr );
+        return ::NS(LimitEllipse_num_dataptrs)( nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -801,8 +786,8 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     /* --------------------------------------------------------------------- */
-    
-    void LimitEllipse::setHalfAxes( 
+
+    void LimitEllipse::setHalfAxes(
         LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis ) SIXTRL_NOEXCEPT
     {
@@ -837,16 +822,16 @@ namespace SIXTRL_CXX_NAMESPACE
         LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis )
     {
-        return LimitEllipse::AddToBuffer( 
+        return LimitEllipse::AddToBuffer(
             *buffer.getCApiPtr(), x_half_axis, y_half_axis );
     }
 
     SIXTRL_INLINE SIXTRL_ARGPTR_DEC LimitEllipse* LimitEllipse_add(
         LimitEllipse::c_buffer_t& SIXTRL_RESTRICT_REF buffer,
-        LimitEllipse::value_type const x_half_axis, 
+        LimitEllipse::value_type const x_half_axis,
         LimitEllipse::value_type const y_half_axis )
     {
-        return LimitEllipse::AddToBuffer( 
+        return LimitEllipse::AddToBuffer(
             buffer, x_half_axis, y_half_axis );
     }
 
@@ -866,7 +851,4 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 #endif /* !defined( _GPUCODE ) */
-
 #endif /* defined( SIXTRACKLIB_COMMON_BE_LIMIT_ELLIPSE_CXX_HPP__ ) */
-
-/* end: sixtracklib/common/be_limit/be_limit_ellipse.hpp */

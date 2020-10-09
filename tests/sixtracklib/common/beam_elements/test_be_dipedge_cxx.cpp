@@ -14,7 +14,7 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/buffer.hpp"
 
-TEST( CXXCommonBeamElementDipoleEdgeTests, BasicUsage )
+TEST( CXXCommonBeamElementDipoleEdge, BasicUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -38,5 +38,3 @@ TEST( CXXCommonBeamElementDipoleEdgeTests, BasicUsage )
     ASSERT_TRUE( 0 == ::NS(DipoleEdge_compare_values)(
         e4->getCApiPtr(), e1.getCApiPtr() ) );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_cxx.cpp */

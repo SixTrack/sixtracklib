@@ -306,8 +306,8 @@ SIXTRL_INLINE NS(arch_status_t) NS(BeamMonitor_assign_managed_output_buffer)(
         {
             ptr_beam_monitor_t monitor = ( ptr_beam_monitor_t )addr;
 
-            nturn_t const    nn = NS(BeamMonitor_get_num_stores)( monitor );
-            nturn_t const start = NS(BeamMonitor_get_start)( monitor );
+            nturn_t const    nn = NS(BeamMonitor_num_stores)( monitor );
+            nturn_t const start = NS(BeamMonitor_start)( monitor );
 
             if( ( nn > ( nturn_t )0u ) &&
                 ( start >= first_turn_id ) && ( out_it != out_end ) )
@@ -319,10 +319,10 @@ SIXTRL_INLINE NS(arch_status_t) NS(BeamMonitor_assign_managed_output_buffer)(
                     NS(Particles_get_num_of_particles)( particles );
 
                 mon_index_t const min_particle_id =
-                    NS(BeamMonitor_get_min_particle_id)( monitor );
+                    NS(BeamMonitor_min_particle_id)( monitor );
 
                 mon_index_t const max_particle_id =
-                    NS(BeamMonitor_get_max_particle_id)( monitor );
+                    NS(BeamMonitor_max_particle_id)( monitor );
 
                 buf_size_t const stored_particles_per_turn =
                     ( max_particle_id >= min_particle_id )

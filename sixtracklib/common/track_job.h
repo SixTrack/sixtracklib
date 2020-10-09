@@ -465,7 +465,7 @@ NS(TrackJob_particles_addr_buffer)(
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
 NS(TrackJob_add_assign_address_item)( NS(TrackJobBase)* SIXTRL_RESTRICT job,
-    const NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item_to_add );
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_item_to_add );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(AssignAddressItem)*
 NS(TrackJob_add_assign_address_item_detailed)(
@@ -487,12 +487,12 @@ NS(TrackJob_remove_assign_address_item)(
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(TrackJob_remove_assign_address_item_by_key_and_index)(
     NS(TrackJobBase)* SIXTRL_RESTRICT job,
-    const NS(TrackJobDestSrcBufferIds) *const SIXTRL_RESTRICT_REF key,
+    const NS(TrackJobDestSrcBufferIds) *const SIXTRL_RESTRICT key,
     NS(buffer_size_t) const index_of_item_to_remove );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_address_item)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,
-    const NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item_to_add );
+    const NS(AssignAddressItem) *const SIXTRL_RESTRICT item );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(TrackJob_has_assign_item_by_index)(
     const NS(TrackJobBase) *const SIXTRL_RESTRICT job,

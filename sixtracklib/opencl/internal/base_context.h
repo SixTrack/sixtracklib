@@ -688,20 +688,23 @@ namespace SIXTRL_CXX_NAMESPACE
         template< typename T >
         SIXTRL_HOST_FN void assignKernelArgumentPtr(
             kernel_id_t const kernel_id, size_type const arg_index,
-                T* SIXTRL_RESTRICT ptr ) SIXTRL_NOEXCEPT
+            SIXTRL_ARGPTR_DEC T* ptr ) SIXTRL_NOEXCEPT
         {
-            using _this_t = ClContextBase;
-
-            SIXTRL_ASSERT( kernel_id >= kernel_id_t{ 0 } );
-            SIXTRL_ASSERT( static_cast< _this_t::size_type >( kernel_id ) <
-                           this->numAvailableKernels() );
+            SIXTRL_ASSERT( kernel_id >= ClContextBase::kernel_id_t{ 0 } );
+            SIXTRL_ASSERT( static_cast< ClContextBase::size_type >(
+                kernel_id ) < this->numAvailableKernels() );
 
             this->m_kernel_data[ kernel_id ].setKernelArg(
-                    _this_t::ARG_TYPE_RAW_PTR, arg_index, nullptr );
+                    ClContextBase::ARG_TYPE_RAW_PTR, arg_index, nullptr );
 
             cl::Kernel* kernel = this->openClKernel( kernel_id );
             if( kernel != nullptr ) kernel->setArg( arg_index, ptr );
         }
+
+        SIXTRL_HOST_FN void assignKernelArgumentRawPtr(
+            kernel_id_t const kernel_id, size_type const arg_index,
+            size_type const arg_size,
+            SIXTRL_ARGPTR_DEC void const* ptr ) SIXTRL_NOEXCEPT;
 
         template< typename T >
         SIXTRL_HOST_FN void assignKernelArgumentValue(
@@ -1515,11 +1518,11 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_reset_single_kernel_argument)
     NS(arch_kernel_id_t) const kernel_id,
     NS(arch_size_t) const arg_index );
 
-SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_ptr)(
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ClContextBase_assign_kernel_argument_raw_ptr)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,
-    NS(arch_kernel_id_t) const kernel_id,
-    NS(arch_size_t) const arg_index,
-    void* SIXTRL_RESTRICT ptr );
+    NS(arch_kernel_id_t) const kernel_id, NS(arch_size_t) const arg_index,
+    NS(arch_size_t) const arg_size, void const* ptr );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(ClContextBase_assign_kernel_argument_value)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx,

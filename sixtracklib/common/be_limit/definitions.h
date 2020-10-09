@@ -33,6 +33,14 @@ extern "C" {
     #define SIXTRL_LIMIT_DEFAULT_MIN_Y -SIXTRL_APERTURE_Y_LIMIT
 #endif /* !defined( SIXTRL_LIMIT_DEFAULT_MIN_Y ) */
 
+#if !defined( SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS )
+    #define SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS SIXTRL_APERTURE_X_LIMIT
+#endif /* !defined( SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS ) */
+
+#if !defined( SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS )
+    #define SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS SIXTRL_APERTURE_Y_LIMIT
+#endif /* !defined( SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS ) */
+
 #if !defined( _GPUCODE )
 
 SIXTRL_STATIC_VAR NS(particle_real_t) const NS(LIMIT_DEFAULT_MIN_X) = (
@@ -47,19 +55,20 @@ SIXTRL_STATIC_VAR NS(particle_real_t) const NS(LIMIT_DEFAULT_MIN_Y) = (
 SIXTRL_STATIC_VAR NS(particle_real_t) const NS(LIMIT_DEFAULT_MAX_Y) = (
     NS(particle_real_t) )SIXTRL_LIMIT_DEFAULT_MAX_Y;
 
-
 SIXTRL_STATIC_VAR NS(particle_real_t) const NS(LIMIT_DEFAULT_X_HALF_AXIS) =
-    ( NS(particle_real_t) )( 0.5 * (
-        SIXTRL_LIMIT_DEFAULT_MAX_X - SIXTRL_LIMIT_DEFAULT_MIN_X ) );
+    ( NS(particle_real_t) )( SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS );
 
 SIXTRL_STATIC_VAR NS(particle_real_t) const NS(LIMIT_DEFAULT_Y_HALF_AXIS) =
-    ( NS(particle_real_t) )( 0.5 * (
-        SIXTRL_LIMIT_DEFAULT_MAX_Y - SIXTRL_LIMIT_DEFAULT_MIN_Y ) );
+    ( NS(particle_real_t) )( SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS );
 
 #endif /* !defined( _GPUCODE ) */
 
-#if defined( __cplusplus ) && !defined( _GPUCODE )
+#if !defined(  _GPUCODE ) && defined( __cplusplus )
+}
+#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
 namespace SIXTRL_CXX_NAMESPACE
 {
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
@@ -78,21 +87,14 @@ namespace SIXTRL_CXX_NAMESPACE
         LIMIT_DEFAULT_MIN_Y = static_cast< NS(particle_real_t) >(
             SIXTRL_LIMIT_DEFAULT_MIN_Y );
 
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
+        LIMIT_DEFAULT_X_HALF_AXIS = static_cast< NS(particle_real_t) >(
+            SIXTRL_LIMIT_DEFAULT_X_HALF_AXIS );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
-        LIMIT_DEFAULT_X_HALF_AXIS = static_cast< NS(particle_real_t) >( 0.5 *
-            ( SIXTRL_LIMIT_DEFAULT_MAX_X - SIXTRL_LIMIT_DEFAULT_MIN_X ) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST NS(particle_real_t)
-        LIMIT_DEFAULT_Y_HALF_AXIS = static_cast< NS(particle_real_t) >( 0.5 *
-            ( SIXTRL_LIMIT_DEFAULT_MAX_Y - SIXTRL_LIMIT_DEFAULT_MIN_Y ) );
+        LIMIT_DEFAULT_Y_HALF_AXIS = static_cast< NS(particle_real_t) >(
+            SIXTRL_LIMIT_DEFAULT_Y_HALF_AXIS );
 }
-
 #endif /* C++, host */
 
-#if !defined(  _GPUCODE ) && defined( __cplusplus )
-}
-#endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_COMMON_BE_LIMIT_DEFINTIONS_C99_H__ */
-/* end: sixtracklib/common/be_limit/definitions.h */

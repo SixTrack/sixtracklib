@@ -69,5 +69,4 @@ SIXTRL_INLINE void NS(Buffer_disable_developer_debug_mode)(
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined( _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_COMMON_BUFFER_BUFFER_DEV_DEBUG_H__ */

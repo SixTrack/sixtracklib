@@ -233,25 +233,34 @@ SIXTRL_INLINE void NS(tricub_construct_b_vector)(
     //NS(be_tricub_int_t) const lookup_table_size = NS(TriCubData_table_size)( tricub_data );
     NS(be_tricub_int_t) const nx = NS(TriCubData_nx)( tricub_data );
     NS(be_tricub_int_t) const ny = NS(TriCubData_ny)( tricub_data );
-    NS(be_tricub_int_t) const nz = NS(TriCubData_nz)( tricub_data );
+    // NS(be_tricub_int_t) const nz = NS(TriCubData_nz)( tricub_data );
 
-    NS(be_tricub_real_t) const dx = NS(TriCubData_dx)( tricub_data );
-    NS(be_tricub_real_t) const dy = NS(TriCubData_dy)( tricub_data );
-    NS(be_tricub_real_t) const dz = NS(TriCubData_dz)( tricub_data );
+    // NS(be_tricub_real_t) const dx = NS(TriCubData_dx)( tricub_data );
+    // NS(be_tricub_real_t) const dy = NS(TriCubData_dy)( tricub_data );
+    // NS(be_tricub_real_t) const dz = NS(TriCubData_dz)( tricub_data );
 
-    NS(be_tricub_real_t) const scale[8] = { 1., dx, dy, dz, 
-                                          dx * dy, dx * dz, dy * dz, 
-                                          (dx * dy) * dz };
+    // NS(be_tricub_real_t) const scale[8] = { 1., dx, dy, dz, 
+    //                                       dx * dy, dx * dz, dy * dz, 
+    //                                       (dx * dy) * dz };
+    //
     for(int l = 0; l < 8; l++)
     {
-        b_vector[8 * l    ] = lookup_table_begin[ (ix  ) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 1] = lookup_table_begin[ (ix+1) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 2] = lookup_table_begin[ (ix  ) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 3] = lookup_table_begin[ (ix+1) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 4] = lookup_table_begin[ (ix  ) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 5] = lookup_table_begin[ (ix+1) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 6] = lookup_table_begin[ (ix  ) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
-        b_vector[8 * l + 7] = lookup_table_begin[ (ix+1) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
+        b_vector[8 * l    ] = lookup_table_begin[ l + 8 * ( (ix  ) + nx * ( (iy  ) + ny * ( (iz  ) ) ) ) ];
+        b_vector[8 * l + 1] = lookup_table_begin[ l + 8 * ( (ix+1) + nx * ( (iy  ) + ny * ( (iz  ) ) ) ) ];
+        b_vector[8 * l + 2] = lookup_table_begin[ l + 8 * ( (ix  ) + nx * ( (iy+1) + ny * ( (iz  ) ) ) ) ];
+        b_vector[8 * l + 3] = lookup_table_begin[ l + 8 * ( (ix+1) + nx * ( (iy+1) + ny * ( (iz  ) ) ) ) ];
+        b_vector[8 * l + 4] = lookup_table_begin[ l + 8 * ( (ix  ) + nx * ( (iy  ) + ny * ( (iz+1) ) ) ) ];
+        b_vector[8 * l + 5] = lookup_table_begin[ l + 8 * ( (ix+1) + nx * ( (iy  ) + ny * ( (iz+1) ) ) ) ];
+        b_vector[8 * l + 6] = lookup_table_begin[ l + 8 * ( (ix  ) + nx * ( (iy+1) + ny * ( (iz+1) ) ) ) ];
+        b_vector[8 * l + 7] = lookup_table_begin[ l + 8 * ( (ix+1) + nx * ( (iy+1) + ny * ( (iz+1) ) ) ) ];
+        //b_vector[8 * l    ] = lookup_table_begin[ (ix  ) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 1] = lookup_table_begin[ (ix+1) + nx * ( (iy  ) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 2] = lookup_table_begin[ (ix  ) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 3] = lookup_table_begin[ (ix+1) + nx * ( (iy+1) + ny * ( (iz  ) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 4] = lookup_table_begin[ (ix  ) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 5] = lookup_table_begin[ (ix+1) + nx * ( (iy  ) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 6] = lookup_table_begin[ (ix  ) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
+        //b_vector[8 * l + 7] = lookup_table_begin[ (ix+1) + nx * ( (iy+1) + ny * ( (iz+1) + nz * l) ) ] * scale[l];
     }
 
     return;

@@ -27,7 +27,8 @@ set_target_properties( sixtrack_test_common_track_c99 PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_track_c99 PRIVATE
-        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 
@@ -52,7 +53,8 @@ set_target_properties( sixtrack_test_common_track_cxx PROPERTIES
     CXX_STANDARD 11 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_track_cxx PRIVATE
-        ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_test_common_track_c99 and

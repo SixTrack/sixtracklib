@@ -5,58 +5,52 @@
     #include "sixtracklib/common/definitions.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
+#if !defined( SIXTRL_OBJECT_TYPE_UNDEFINED )
+    #define SIXTRL_OBJECT_TYPE_UNDEFINED 0
+#endif /* !defined( SIXTRL_OBJECT_TYPE_UNDEFINED ) */
+
 #if defined( __cplusplus )
 extern "C" {
 #endif /* defined( __cplusplus ) */
 
 typedef enum NS(object_type_values_e)
 {
-    NS(OBJECT_TYPE_NONE)                  =          0,
-    NS(OBJECT_TYPE_PARTICLE)              =          1,
-    NS(OBJECT_TYPE_DRIFT)                 =          2,
-    NS(OBJECT_TYPE_DRIFT_EXACT)           =          3,
-    NS(OBJECT_TYPE_MULTIPOLE)             =          4,
-    NS(OBJECT_TYPE_RF_MULTIPOLE)          =        256,
-    NS(OBJECT_TYPE_CAVITY)                =          5,
-    NS(OBJECT_TYPE_XYSHIFT)               =          6,
-    NS(OBJECT_TYPE_SROTATION)             =          7,
-    NS(OBJECT_TYPE_BEAM_BEAM_4D)          =          8,
-    NS(OBJECT_TYPE_BEAM_BEAM_6D)          =          9,
-    NS(OBJECT_TYPE_BEAM_MONITOR)          =         10,
-    NS(OBJECT_TYPE_LIMIT_RECT)            =         11,
-    NS(OBJECT_TYPE_LIMIT_ELLIPSE)         =         12,
-    NS(OBJECT_TYPE_LIMIT_ZETA)            =         13,
-    NS(OBJECT_TYPE_LIMIT_DELTA)           =         14,
-    NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE)    =         16,
-    NS(OBJECT_TYPE_SPACE_CHARGE_COASTING) =         13,
-    NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED)  =         14,
-    NS(OBJECT_TYPE_DIPEDGE)               =         24,
-    NS(OBJECT_TYPE_PARTICLES_ADDR)        =        512,
-    NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM)   =        513,
-    NS(OBJECT_TYPE_BINARY_PATCH_ITEM)     =        514,
-    NS(OBJECT_TYPE_LINE)                  =       1024,
-    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)     =       1025,
-    NS(OBJECT_TYPE_NODE_ID)               =       1026,
-    NS(OBJECT_TYPE_BINARY_ARRAY)          =       8192,
-    NS(OBJECT_TYPE_REAL_ARRAY)            =       8193,
-    NS(OBJECT_TYPE_FLOAT32_ARRAY)         =       8194,
-    NS(OBJECT_TYPE_UINT64_ARRAY)          =       8195,
-    NS(OBJECT_TYPE_INT64_ARRAY)           =       8196,
-    NS(OBJECT_TYPE_UINT32_ARRAY)          =       8197,
-    NS(OBJECT_TYPE_INT32_ARRAY)           =       8198,
-    NS(OBJECT_TYPE_UINT16_ARRAY)          =       8199,
-    NS(OBJECT_TYPE_INT16_ARRAY)           =       8200,
-    NS(OBJECT_TYPE_UINT8_ARRAY)           =       8192,
-    NS(OBJECT_TYPE_INT8_ARRAY)            =       8201,
-    NS(OBJECT_TYPE_CSTRING)               =       8202,
-    NS(OBJECT_TYPE_BINARY_VECTOR)         =       8203,
-    NS(OBJECT_TYPE_MIN_USERDEFINED)       =      32768,
-    NS(OBJECT_TYPE_TRICUB)                =      32768,
-    NS(OBJECT_TYPE_TRICUB_DATA)           =      32769,
-    NS(OBJECT_TYPE_1D_INTERPOL_DATA)      =      32770,
-    NS(OBJECT_TYPE_MAX_USERDEFINED)       =      65535,
-    NS(OBJECT_TYPE_LAST_AVAILABLE)        =      65535,
-    NS(OBJECT_TYPE_INVALID)               = 0x7fffffff
+    NS(OBJECT_TYPE_NONE)                      =          0,
+    NS(OBJECT_TYPE_UNDEFINED)                 =          0,
+    NS(OBJECT_TYPE_PARTICLE)                  =          1,
+    NS(OBJECT_TYPE_DRIFT)                     =          2,
+    NS(OBJECT_TYPE_DRIFT_EXACT)               =          3,
+    NS(OBJECT_TYPE_MULTIPOLE)                 =          4,
+    NS(OBJECT_TYPE_RF_MULTIPOLE)              =        256,
+    NS(OBJECT_TYPE_CAVITY)                    =          5,
+    NS(OBJECT_TYPE_XYSHIFT)                   =          6,
+    NS(OBJECT_TYPE_SROTATION)                 =          7,
+    NS(OBJECT_TYPE_LIN_DECOUPLED_ROTATION)    =        259,
+    NS(OBJECT_TYPE_BEAM_BEAM_4D)              =          8,
+    NS(OBJECT_TYPE_BEAM_BEAM_6D)              =          9,
+    NS(OBJECT_TYPE_BEAM_MONITOR)              =         10,
+    NS(OBJECT_TYPE_LIMIT_RECT)                =         11,
+    NS(OBJECT_TYPE_LIMIT_ELLIPSE)             =         12,
+    NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE)        =         16,
+    NS(OBJECT_TYPE_SC_COASTING)               =         13,
+    NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF)         =         14,
+    NS(OBJECT_TYPE_SC_INTERPOLATED_PROF)      =        257,
+    NS(OBJECT_TYPE_LINE_DENSITY_PROF_DATA)    =        258,
+    NS(OBJECT_TYPE_TRICUB_DATA)               =        260,
+    NS(OBJECT_TYPE_TRICUB)                    =        261,
+    NS(OBJECT_TYPE_DIPEDGE)                   =         24,
+    NS(OBJECT_TYPE_PARTICLES_ADDR)            =        512,
+    NS(OBJECT_TYPE_LINE)                      =       1024,
+    NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF)         =      65534,
+    NS(OBJECT_TYPE_NODE_ID)                   =      65535,
+    NS(OBJECT_TYPE_ASSIGN_ADDRESS_ITEM)       =      65536,
+    NS(OBJECT_TYPE_BINARY_PATCH_ITEM)         =      65537,
+    NS(OBJECT_TYPE_CSTRING)                   =      65538,
+    NS(OBJECT_TYPE_BINARY_ARRAY)              =      65539,
+    NS(OBJECT_TYPE_LAST_AVAILABLE)            =      65538,
+    NS(OBJECT_TYPE_MIN_USERDEFINED)           = 0x10000000,
+    NS(OBJECT_TYPE_MAX_USERDEFINED)           = 0x7ffffffe,
+    NS(OBJECT_TYPE_INVALID)                   = 0x7fffffff
 }
 NS(object_type_values_t);
 
@@ -75,6 +69,10 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_NONE = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_NONE) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_UNDEFINED = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_UNDEFINED) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_PARTICLE     = static_cast< object_type_id_t >(
@@ -121,28 +119,20 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_LIMIT_ELLIPSE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_LIMIT_ZETA = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_LIMIT_ZETA) );
+        OBJECT_TYPE_LIMIT_RECT_ELLIPSE = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_LIMIT_RECT_ELLIPSE) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_LIMIT_DELTA = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_LIMIT_DELTA) );
+        OBJECT_TYPE_SC_COASTING = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_COASTING) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_4D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_4D) );
+        OBJECT_TYPE_SC_QGAUSSIAN_PROF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BEAM_BEAM_6D = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BEAM_BEAM_6D) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_SPACE_CHARGE_COASTING = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_SPACE_CHARGE_COASTING) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_SPACE_CHARGE_BUNCHED = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED) );
+        OBJECT_TYPE_SC_INTERPOLATED_PROF = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_SC_INTERPOLATED_PROF) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_DIPEDGE = static_cast< object_type_id_t >(
@@ -173,54 +163,6 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_ELEM_BY_ELEM_CONF) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BINARY_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BINARY_ARRAY ) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_REAL_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_REAL_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_UINT64_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_UINT64_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INT64_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_INT64_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_UINT32_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_UINT32_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INT32_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_INT32_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_UINT16_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_UINT16_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INT16_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_INT16_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_UINT8_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_UINT8_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_INT8_ARRAY = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_INT8_ARRAY) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_CSTRING) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_BINARY_VECTOR = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_BINARY_VECTOR) );
-
-    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_MIN_USERDEFINED = static_cast< object_type_id_t >(
             NS(OBJECT_TYPE_MIN_USERDEFINED) );
 
@@ -229,12 +171,16 @@ namespace SIXTRL_CXX_NAMESPACE
             NS(OBJECT_TYPE_TRICUB) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_TRICUB_DATA = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_TRICUB_DATA) );
+        OBJECT_TYPE_CSTRING = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_CSTRING) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
-        OBJECT_TYPE_1D_INTERPOL_DATA = static_cast< object_type_id_t >(
-            NS(OBJECT_TYPE_1D_INTERPOL_DATA) );
+        OBJECT_TYPE_BINARY_ARRAY = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_BINARY_ARRAY) );
+
+    SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
+        OBJECT_TYPE_TRICUB_DATA = static_cast< object_type_id_t >(
+            NS(OBJECT_TYPE_TRICUB_DATA) );
 
     SIXTRL_STATIC_VAR SIXTRL_CONSTEXPR_OR_CONST object_type_id_t
         OBJECT_TYPE_MAX_USERDEFINED = static_cast< object_type_id_t >(

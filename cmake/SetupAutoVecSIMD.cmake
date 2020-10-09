@@ -8,13 +8,63 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_AUTOVEC_SIMD_FINISHED )
     # and track its state:
 
     list( APPEND SIXTRACKLIB_SUPPORTED_MODULES "AUTOVECTORIZATION" )
+    set( SIXTRACKL_C_ENABLED_AUTOVEC_FLAGS )
+    set( SIXTRACKL_C_DISABLED_AUTOVEC_FLAGS )
+
+    if( CMAKE_C_COMPILER_ID STREQUAL "Clang" )
+        set( SIXTRACKL_C_DISABLED_AUTOVEC_FLAGS -fno-slp-vectorize )
+    elseif( CMAKE_C_COMPILER_ID STREQUAL "GNU" )
+        set( SIXTRACKL_C_ENABLED_AUTOVEC_FLAGS
+             -ftree-vectorize -ftree-vectorizer-verbose=6
+             -fopt-info-loop
+             -fno-fast-math
+             --param vect-max-version-for-alias-checks=150 )
+        set( SIXTRACKL_DEFAULT_C_NOAUTOVEC_FLAGS -fno-tree-vectorize )
+    endif()
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    set( SIXTRACKL_CXX_ENABLED_AUTOVEC_FLAGS )
+    set( SIXTRACKL_CXX_DISABLED_AUTOVEC_FLAGS )
+
+    if( SIXTRACKL_ENABLE_CXX )
+        if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
+            set( SIXTRACKL_CXX_DISABLED_AUTOVEC_FLAGS -fno-slp-vectorize )
+        elseif( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
+            set( SIXTRACKL_CXX_ENABLED_AUTOVEC_FLAGS
+                 -ftree-vectorize -ftree-vectorizer-verbose=6
+                 -fopt-info-loop
+                 -fno-fast-math
+                 --param vect-max-version-for-alias-checks=150 )
+            set( SIXTRACKL_CXX_DISABLED_AUTOVEC_FLAGS -fno-tree-vectorize )
+        endif()
+    endif()
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    set( SIXTRACKL_C99_AUTOVEC_FLAGS )
+    set( SIXTRACKL_CXX_AUTOVEC_FLAGS )
 
     if( SIXTRACKL_ENABLE_AUTOVECTORIZATION )
         list( APPEND SIXTRACKLIB_SUPPORTED_MODULES_VALUES "1" )
+        set( SIXTRACKL_C99_AUTOVEC_FLAGS ${SIXTRACKL_C_ENABLED_AUTOVEC_FLAGS} )
+
+        if( SIXTRACKL_ENABLE_CXX )
+            set( SIXTRACKL_CXX_AUTOVEC_FLAGS
+               ${SIXTRACKL_CXX_ENABLED_AUTOVEC_FLAGS} )
+        endif()
     else()
         list( APPEND SIXTRACKLIB_SUPPORTED_MODULES_VALUES "0" )
+        set( SIXTRACKL_C99_AUTOVEC_FLAGS
+           ${SIXTRACKL_C_DISABLED_AUTOVEC_FLAGS} )
+
+        if( SIXTRACKL_ENABLE_C99 )
+            set( SIXTRACKL_C99_AUTOVEC_FLAGS
+               ${SIXTRACKL_C99_ENABLED_AUTOVEC_FLAGS} )
+        endif()
     endif()
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     list( APPEND SIXTRACKLIB_SUPPORTED_MODULES "MANUAL_SIMD" )
 

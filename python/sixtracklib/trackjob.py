@@ -52,10 +52,6 @@ from .stcommon import (
     st_OutputBuffer_required_for_tracking,
     st_OutputBuffer_requires_output_buffer,
     st_OutputBuffer_calculate_output_buffer_params,
-    st_OpenCL_get_available_nodes_required_str_capacity,
-    st_OpenCL_get_all_nodes_required_str_capacity,
-    st_OpenCL_get_available_nodes_as_string,
-    st_OpenCL_get_all_nodes_as_string,
     st_TrackJob_get_type_str,
     st_TrackJobNew_track_elem_by_elem,
     st_TrackJobNew_track_line,
@@ -141,6 +137,14 @@ from .stcommon import (
     st_TrackJobNew_uses_controller,
     st_TrackJobNew_uses_arguments,
 )
+
+if stconf.SIXTRACKLIB_MODULES.get("opencl", False):
+    from .stcommon import (
+        st_OpenCL_get_available_nodes_required_str_capacity,
+        st_OpenCL_get_all_nodes_required_str_capacity,
+        st_OpenCL_get_available_nodes_as_string,
+        st_OpenCL_get_all_nodes_as_string,
+    )
 
 
 class TrackJobBaseNew(object):
@@ -575,6 +579,22 @@ class TrackJobBaseNew(object):
     def beam_elements_buffer(self):
         return self._beam_elements_buffer
 
+    @property
+    def has_stored_buffers(self):
+        return st.st_TrackJobNew_has_stored_buffers( self._ptr_track_job )
+
+    @property
+    def num_stored_buffers(self):
+        return st.st_TrackJobNew_num_stored_buffers( self._ptr_track_job )
+
+    @property
+    def min_stored_buffer_id(self):
+        return st.st_TrackJobNew_min_stored_buffer_id( self._ptr_track_job )
+
+    @property
+    def max_stored_buffer_id(self):
+        return st.st_TrackJobNew_max_stored_buffer_id( self._ptr_track_job )
+
     # -------------------------------------------------------------------------
 
     def track_until(self, until_turn):
@@ -825,6 +845,370 @@ class TrackJobBaseNew(object):
             self._ptr_track_job, st_buffer_size_t(particle_set_index)
         )
 
+    # -------------------------------------------------------------------------
+
+    def add_stored_buffer(
+        self,
+        cbuffer=None,
+        size=None,
+        ptr_c_buffer=None,
+        take_ownership=False,
+        delete_ptr_after_move=False,
+    ):
+        _st_buffer = None
+        buffer_id = st.st_ARCH_ILLEGAL_BUFFER_ID.value
+        if not (cbuffer is None):
+            _st_buffer = Buffer.from_cbuffer(cbuffer)
+        elif not (size is None) and size > 0:
+            _st_buffer = Buffer(size=size)
+        elif not (ptr_c_buffer is None) and ptr_c_buffer != st_NullBuffer:
+            owns_buffer = take_ownership
+            owns_pointer = take_ownership and delete_ptr_after_move
+            _st_buffer = Buffer(
+                ptr_ext_buffer=ptr_c_buffer,
+                owns_buffer=owns_buffer,
+                owns_pointer=owns_pointer,
+            )
+        if not (_st_buffer is None) and _st_buffer.pointer != st_NullBuffer:
+            buffer_id = st.st_TrackJobNew_add_stored_buffer(
+                self._ptr_track_job,
+                _st_buffer.pointer,
+                ct.c_bool(False),
+                ct.c_bool(False)
+            )
+            if buffer_id != st.st_ARCH_ILLEGAL_BUFFER_ID.value:
+                assert buffer_id not in self._stored_buffers
+                self._stored_buffers[buffer_id] = _st_buffer
+        return buffer_id
+
+    def remove_stored_buffer(self, buffer_id):
+        return st.st_TrackJobNew_remove_stored_buffer(
+            self._ptr_track_job, st_arch_size_t(buffer_id)
+        )
+
+    def owns_stored_buffer(self, buffer_id):
+        return st.st_TrackJobNew_owns_stored_buffer(
+            self._ptr_track_job, st_arch_size_t(buffer_id)
+        )
+
+    @property
+    def stored_buffer_is_cbuffer(self, buffer_id):
+        return (
+            buffer_id in self._stored_buffers
+            and self._stored_buffers[buffer_id].maps_to_cbuffer
+        )
+
+    def stored_buffer_cbuffer(self, buffer_id):
+        if not self.stored_buffer_is_cbuffer:
+            raise RuntimeError(
+                f"Unable to retrieve CBuffer for buffer_id={buffer_id}"
+            )
+        return self._stored_buffers[buffer_id].cbuffer
+
+    def ptr_stored_buffer(self, buffer_id):
+        return st.st_TrackJobNew_stored_buffer(
+            self._ptr_track_job, st_arch_size_t(buffer_id)
+        )
+
+    def stored_buffer(self, buffer_id):
+        return self._stored_buffers.get(buffer_id, None)
+
+    def push_stored_buffer(self, buffer_id):
+        self._last_status = st.st_TrackJobNew_push_stored_buffer(
+            self._ptr_track_job, st_buffer_size_t(buffer_id)
+        )
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(f"Unable to push stored buffer {buffer_id}")
+        return self
+
+    def collect_stored_buffer(self, buffer_id):
+        self._last_status = st.st_TrackJobNew_collect_stored_buffer(
+            self._ptr_track_job, st_buffer_size_t(buffer_id)
+        )
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(f"Unable to collect stored buffer {buffer_id}")
+        return self
+
+    # -------------------------------------------------------------------------
+
+    @property
+    def total_num_assign_items(self):
+        return st.st_TrackJobNew_total_num_assign_items(self._ptr_track_job)
+
+    def ptr_assign_address_item(
+        self,
+        item=None,
+        dest_elem_type_id=None,
+        dest_buffer_id=None,
+        dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None,
+        src_buffer_id=None,
+        src_elem_index=None,
+        src_pointer_offset=None,
+        index=None,
+    ):
+        _ptr_found = st.st_NullAssignAddressItem
+        if not (item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                _ptr_found = st.st_TrackJobNew_ptr_assign_address_item(
+                    self._ptr_track_job,
+                    ct.cast(item._get_address(), st.st_AssignAddressItem_p),
+                )
+            elif item != st.st_NullAssignAddressItem:
+                _ptr_found = st.st_TrackJobNew_ptr_assign_address_item(
+                    self._ptr_track_job, item
+                )
+        elif not (dest_buffer_id is None) and not (src_buffer_id is None):
+            if not (index is None) and index >= 0:
+                _ptr_found = st.st_TrackJobNew_ptr_assign_address_item_by_index(
+                    self._ptr_track_job,
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(index),
+                )
+            elif (
+                not (dest_elem_type_id is None)
+                and not (dest_elem_index is None)
+                and not (dest_pointer_offset is None)
+                and not (src_elem_type_id is None)
+                and not (src_elem_index is None)
+                and not (src_pointer_offset is None)
+            ):
+                _ptr_found = st.st_TrackJobNew_ptr_assign_address_item_detailed(
+                    self._ptr_track_job,
+                    st_object_type_id_t(dest_elem_type_id),
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(dest_elem_index),
+                    st_buffer_size_t(dest_pointer_offset),
+                    st_object_type_id_t(src_elem_type_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(src_elem_index),
+                    st_buffer_size_t(src_pointer_offset),
+                )
+        return _ptr_found
+
+    def has_assign_items(self, dest_buffer_id, src_buffer_id):
+        return st.st_TrackJobNew_has_assign_items(
+            self._ptr_track_job,
+            st_buffer_size_t(dest_buffer_id),
+            st_buffer_size_t(src_buffer_id),
+        )
+
+    def num_assign_items(self, dest_buffer_id, src_buffer_id):
+        return st.st_TrackJobNew_num_assign_items(
+            self._ptr_track_job,
+            st_buffer_size_t(dest_buffer_id),
+            st_buffer_size_t(src_buffer_id),
+        )
+
+    def has_assign_item(
+        self,
+        item=None,
+        dest_buffer_id=None,
+        src_buffer_id=None,
+        index=None,
+        dest_elem_type_id=None,
+        dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None,
+        src_elem_index=None,
+        src_pointer_offset=None,
+    ):
+        has_item = False
+        if not (item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                has_item = st.st_TrackJobNew_has_assign_address_item(
+                    self._ptr_track_job,
+                    ct.cast(item._get_address(), st.st_AssignAddressItem_p),
+                )
+            elif item != st.st_NullAssignAddressItem:
+                has_item = st.st_TrackJobNew_has_assign_address_item(
+                    self._ptr_track_job, item
+                )
+        elif not (dest_buffer_id is None) and not (src_buffer_id is None):
+            if not (index is None) and index >= 0:
+                has_item = st.st_TrackJobNew_has_assign_item_by_index(
+                    self._ptr_track_job,
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(index),
+                )
+            elif (
+                not (dest_elem_type_id is None)
+                and not (dest_elem_index is None)
+                and not (dest_pointer_offset is None)
+                and not (src_elem_type_id is None)
+                and not (src_elem_index is None)
+                and not (src_pointer_offset is None)
+            ):
+                has_item = st.st_TrackJobNew_has_assign_address_item_detailed(
+                    self._ptr_track_job,
+                    st_object_type_id_t(dest_elem_type_id),
+                    st_buffer_size_t(dest_buffer_id),
+                    st_buffer_size_t(dest_elem_index),
+                    st_buffer_size_t(dest_pointer_offset),
+                    st_object_type_id_t(src_elem_type_id),
+                    st_buffer_size_t(src_buffer_id),
+                    st_buffer_size_t(src_elem_index),
+                    st_buffer_size_t(src_pointer_offset),
+                )
+        return has_item
+
+    def index_of_assign_address_item(
+        self,
+        item=None,
+        dest_buffer_id=None,
+        src_buffer_id=None,
+        dest_elem_type_id=None,
+        dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None,
+        src_elem_index=None,
+        src_pointer_offset=None,
+    ):
+        index_of_item = None
+        if not (item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                index_of_item = st.st_TrackJobNew_index_of_assign_address_item(
+                    self._ptr_track_job,
+                    ct.cast(item._get_address(), st.st_AssignAddressItem_p),
+                )
+            elif item != st.st_NullAssignAddressItem:
+                index_of_item = st.st_TrackJobNew_index_of_assign_address_item(
+                    self._ptr_track_job, item
+                )
+        elif (
+            not (dest_buffer_id is None)
+            and not (src_buffer_id is None)
+            and not (dest_elem_type_id is None)
+            and not (dest_elem_index is None)
+            and not (dest_pointer_offset is None)
+            and not (src_elem_type_id is None)
+            and not (src_elem_index is None)
+            and not (src_pointer_offset is None)
+        ):
+            index_of_item = st.st_TrackJobNew_index_of_assign_address_item_detailed(
+                self._ptr_track_job,
+                st_object_type_id_t(dest_elem_type_id),
+                st_buffer_size_t(dest_buffer_id),
+                st_buffer_size_t(dest_elem_index),
+                st_buffer_size_t(dest_pointer_offset),
+                st_object_type_id_t(src_elem_type_id),
+                st_buffer_size_t(src_buffer_id),
+                st_buffer_size_t(src_elem_index),
+                st_buffer_size_t(src_pointer_offset),
+            )
+        return index_of_item
+
+    def add_assign_address_item(
+        self,
+        item=None,
+        dest_elem_type_id=None,
+        dest_buffer_id=None,
+        dest_elem_index=None,
+        dest_pointer_offset=None,
+        src_elem_type_id=None,
+        src_buffer_id=None,
+        src_elem_index=None,
+        src_pointer_offset=None,
+    ):
+        ptr_added_item = st.st_NullAssignAddressItem
+        if not (item is None):
+            if isinstance(item, AssignAddressItem):
+                # TODO: Figure out a way to do this without relying on
+                #      internal API for cobjects
+                _ptr_item = ct.cast(
+                    item._get_address(), st.st_AssignAddressItem_p
+                )
+
+                ptr_added_item = st.st_TrackJobNew_add_assign_address_item(
+                    self._ptr_track_job, _ptr_item
+                )
+            elif item != st.st_NullAssignAddressItem:
+                ptr_added_item = st.st_TrackJobNew_add_assign_address_item(
+                    self._ptr_track_job, item
+                )
+        elif (
+            not (dest_elem_type_id is None)
+            and not (dest_buffer_id is None)
+            and not (dest_elem_index is None)
+            and not (dest_pointer_offset is None)
+            and not (src_elem_type_id is None)
+            and not (src_buffer_id is None)
+            and not (src_elem_index is None)
+            and not (src_pointer_offset is None)
+        ):
+            ptr_added_item = st.st_TrackJobNew_add_assign_address_item_detailed(
+                self._ptr_track_job,
+                st.st_object_type_id_t(dest_elem_type_id),
+                st_buffer_size_t(dest_buffer_id),
+                st_buffer_size_t(dest_elem_index),
+                st_buffer_size_t(dest_pointer_offset),
+                st.st_object_type_id_t(src_elem_type_id),
+                st_buffer_size_t(src_buffer_id),
+                st_buffer_size_t(src_elem_index),
+                st_buffer_size_t(src_pointer_offset),
+            )
+
+        if ptr_added_item == st.st_NullAssignAddressItem:
+            raise ValueError(
+                "unable to add AssignAddressItem given by these parameters"
+            )
+        return ptr_added_item
+
+    def commit_address_assignments(self):
+        self._last_status = st.st_TrackJobNew_commit_address_assignments(
+            self._ptr_track_job
+        )
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError("Unable to commit address assignment items")
+
+        return self
+
+    def assign_all_addresses(self):
+        self._last_status = st.st_TrackJobNew_assign_all_addresses(
+            self._ptr_track_job
+        )
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError(
+                "Unable to perform assignment of all address items"
+            )
+
+        return self
+
+    def assign_addresses(self, dest_buffer_id, src_buffer_id):
+        if dest_buffer_id is None and src_buffer_id is None:
+            self._last_status = st.st_TrackJobNew_assign_all_addresses(
+                self._ptr_track_job
+            )
+        elif not (dest_buffer_id is None) and not (src_buffer_id is None):
+            self._last_status = st.st_TrackJobNew_assign_addresses(
+                self._ptr_track_job,
+                st_buffer_size_t(dest_buffer_id),
+                st_buffer_size_t(src_buffer_id),
+            )
+        else:
+            raise ValueError(
+                "inconsistent dest_buffer_id and src_buffer_id parameters"
+            )
+            self._last_status = st_ARCH_STATUS_GENERAL_FAILURE.value
+
+        if self._last_status != st_ARCH_STATUS_SUCCESS.value:
+            raise RuntimeError("Unable to perform assignment of address items")
+        return self
+
+# *****************************************************************************
+# *****************************************************************************
+
 
 class TrackJob(object):
     @staticmethod
@@ -917,7 +1301,6 @@ class TrackJob(object):
         self._output_buffer = None
         self._ptr_c_output_buffer = st.st_NullBuffer
         self._stored_buffers = {}
-        self._ext_stored_st_buffers = {}
         self._last_status = st_ARCH_STATUS_SUCCESS.value
         self._last_track_status = st_TRACK_SUCCESS.value
 
@@ -1085,8 +1468,17 @@ class TrackJob(object):
             st.st_Buffer_delete(self._ptr_c_output_buffer)
             self._ptr_c_output_buffer = st.st_NullBuffer
 
-        if len(self._ext_stored_st_buffers) > 0:
-            self._ext_stored_st_buffers = None
+        if len(self._stored_buffers) > 0:
+            stored_buffer_ids = [ ii for ii in self._stored_buffers.keys() ]
+            for buffer_id in stored_buffer_ids:
+                if self._stored_buffers.get( buffer_id ) is None or \
+                   isinstance( self._stored_buffers[ buffer_id ], Buffer ) or \
+                   isinstance( self._stored_buffers[ buffer_id ], CBuffer ) or \
+                   isinstance( self._stored_buffers[ buffer_id ], CObject ):
+                    self._stored_buffers.pop( buffer_id )
+            if len( self._stored_buffers ) > 0:
+                raise RuntimeWarning(
+                    f"remaining stored buffers at destruction of trackjob: {self._stored_buffers.keys()}" )
 
     @property
     def last_status(self):
@@ -1869,6 +2261,7 @@ class TrackJob(object):
                 f"unable to get argument for stored buffer on arch {arch_str}"
             )
         return ptr_arg
+
 
 
 # end: python/sixtracklib/trackjob.py

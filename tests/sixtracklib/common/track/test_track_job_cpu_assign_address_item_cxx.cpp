@@ -302,17 +302,14 @@ TEST( CXX_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
     status = job.collect_stored_buffer( my_lattice_buffer_id );
     ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
 
-    bm0 = reinterpret_cast< be_monitor_t* >(
-        ::NS(BeamElements_buffer_get_beam_monitor)( ptr_my_lattice_buffer,
-            bm0_elem_idx ) );
+    bm0 = reinterpret_cast< be_monitor_t* >( ::NS(BeamMonitor_from_buffer)(
+        ptr_my_lattice_buffer, bm0_elem_idx ) );
 
-    bm1 = reinterpret_cast< be_monitor_t* >(
-        ::NS(BeamElements_buffer_get_beam_monitor)( ptr_my_lattice_buffer,
-            bm1_elem_idx ) );
+    bm1 = reinterpret_cast< be_monitor_t* >( ::NS(BeamMonitor_from_buffer)(
+        ptr_my_lattice_buffer, bm1_elem_idx ) );
 
-    bm2 = reinterpret_cast< be_monitor_t* >(
-        ::NS(BeamElements_buffer_get_beam_monitor)( ptr_my_lattice_buffer,
-            bm2_elem_idx ) );
+    bm2 = reinterpret_cast< be_monitor_t* >( ::NS(BeamMonitor_from_buffer)(
+        ptr_my_lattice_buffer, bm2_elem_idx ) );
 
     SIXTRL_ASSERT( bm0 != nullptr );
     SIXTRL_ASSERT( bm1 != nullptr );

@@ -138,17 +138,26 @@ void NS(Buffer_object_typeid_to_string)( NS(object_type_id_t) const type_id,
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_COASTING):
+            case NS(OBJECT_TYPE_SC_COASTING):
             {
                 strncpy( type_str, SIXTRL_C99_NAMESPACE_PREFIX_STR, len );
                 strncat( type_str, "SpaceChargeCoasting", max_len - pref_len );
                 break;
             }
 
-            case NS(OBJECT_TYPE_SPACE_CHARGE_BUNCHED):
+            case NS(OBJECT_TYPE_SC_QGAUSSIAN_PROF):
             {
                 strncpy( type_str, SIXTRL_C99_NAMESPACE_PREFIX_STR, len );
-                strncat( type_str, "SpaceChargeBunched", max_len - pref_len );
+                strncat( type_str, "SpaceChargeQGaussianProfile",
+                         max_len - pref_len );
+                break;
+            }
+
+            case NS(OBJECT_TYPE_SC_INTERPOLATED_PROF):
+            {
+                strncpy( type_str, SIXTRL_C99_NAMESPACE_PREFIX_STR, len );
+                strncat( type_str, "SpaceChargeInterpolatedProfile",
+                         max_len - pref_len );
                 break;
             }
 
@@ -187,6 +196,7 @@ void NS(Buffer_object_typeid_to_string)( NS(object_type_id_t) const type_id,
                 break;
             }
 
+            /*
             case NS(OBJECT_TYPE_REAL_ARRAY):
             {
                 strncpy( type_str, SIXTRL_C99_NAMESPACE_PREFIX_STR, len );
@@ -249,6 +259,7 @@ void NS(Buffer_object_typeid_to_string)( NS(object_type_id_t) const type_id,
                 strncat( type_str, "Int8Array", max_len - pref_len );
                 break;
             }
+            */
 
             case NS(OBJECT_TYPE_CSTRING):
             {

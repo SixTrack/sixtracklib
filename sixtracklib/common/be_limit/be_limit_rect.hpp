@@ -31,20 +31,19 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ----------------------------------------------------------------- */
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X =
-             value_type{ SIXTRL_LIMIT_DEFAULT_MAX_X };
+        static constexpr value_type  DEFAULT_MIN_X =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MIN_X );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_X };
+        static constexpr value_type  DEFAULT_MAX_X =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MAX_X );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_Y =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MAX_Y };
+        static constexpr value_type  DEFAULT_MIN_Y =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MIN_Y );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_Y =
-            value_type{ SIXTRL_LIMIT_DEFAULT_MIN_Y };
+        static constexpr value_type  DEFAULT_MAX_Y =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MAX_Y );
 
         /* ----------------------------------------------------------------- */
-
 
         SIXTRL_FN TLimitRect() = default;
 
@@ -194,7 +193,7 @@ namespace SIXTRL_CXX_NAMESPACE
      * ====  Specialization TLimitRect< NS(particle_real_t) > :
      * ===================================================================== */
 
-    template<> struct TLimitRect< NS(particle_real_t) > :
+    template<> struct TLimitRect< ::NS(particle_real_t) > :
         public ::NS(LimitRect)
     {
         using value_type = ::NS(particle_real_t);
@@ -204,17 +203,17 @@ namespace SIXTRL_CXX_NAMESPACE
         using c_buffer_t = buffer_t::c_api_t;
         using c_api_t    = ::NS(LimitRect);
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MAX_X =
-             SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_X;
+        static constexpr value_type  DEFAULT_MAX_X =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MAX_X );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type  DEFAULT_MIN_X =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_X;
+        static constexpr value_type  DEFAULT_MIN_X =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MIN_X );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_MAX_Y =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MAX_Y;
+        static constexpr value_type  DEFAULT_MIN_Y =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MIN_Y );
 
-        static SIXTRL_CONSTEXPR_OR_CONST value_type DEFAULT_MIN_Y =
-            SIXTRL_CXX_NAMESPACE::LIMIT_DEFAULT_MIN_Y;
+        static constexpr value_type  DEFAULT_MAX_Y =
+            static_cast< value_type >( SIXTRL_LIMIT_DEFAULT_MAX_Y );
 
         /* ---------------------------------------------------------------- */
 
@@ -522,19 +521,18 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE typename TLimitRect< T >::size_type
     TLimitRect< T >::RequiredNumDataPtrs(
         typename TLimitRect< T >::buffer_t const&
-            SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_RESTRICT_REF SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(LimitRect_num_dataptrs)( nullptr );
     }
 
     template< typename T >
     SIXTRL_INLINE typename TLimitRect< T >::size_type
     TLimitRect< T >::RequiredNumDataPtrs( SIXTRL_BUFFER_ARGPTR_DEC const
         typename TLimitRect< T >::c_buffer_t *const
-            SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_RESTRICT SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_required_num_dataptrs)( ptr_buffer, nullptr );
+        return ::NS(LimitRect_num_dataptrs)( nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -788,18 +786,17 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     LimitRect::size_type LimitRect::RequiredNumDataPtrs(
-        LimitRect::buffer_t const& SIXTRL_RESTRICT_REF buffer ) SIXTRL_NOEXCEPT
+        LimitRect::buffer_t const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( buffer )
+            ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_required_num_dataptrs)(
-            buffer.getCApiPtr(), nullptr );
+        return ::NS(LimitRect_num_dataptrs)( nullptr );
     }
 
     LimitRect::size_type LimitRect::RequiredNumDataPtrs(
         SIXTRL_BUFFER_ARGPTR_DEC const LimitRect::c_buffer_t *const
-            SIXTRL_RESTRICT ptr_buffer ) SIXTRL_NOEXCEPT
+            SIXTRL_RESTRICT SIXTRL_UNUSED( buffer ) ) SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_required_num_dataptrs)(
-            ptr_buffer, nullptr );
+        return ::NS(LimitRect_num_dataptrs)( nullptr );
     }
 
     /* --------------------------------------------------------------------- */
@@ -818,22 +815,22 @@ namespace SIXTRL_CXX_NAMESPACE
 
     LimitRect::value_type LimitRect::getMinX() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_min_x)( this->getCApiPtr() );
+        return ::NS(LimitRect_min_x)( this->getCApiPtr() );
     }
 
     LimitRect::value_type LimitRect::getMaxX() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_max_x)( this->getCApiPtr() );
+        return ::NS(LimitRect_max_x)( this->getCApiPtr() );
     }
 
     LimitRect::value_type LimitRect::getMinY() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_min_y)( this->getCApiPtr() );
+        return ::NS(LimitRect_min_y)( this->getCApiPtr() );
     }
 
     LimitRect::value_type LimitRect::getMaxY() const SIXTRL_NOEXCEPT
     {
-        return ::NS(LimitRect_get_max_y)( this->getCApiPtr() );
+        return ::NS(LimitRect_max_y)( this->getCApiPtr() );
     }
 
     /* --------------------------------------------------------------------- */
@@ -927,7 +924,4 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 #endif /* __cplusplus */
-
 #endif /* SIXTRACKLIB_COMMON_BE_LIMIT_RECT_CXX_HPP__ */
-
-/* end: sixtracklib/common/be_limit/be_limit.hpp */

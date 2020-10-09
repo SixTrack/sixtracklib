@@ -26,14 +26,13 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_opencl)(
 }
 
 __kernel void NS(BeamMonitor_clear_all_line_obj_opencl)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT belements_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     SIXTRL_UINT64_T const slot_size )
 {
     typedef NS(buffer_size_t) buf_size_t;
-
     if( ( buf_size_t )get_global_id( 0 ) == ( buf_size_t )0u )
     {
-        NS(BeamMonitor_clear_all_on_managed_buffer)( belements_buf, slot_size );
+        NS(BeamMonitor_reset_all_in_managed_buffer)( buffer_begin, slot_size );
     }
 }
 

@@ -12,12 +12,12 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-struct NS(MultiPole);
+struct NS(Multipole);
 
 SIXTRL_FN SIXTRL_STATIC SIXTRL_TRACK_RETURN NS(Track_particle_multipole)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const particle_index,
-    SIXTRL_BE_ARGPTR_DEC const struct NS(MultiPole) *const SIXTRL_RESTRICT mp );
+    SIXTRL_BE_ARGPTR_DEC const struct NS(Multipole) *const SIXTRL_RESTRICT mp );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -38,7 +38,7 @@ extern "C" {
 SIXTRL_INLINE int NS(Track_particle_multipole)(
     SIXTRL_PARTICLE_ARGPTR_DEC NS(Particles)* SIXTRL_RESTRICT particles,
     NS(particle_num_elements_t) const index,
-    SIXTRL_BE_ARGPTR_DEC const NS(MultiPole) *const SIXTRL_RESTRICT mp )
+    SIXTRL_BE_ARGPTR_DEC const NS(Multipole) *const SIXTRL_RESTRICT mp )
 {
     typedef NS(particle_real_t)  real_t;
     typedef NS(particle_index_t) index_t;
@@ -46,19 +46,19 @@ SIXTRL_INLINE int NS(Track_particle_multipole)(
     SIXTRL_STATIC_VAR index_t const TWO  = ( index_t )2;
     SIXTRL_STATIC_VAR real_t  const ZERO = ( real_t )0.0;
 
-    index_t const order = NS(MultiPole_get_order)( mp );
+    index_t const order = NS(Multipole_order)( mp );
     index_t index_x = TWO * order;
     index_t index_y = index_x + ( index_t )1;
 
-    real_t dpx = NS(MultiPole_get_bal_value)( mp, index_x );
-    real_t dpy = NS(MultiPole_get_bal_value)( mp, index_y );
+    real_t dpx = NS(Multipole_bal)( mp, index_x );
+    real_t dpy = NS(Multipole_bal)( mp, index_y );
 
     real_t const x      = NS(Particles_get_x_value)( particles, index );
     real_t const y      = NS(Particles_get_y_value)( particles, index );
     real_t const chi    = NS(Particles_get_chi_value)( particles, index );
 
-    real_t const hxl    = NS(MultiPole_get_hxl)( mp );
-    real_t const hyl    = NS(MultiPole_get_hyl)( mp );
+    real_t const hxl    = NS(Multipole_hxl)( mp );
+    real_t const hyl    = NS(Multipole_hyl)( mp );
 
     SIXTRL_ASSERT( NS(Particles_get_state_value)( particles, index ) ==
                    ( NS(particle_index_t) )1 );
@@ -74,8 +74,8 @@ SIXTRL_INLINE int NS(Track_particle_multipole)(
         index_x -= TWO;
         index_y -= TWO;
 
-        dpx = NS(MultiPole_get_bal_value)( mp, index_x ) + zre;
-        dpy = NS(MultiPole_get_bal_value)( mp, index_y ) + zim;
+        dpx = NS(Multipole_bal)( mp, index_x ) + zre;
+        dpy = NS(Multipole_bal)( mp, index_y ) + zim;
     }
 
     dpx = -chi * dpx;
@@ -84,7 +84,7 @@ SIXTRL_INLINE int NS(Track_particle_multipole)(
     if( ( hxl > ZERO ) || ( hyl > ZERO ) || ( hxl < ZERO ) || ( hyl < ZERO ) )
     {
         real_t const delta  = NS(Particles_get_delta_value)( particles, index );
-        real_t const length = NS(MultiPole_get_length)( mp );
+        real_t const length = NS(Multipole_length)( mp );
 
         real_t const hxlx   = x * hxl;
         real_t const hyly   = y * hyl;
@@ -97,8 +97,8 @@ SIXTRL_INLINE int NS(Track_particle_multipole)(
 
         if( length > ZERO )
         {
-            real_t const b1l = chi * NS(MultiPole_get_bal_value)( mp, 0 );
-            real_t const a1l = chi * NS(MultiPole_get_bal_value)( mp, 1 );
+            real_t const b1l = chi * NS(Multipole_bal)( mp, 0 );
+            real_t const a1l = chi * NS(Multipole_bal)( mp, 1 );
 
             dpx -= b1l * hxlx / length;
             dpy += a1l * hyly / length;

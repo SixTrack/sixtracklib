@@ -21,7 +21,5 @@
     #include "sixtracklib/common/control/controller_base.h"
     #include "sixtracklib/common/control/node_controller_base.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
-
 #endif /* SIXTRACKLIB_COMMON_CONTEXT_H__ */
-
 /* end: sixtracklib/common/controller.h */

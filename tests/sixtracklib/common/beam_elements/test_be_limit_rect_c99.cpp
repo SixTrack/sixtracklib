@@ -18,7 +18,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/be_limit/track.h"
 
-TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
+TEST( C99CommonBeamElementLimitRect, BasicUsage )
 {
     using be_limit_t   = ::NS(LimitRect);
     using buffer_t     = ::NS(Buffer);
@@ -47,16 +47,16 @@ TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
     be_limit_t* l2 = ::NS(LimitRect_new)( eb );
     ASSERT_TRUE( l2 != nullptr );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_min_x)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_x)( l2 ) -
         ::NS(LIMIT_DEFAULT_MIN_X) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_max_x)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_max_x)( l2 ) -
         ::NS(LIMIT_DEFAULT_MAX_X) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_min_y)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_y)( l2 ) -
         ::NS(LIMIT_DEFAULT_MIN_Y) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_max_y)( l2 ) -
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_max_y)( l2 ) -
         ::NS(LIMIT_DEFAULT_MAX_Y) ) < EPS );
 
     ASSERT_TRUE( ::NS(ARCH_STATUS_SUCCESS) ==
@@ -67,26 +67,18 @@ TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
         MIN_X_VALUE, MAX_X_VALUE, MIN_Y_VALUE, MAX_Y_VALUE );
     ASSERT_TRUE( l3 != nullptr );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_min_x)( l3 ) -
-        MIN_X_VALUE ) < EPS );
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_x)( l3 ) - MIN_X_VALUE ) < EPS );
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_max_x)( l3 ) - MAX_X_VALUE ) < EPS );
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_y)( l3 ) - MIN_Y_VALUE ) < EPS );
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_max_y)( l3 ) - MAX_Y_VALUE ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_max_x)( l3 ) -
-        MAX_X_VALUE ) < EPS );
+    ::NS(LimitRect_set_x_limit)( l3, ::NS(LimitRect_max_y)( l3 ) );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_min_y)( l3 ) -
-        MIN_Y_VALUE ) < EPS );
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_max_x)( l3 ) -
+        ::NS(LimitRect_max_y)( l3 ) ) < EPS );
 
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_max_y)( l3 ) -
-        MAX_Y_VALUE ) < EPS );
-
-    ::NS(LimitRect_set_x_limit)( l3, ::NS(LimitRect_get_max_y)( l3 ) );
-
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_max_x)( l3 ) -
-        ::NS(LimitRect_get_max_y)( l3 ) ) < EPS );
-
-    ASSERT_TRUE( std::fabs( ::NS(LimitRect_get_min_x)( l3 ) -
-        ( -::NS(LimitRect_get_max_y)( l3 ) ) ) < EPS );
-
+    ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_x)( l3 ) -
+        ( -::NS(LimitRect_max_y)( l3 ) ) ) < EPS );
 
     be_limit_t* l4 = ::NS(LimitRect_add_copy)( eb, &limit );
 
@@ -95,11 +87,8 @@ TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
 
     real_t const TRESHOLD = real_t{ 9e-4 };
 
-    ::NS(LimitRect_set_x_limit)( l4,
-         ::NS(LimitRect_get_max_x)( l4 ) + TRESHOLD );
-
+    ::NS(LimitRect_set_x_limit)( l4, ::NS(LimitRect_max_x)( l4 ) + TRESHOLD );
     ASSERT_TRUE( 0 != ::NS(LimitRect_compare_values)( l4, &limit ) );
-
     ASSERT_TRUE( 0 != ::NS(LimitRect_compare_values_with_treshold)(
         l4, &limit, EPS ) );
 
@@ -110,7 +99,7 @@ TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
 }
 
 
-TEST( C99CommonBeamElementLimitRectTests, ApertureCheck )
+TEST( C99CommonBeamElementLimitRect, ApertureCheck )
 {
     using be_limit_t  = ::NS(LimitRect);
     using buffer_t    = ::NS(Buffer);
@@ -240,5 +229,3 @@ TEST( C99CommonBeamElementLimitRectTests, ApertureCheck )
 
     ::NS(Buffer_delete)( pb );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_c99.cpp */

@@ -16,7 +16,7 @@
 #include "sixtracklib/common/particles.hpp"
 #include "sixtracklib/common/be_limit/track.h"
 
-TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
+TEST( CXXCommonBeamElementLimitRect, BasicUsage )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -84,8 +84,7 @@ TEST( C99CommonBeamElementLimitRectTests, BasicUsage )
         l4->getCApiPtr(), limit.getCApiPtr(), TRESHOLD ) );
 }
 
-
-TEST( CXXCommonBeamElementLimitRectTests, ApertureCheck )
+TEST( CXXCommonBeamElementLimitRect, ApertureCheck )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -214,5 +213,3 @@ TEST( CXXCommonBeamElementLimitRectTests, ApertureCheck )
                      expected_state_after_track[ ii ] );
     }
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_rect_cxx.cpp */

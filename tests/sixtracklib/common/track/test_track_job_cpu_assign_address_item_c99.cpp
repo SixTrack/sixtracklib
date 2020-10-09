@@ -417,27 +417,22 @@ TEST( C99_Cpu_CpuTrackJob_AssignAddressItemTests, MinimalUsage )
 
     ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
-    bm0 = ::NS(BeamElements_buffer_get_beam_monitor)(
-                ptr_my_lattice_buffer, bm0_elem_idx );
-
-    bm1 = ::NS(BeamElements_buffer_get_beam_monitor)(
-                ptr_my_lattice_buffer, bm1_elem_idx );
-
-    bm2 = ::NS(BeamElements_buffer_get_beam_monitor)(
-                ptr_my_lattice_buffer, bm2_elem_idx );
+    bm0 = ::NS(BeamMonitor_from_buffer)( ptr_my_lattice_buffer, bm0_elem_idx );
+    bm1 = ::NS(BeamMonitor_from_buffer)( ptr_my_lattice_buffer, bm1_elem_idx );
+    bm2 = ::NS(BeamMonitor_from_buffer)( ptr_my_lattice_buffer, bm2_elem_idx );
 
     SIXTRL_ASSERT( bm0 != nullptr );
     SIXTRL_ASSERT( bm1 != nullptr );
     SIXTRL_ASSERT( bm2 != nullptr );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm0 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer0 ) );
+    ASSERT_TRUE( ::NS(BeamMonitor_out_address)( bm0 ) ==
+        reinterpret_cast< uintptr_t >( out_buffer0 ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm1 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer1 ) );
+    ASSERT_TRUE( ::NS(BeamMonitor_out_address)( bm1 ) ==
+        reinterpret_cast< uintptr_t >( out_buffer1 ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( bm2 ) ==
-                        reinterpret_cast< uintptr_t >( out_buffer0 ) );
+    ASSERT_TRUE( ::NS(BeamMonitor_out_address)( bm2 ) ==
+        reinterpret_cast< uintptr_t >( out_buffer0 ) );
 
     /* --------------------------------------------------------------------- */
 

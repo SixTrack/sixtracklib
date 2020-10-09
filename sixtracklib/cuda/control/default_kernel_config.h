@@ -58,7 +58,10 @@ NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
     NS(buffer_size_t) const threads_per_block );
 
-
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(CudaKernelConfig_configure_assign_address_kernel)(
+    NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
 
 #endif /* !defined( _GPUCODE ) */
 

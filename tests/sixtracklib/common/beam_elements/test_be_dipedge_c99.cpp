@@ -14,7 +14,7 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/buffer.h"
 
-TEST( C99CommonBeamElementDipoleEdgeTests, BasicUsage )
+TEST( C99CommonBeamElementDipoleEdge, BasicUsage )
 {
     using be_dipedge_t = ::NS(DipoleEdge);
     using buffer_t     = ::NS(Buffer);
@@ -38,5 +38,3 @@ TEST( C99CommonBeamElementDipoleEdgeTests, BasicUsage )
 
     ::NS(Buffer_delete)( eb );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_c99.cpp */

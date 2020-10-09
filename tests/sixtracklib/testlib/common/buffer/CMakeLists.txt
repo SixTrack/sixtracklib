@@ -22,7 +22,8 @@ set_target_properties( sixtrack_test_common_buffer_c99 PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_buffer_c99 PRIVATE
-        ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # -----------------------------------------------------------------------------
 # cxx object library

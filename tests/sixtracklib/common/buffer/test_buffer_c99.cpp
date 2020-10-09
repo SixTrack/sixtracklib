@@ -791,7 +791,7 @@ TEST( CXX_Common_Buffer_BufferTests, ReconstructFromCObjectFile )
                      ::NS(Object_get_type_id)( obj_it ) );
 
         ASSERT_TRUE( ptr_my_obj->a == cmp_obj_it->a );
-        ASSERT_TRUE( std::abs( ( ptr_my_obj->b - cmp_obj_it->b ) < EPS ) );
+        ASSERT_TRUE( std::abs( ptr_my_obj->b - cmp_obj_it->b ) < EPS );
 
         for( std::size_t ii = 0u ; ii < 4u ; ++ii )
         {
@@ -804,8 +804,8 @@ TEST( CXX_Common_Buffer_BufferTests, ReconstructFromCObjectFile )
 
         for( std::size_t ii = 0u ; ii < 4u ; ++ii )
         {
-            ASSERT_TRUE( std::abs( ( ptr_my_obj->d[ ii ] -
-                cmp_obj_it->d[ ii ] ) < EPS ) );
+            ASSERT_TRUE( std::abs( ptr_my_obj->d[ ii ] -
+                cmp_obj_it->d[ ii ] ) < EPS );
         }
 
         ASSERT_TRUE( ptr_my_obj->e != nullptr );

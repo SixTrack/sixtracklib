@@ -28,7 +28,7 @@
 #include "sixtracklib/common/track/track.h"
 
 
-TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
+TEST( C99CommonBeamMonitor, MinimalAddToBufferCopyRemapRead )
 {
     using size_t        = ::NS(buffer_size_t);
     using raw_t         = unsigned char;
@@ -77,14 +77,14 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ::NS(BeamMonitor)* be_monitor = ::NS(BeamMonitor_new)( eb );
 
     ASSERT_TRUE( be_monitor != nullptr );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_num_stores)( be_monitor ) == nturn_t{ 0 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_start)( be_monitor ) == nturn_t{ 0 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_skip)( be_monitor ) == nturn_t{ 1 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_num_stores)( be_monitor ) == nturn_t{ 0 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_start)( be_monitor ) == nturn_t{ 0 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_skip)( be_monitor ) == nturn_t{ 1 } );
     ASSERT_TRUE( !::NS(BeamMonitor_is_rolling)( be_monitor ) );
     ASSERT_TRUE(  ::NS(BeamMonitor_is_turn_ordered)( be_monitor ) );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_out_address)( be_monitor ) == addr_t{ 0 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) == index_t{ 0 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) == index_t{ 0 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_out_address)( be_monitor ) == addr_t{ 0 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_min_particle_id)( be_monitor ) == index_t{ -1 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_max_particle_id)( be_monitor ) == index_t{ -1 } );
 
     ::NS(BeamMonitor_set_num_stores)( be_monitor, 10u );
     ::NS(BeamMonitor_set_start)( be_monitor, 1000u );
@@ -94,23 +94,23 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ::NS(BeamMonitor_set_out_address)( be_monitor, out_addr_0 );
 
     ASSERT_TRUE( be_monitor != nullptr );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_num_stores)( be_monitor ) == nturn_t{ 10 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_start)( be_monitor ) == nturn_t{ 1000 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_skip)( be_monitor ) == nturn_t{ 4 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_num_stores)( be_monitor ) == nturn_t{ 10 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_start)( be_monitor ) == nturn_t{ 1000 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_skip)( be_monitor ) == nturn_t{ 4 } );
     ASSERT_TRUE(  ::NS(BeamMonitor_is_rolling)( be_monitor ) );
     ASSERT_TRUE(  ::NS(BeamMonitor_is_turn_ordered)( be_monitor ) );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_out_address)( be_monitor ) == out_addr_0 );
+    ASSERT_TRUE(  ::NS(BeamMonitor_out_address)( be_monitor ) == out_addr_0 );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) >=
+    ASSERT_TRUE(  ::NS(BeamMonitor_min_particle_id)( be_monitor ) >=
                   index_t{ 0 } );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) <=
+    ASSERT_TRUE(  ::NS(BeamMonitor_min_particle_id)( be_monitor ) <=
                   static_cast< index_t >( min_particle_id ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) >=
-                 ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) );
+    ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( be_monitor ) >=
+                 ::NS(BeamMonitor_min_particle_id)( be_monitor ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) >=
+    ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( be_monitor ) >=
                  static_cast< index_t >( max_particle_id ) );
 
     cmp_beam_monitors.push_back( *be_monitor );
@@ -123,14 +123,14 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 
     cmp_beam_monitors.push_back( *copy_be_monitor );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_num_stores)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_num_stores)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_num_stores)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_num_stores)( &cmp_beam_monitors[ 0 ] ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_start)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_start)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_start)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_start)( &cmp_beam_monitors[ 0 ] ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_skip)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_skip)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_skip)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_skip)( &cmp_beam_monitors[ 0 ] ) );
 
     ASSERT_TRUE(  ::NS(BeamMonitor_is_rolling)( copy_be_monitor ) ==
                   ::NS(BeamMonitor_is_rolling)( &cmp_beam_monitors[ 0 ] ) );
@@ -141,30 +141,30 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ASSERT_TRUE(  ::NS(BeamMonitor_is_turn_ordered)( copy_be_monitor ) ==
                   ::NS(BeamMonitor_is_turn_ordered)( &cmp_beam_monitors[ 0 ] ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_out_address)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_out_address)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_out_address)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_out_address)( &cmp_beam_monitors[ 0 ] ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_min_particle_id)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_min_particle_id)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_min_particle_id)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_min_particle_id)( &cmp_beam_monitors[ 0 ] ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_max_particle_id)( copy_be_monitor ) ==
-                  ::NS(BeamMonitor_get_max_particle_id)( &cmp_beam_monitors[ 0 ] ) );
+    ASSERT_TRUE(  ::NS(BeamMonitor_max_particle_id)( copy_be_monitor ) ==
+                  ::NS(BeamMonitor_max_particle_id)( &cmp_beam_monitors[ 0 ] ) );
 
     be_monitor = ::NS(BeamMonitor_add)( eb, 10u, 5000u, 1u, out_addr_1,
         min_particle_id, max_particle_id, false, true );
 
     ASSERT_TRUE( be_monitor != nullptr );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_num_stores)( be_monitor ) == nturn_t{ 10 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_start)( be_monitor ) == nturn_t{ 5000 } );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_skip)( be_monitor ) == nturn_t{ 1 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_num_stores)( be_monitor ) == nturn_t{ 10 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_start)( be_monitor ) == nturn_t{ 5000 } );
+    ASSERT_TRUE(  ::NS(BeamMonitor_skip)( be_monitor ) == nturn_t{ 1 } );
     ASSERT_TRUE( !::NS(BeamMonitor_is_rolling)( be_monitor ) );
     ASSERT_TRUE(  ::NS(BeamMonitor_is_turn_ordered)( be_monitor ) );
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_out_address)( be_monitor ) == out_addr_1 );
+    ASSERT_TRUE(  ::NS(BeamMonitor_out_address)( be_monitor ) == out_addr_1 );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) ==
+    ASSERT_TRUE(  ::NS(BeamMonitor_min_particle_id)( be_monitor ) ==
                   static_cast< index_t >( min_particle_id ) );
 
-    ASSERT_TRUE(  ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) ==
+    ASSERT_TRUE(  ::NS(BeamMonitor_max_particle_id)( be_monitor ) ==
                   static_cast< index_t >( max_particle_id ) );
 
     cmp_beam_monitors.push_back( *be_monitor );
@@ -215,14 +215,14 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
             ::NS(Buffer_get_const_data_begin)( eb ),
             ::NS(Buffer_get_slot_size)( eb ) ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    ASSERT_TRUE( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                  cmp_beam_monitors.size() );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_num_of_beam_monitor_objects_from_managed_buffer)(
-        ::NS(Buffer_get_const_data_begin)( eb ), ::NS(Buffer_get_slot_size)( eb ) ) ==
-                 cmp_beam_monitors.size() );
+    ASSERT_TRUE( ::NS(BeamMonitor_num_monitors_in_managed_buffer)(
+        ::NS(Buffer_get_const_data_begin)( eb ),
+        ::NS(Buffer_get_slot_size)( eb ) ) == cmp_beam_monitors.size() );
 
-    ::NS(BeamMonitor_clear_all)( eb );
+    ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
     jj = 0;
 
@@ -240,14 +240,14 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
 
         ASSERT_TRUE( ptr_bemon != nullptr );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_num_stores)( ptr_bemon ) ==
-                     ::NS(BeamMonitor_get_num_stores)( &cmp_be_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_num_stores)( ptr_bemon ) ==
+                     ::NS(BeamMonitor_num_stores)( &cmp_be_monitor ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_start)( ptr_bemon ) ==
-                     ::NS(BeamMonitor_get_start)( &cmp_be_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_start)( ptr_bemon ) ==
+                     ::NS(BeamMonitor_start)( &cmp_be_monitor ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_skip)( ptr_bemon ) ==
-                     ::NS(BeamMonitor_get_skip)( &cmp_be_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_skip)( ptr_bemon ) ==
+                     ::NS(BeamMonitor_skip)( &cmp_be_monitor ) );
 
         ASSERT_TRUE( ::NS(BeamMonitor_is_rolling)( ptr_bemon ) ==
                      ::NS(BeamMonitor_is_rolling)( &cmp_be_monitor ) );
@@ -255,17 +255,17 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
         ASSERT_TRUE( ::NS(BeamMonitor_is_turn_ordered)( ptr_bemon ) ==
                      ::NS(BeamMonitor_is_turn_ordered)( &cmp_be_monitor ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( ptr_bemon ) !=
-                     ::NS(BeamMonitor_get_out_address)( &cmp_be_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( ptr_bemon ) !=
+                     ::NS(BeamMonitor_out_address)( &cmp_be_monitor ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( ptr_bemon ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( ptr_bemon ) ==
                      addr_t{ 0 } );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( ptr_bemon ) ==
-                     index_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( ptr_bemon ) ==
+                     index_t{ -1 } );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( ptr_bemon ) ==
-                     index_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( ptr_bemon ) ==
+                     index_t{ -1 } );
     }
 
     ::NS(Buffer_delete)( eb );
@@ -274,7 +274,7 @@ TEST( C99CommonBeamMonitorTests, MinimalAddToBufferCopyRemapRead )
     ::NS(Buffer_free)( &cmp_eb );
 }
 
-TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
+TEST( C99CommonBeamMonitor, AssignIoBufferToBeamMonitors )
 {
     using real_t        = ::NS(particle_real_t);
     using size_t        = ::NS(buffer_size_t);
@@ -324,14 +324,14 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
 
         ASSERT_TRUE( be_monitor != nullptr );
 
-        sum_num_of_stores += ::NS(BeamMonitor_get_num_stores)( be_monitor );
+        sum_num_of_stores += ::NS(BeamMonitor_num_stores)( be_monitor );
         cmp_beam_monitors.push_back( *be_monitor );
     }
 
     ASSERT_TRUE( ::NS(ElemByElemConfig_get_num_elem_by_elem_objects)( eb ) ==
                  ( NUM_DRIFTS + NUM_BEAM_MONITORS ) );
 
-    ASSERT_TRUE( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    ASSERT_TRUE( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                  NUM_BEAM_MONITORS );
 
     /* --------------------------------------------------------------------- */
@@ -389,7 +389,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) !=
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) !=
                          addr_t{ 0 } );
 
             addr_t const cmp_addr = static_cast< addr_t >( reinterpret_cast<
@@ -397,22 +397,22 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     out_buffer, out_particles_offset ) ) );
 
             ASSERT_TRUE( cmp_addr != addr_t{ 0 }  );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) == cmp_addr );
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) == cmp_addr );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) >=
                          index_t{ 0 } );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) <=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) <=
                          static_cast< index_t >( min_particle_id ) );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( be_monitor ) >=
                          static_cast< index_t >( max_particle_id ) );
 
             ++out_particles_offset;
         }
     }
 
-    ::NS(BeamMonitor_clear_all)( eb );
+    ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
     eb_it = eb_begin;
 
@@ -425,7 +425,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) ==
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) ==
                          addr_t{ 0 } );
         }
     }
@@ -471,7 +471,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) !=
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) !=
                          addr_t{ 0 } );
 
             addr_t const cmp_addr = static_cast< addr_t >( reinterpret_cast<
@@ -481,16 +481,16 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
             ASSERT_TRUE( cmp_addr != addr_t{ 0 }  );
             ASSERT_TRUE( cmp_beam_monitors.size() > jj );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) ==
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) ==
                          cmp_addr );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) >=
                          index_t{ 0 } );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) <=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) <=
                          static_cast< index_t >( min_particle_id ) );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( be_monitor ) >=
                          static_cast< index_t >( max_particle_id ) );
 
             ++out_particles_offset;
@@ -498,7 +498,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
         }
     }
 
-    ::NS(BeamMonitor_clear_all)( eb );
+    ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
     eb_it = eb_begin;
 
@@ -511,7 +511,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)(
                 be_monitor ) == addr_t{ 0 } );
         }
     }
@@ -557,7 +557,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
             ASSERT_TRUE( be_monitor != nullptr );
 
             nturn_t const num_stores =
-                ::NS(BeamMonitor_get_num_stores)( be_monitor );
+                ::NS(BeamMonitor_num_stores)( be_monitor );
 
             if( num_stores > nturn_t{ 0 } )
             {
@@ -593,7 +593,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) !=
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) !=
                          addr_t{ 0 } );
 
             addr_t const cmp_addr = static_cast< addr_t >( reinterpret_cast<
@@ -603,16 +603,16 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
             ASSERT_TRUE( cmp_addr != addr_t{ 0 }  );
             ASSERT_TRUE( cmp_beam_monitors.size() > jj );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( be_monitor ) ==
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( be_monitor ) ==
                          cmp_addr );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) >=
                          index_t{ 0 } );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_min_particle_id)( be_monitor ) <=
+            ASSERT_TRUE( ::NS(BeamMonitor_min_particle_id)( be_monitor ) <=
                          static_cast< index_t >( min_particle_id ) );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_max_particle_id)( be_monitor ) >=
+            ASSERT_TRUE( ::NS(BeamMonitor_max_particle_id)( be_monitor ) >=
                          static_cast< index_t >( max_particle_id ) );
 
             ++out_particles_offset;
@@ -620,7 +620,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
         }
     }
 
-    ::NS(BeamMonitor_clear_all)( eb );
+    ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
     eb_it = eb_begin;
 
@@ -633,7 +633,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
                     eb_it ) );
 
             ASSERT_TRUE( be_monitor != nullptr );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)(
                 be_monitor ) == addr_t{ 0 } );
         }
     }
@@ -645,7 +645,7 @@ TEST( C99CommonBeamMonitorTests, AssignIoBufferToBeamMonitors )
     ::NS(Buffer_delete)( out_buffer );
 }
 
-TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
+TEST( C99CommonBeamMonitor, TrackingAndTurnByTurnIO )
 {
     using real_t          = ::NS(particle_real_t);
     using status_t        = ::NS(arch_status_t);
@@ -700,10 +700,10 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
         ASSERT_TRUE( be_monitor != nullptr );
 
         nturn_t const num_stores =
-            ::NS(BeamMonitor_get_num_stores)( be_monitor );
+            ::NS(BeamMonitor_num_stores)( be_monitor );
 
-        nturn_t const skip  = ::NS(BeamMonitor_get_skip)( be_monitor );
-        nturn_t const start = ::NS(BeamMonitor_get_start)( be_monitor );
+        nturn_t const skip  = ::NS(BeamMonitor_skip)( be_monitor );
+        nturn_t const start = ::NS(BeamMonitor_start)( be_monitor );
         nturn_t const n     = num_stores * skip;
 
         ASSERT_TRUE( num_stores > nturn_t{ 0 } );
@@ -841,7 +841,7 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                     ::NS(Object_get_const_begin_ptr)( obj_it ) );
 
             ASSERT_TRUE( monitor != nullptr );
-            nturn_t const num_stores = ::NS(BeamMonitor_get_num_stores)( monitor );
+            nturn_t const num_stores = ::NS(BeamMonitor_num_stores)( monitor );
 
             ASSERT_TRUE( out_particle_block_index <
                 ::NS(Buffer_get_num_of_objects)( out_buffer ) );
@@ -850,8 +850,8 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                 ::NS(Particles_buffer_get_const_particles)(
                     out_buffer, out_particle_block_index );
 
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( monitor ) != addr_t{ 0 } );
-            ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( monitor ) == static_cast<
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( monitor ) != addr_t{ 0 } );
+            ASSERT_TRUE( ::NS(BeamMonitor_out_address)( monitor ) == static_cast<
                 addr_t >( reinterpret_cast< uintptr_t >( out_particles ) ) );
 
             ASSERT_TRUE( num_stores > nturn_t{ 0 } );
@@ -913,7 +913,7 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                 ptr_const_mon_t mon = reinterpret_cast< ptr_const_mon_t >(
                         ::NS(Object_get_const_begin_ptr)( obj_it ) );
 
-                ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
+                ASSERT_TRUE( ::NS(BeamMonitor_out_address)(
                     mon ) != addr_t{ 0 } );
 
                 if( !::NS(BeamMonitor_has_turn_stored)( mon, kk, NUM_TURNS ) )
@@ -921,13 +921,13 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
                     continue;
                 }
 
-                ASSERT_TRUE( ::NS(BeamMonitor_get_start)( mon ) <= kk );
-                ASSERT_TRUE( ( ( kk - ::NS(BeamMonitor_get_start)( mon ) )
-                    % ::NS(BeamMonitor_get_skip)( mon ) ) == nturn_t{ 0 } );
+                ASSERT_TRUE( ::NS(BeamMonitor_start)( mon ) <= kk );
+                ASSERT_TRUE( ( ( kk - ::NS(BeamMonitor_start)( mon ) )
+                    % ::NS(BeamMonitor_skip)( mon ) ) == nturn_t{ 0 } );
 
                 ptr_particles_t out_particles = reinterpret_cast<
                     ptr_particles_t >( static_cast< uintptr_t >(
-                        ::NS(BeamMonitor_get_out_address)( mon ) ) );
+                        ::NS(BeamMonitor_out_address)( mon ) ) );
 
                 ASSERT_TRUE( elem_by_elem_particles != nullptr );
 
@@ -1004,5 +1004,3 @@ TEST( C99CommonBeamMonitorTests, TrackingAndTurnByTurnIO )
     ::NS(Buffer_delete)( elem_by_elem_buffer );
     ::NS(Buffer_delete)( cmp_particles_buffer );
 }
-
-/* end: tests/sixtracklib/common/test_be_monitor_c99.cpp */

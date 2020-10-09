@@ -41,7 +41,8 @@ set_target_properties( sixtrack_common_buffer PROPERTIES LINKER_LANGUAGE C
     POSITION_INDEPENDENT_CODE ON C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_common_buffer PRIVATE
-    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXTRACKLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixtrack_common_buffer as a module for sixtracklib:

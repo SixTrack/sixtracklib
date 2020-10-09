@@ -827,7 +827,7 @@ TEST( CXXOpenCLTrackJobClTests, CreateTrackJobTrackLineCompare )
 
         SIXTRL_ASSERT( particles != nullptr );
         particles->copy( *orig_particles );
-        ::NS(BeamMonitor_clear_all)( eb.getCApiPtr() );
+        ::NS(BeamMonitor_reset_all_in_buffer)( eb.getCApiPtr() );
 
         std::cout << "node " << ( kk + size_t{ 1 } )
                   << " / " << num_nodes << "\r\n";
@@ -1142,7 +1142,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
         ASSERT_TRUE( ptr_output_buffer->getNumObjects() ==
                       cmp_output_buffer.getNumObjects() );
 
-        double const ABS_ERR = double{ 2e-14 };
+        double const ABS_ERR = double{ 5e-11 };
 
         if( ::NS(Particles_buffers_compare_values)(
                 ptr_output_buffer->getCApiPtr(),
