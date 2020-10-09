@@ -602,7 +602,7 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     template< typename PartSetIndexIter >
     CudaTrackJob::CudaTrackJob(
-        std::string const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( node_id_str ),
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
         CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         PartSetIndexIter pset_indices_begin, PartSetIndexIter pset_indices_end,
         CudaTrackJob::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
@@ -626,8 +626,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename PartSetIndexIter >
-    CudaTrackJob::CudaTrackJob(
-        char const* SIXTRL_RESTRICT SIXTRL_UNUSED( node_id_str ),
+    CudaTrackJob::CudaTrackJob( char const* SIXTRL_RESTRICT node_id_str,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         PartSetIndexIter pset_indices_begin, PartSetIndexIter pset_indices_end,
         CudaTrackJob::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
