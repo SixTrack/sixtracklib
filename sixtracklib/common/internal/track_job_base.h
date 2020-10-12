@@ -511,7 +511,7 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN size_type numElemByElemTurns() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() SIXTRL_NOEXCEPT;
-        SIXTRL_HOST_FN buffer_t* ptrOutputBuffer() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN buffer_t const* ptrOutputBuffer() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN c_buffer_t* ptrCOutputBuffer() SIXTRL_NOEXCEPT;
 
@@ -783,9 +783,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doUpdateStoredElemByElemConfig(
             ptr_buffer_t&& ptr_config ) SIXTRL_NOEXCEPT;
-
-        SIXTRL_HOST_FN void doUpdateStoredParticlesAddrBuffer(
-            ptr_buffer_t&& ptr_particles_addr_buffer ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN buffer_store_t* doGetPtrBufferStore(
             size_type const buffer_id ) SIXTRL_NOEXCEPT;
