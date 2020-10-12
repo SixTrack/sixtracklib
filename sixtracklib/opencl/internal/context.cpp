@@ -36,7 +36,7 @@ namespace SIXTRL_CXX_NAMESPACE
         using base_ctx_t = st::ClContextBase;
         using ctx_t = st::ClContext;
         using st_size_t    = ctx_t::size_type;
-        using st_kernel_id_t  = st_kernel_id_t;
+        using st_kernel_id_t  = ctx_t::kernel_id_t;
         using st_program_id_t = ctx_t::program_id_t;
         using st_status_t  = ctx_t::status_t;
     }
@@ -49,11 +49,7 @@ namespace SIXTRL_CXX_NAMESPACE
     constexpr st_size_t ctx_t::MIN_NUM_ASSIGN_ELEM_ARGS;
     constexpr st_size_t ctx_t::MIN_NUM_FETCH_PARTICLES_ADDR_ARGS;
 
-    ctx_t::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
-        base_ctx_t( config_str ),
-        m_num_particles_in_pset( st_size_t{ 0 } ), m_pset_index( st_size_t{ 0 } ),
-
-    ctx_t::ClContext( const char *const SIXTRL_RESTRICT config_str ) :
+    ctx_t::ClContext( char const* SIXTRL_RESTRICT config_str ) :
         base_ctx_t( config_str ),
         m_num_particles_in_pset( st_size_t{ 0 } ), m_pset_index( st_size_t{ 0 } ),
         m_elem_by_elem_config_index(
@@ -82,7 +78,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     ctx_t::ClContext( st_size_t const node_index,
-                          const char *const SIXTRL_RESTRICT config_str ) :
+            char const* SIXTRL_RESTRICT config_str ) :
         base_ctx_t( config_str ),
         m_num_particles_in_pset( st_size_t{ 0 } ),
         m_pset_index( st_size_t{ 0 } ),
@@ -581,6 +577,7 @@ namespace SIXTRL_CXX_NAMESPACE
             ctx_t::cl_argument_t& SIXTRL_RESTRICT_REF config_buffer_arg )
     {
         constexpr st_size_t NUM_KERNELS = st_size_t{ 2 };
+        st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         if( ( !config_buffer_arg.usesCObjectBuffer() ) ||
             (  config_buffer_arg.ptrCObjectBuffer() == nullptr ) )
@@ -1701,20 +1698,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    std::unique_ptr< ctx_t::cl_buffer_t > ctx_t::create_elem_by_elem_config_arg()
-    {
-        if( !this->hasSelectedNode() )
-        {
-            st_size_t const type_size = sizeof( ctx_t::elem_by_elem_config_t );
-
-            return std::unique_ptr< ctx_t::cl_buffer_t >(
-                new ctx_t::cl_buffer_t( *this->openClContext(),
-                    CL_MEM_READ_WRITE, type_size , nullptr ) );
-        }
-
-        return std::unique_ptr< ctx_t::cl_buffer_t >( nullptr );
-    }
-
     void ctx_t::disable_beam_beam_tracking()
     {
         if( !this->hasSelectedNode() )
@@ -2432,12 +2415,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
 ::NS(ClContext)* NS(ClContext_create)()
 {
-    return new st::ClContext;
+    return new SIXTRL_CXX_NAMESPACE::ClContext;
 }
 
 ::NS(ClContext)* NS(ClContext_new)( const char* node_id_str )
 {
-    return new st::ClContext( node_id_str, nullptr );
+    return new SIXTRL_CXX_NAMESPACE::ClContext( node_id_str, nullptr );
 }
 
 void NS(ClContext_delete)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
@@ -2458,7 +2441,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ( ctx != nullptr ) && ( particles_arg != nullptr ) )
         ? ctx->assign_particles_arg( *particles_arg )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(ClContext_assign_particle_set_arg)(
@@ -2469,7 +2452,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
     return ( ctx != nullptr )
         ? ctx->assign_particle_set_arg(
             particle_set_index, num_particles_in_selected_set )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_beam_elements_arg)(
@@ -2478,7 +2461,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ( ctx != nullptr ) && ( beam_elem_arg != nullptr ) )
         ? ctx->assign_beam_elements_arg( *beam_elem_arg )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_output_buffer_arg)(
@@ -2487,7 +2470,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ( ctx != nullptr ) && ( out_buffer_arg != nullptr ) )
         ? ctx->assign_output_buffer_arg( *out_buffer_arg )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_buffer_arg)(
@@ -2498,7 +2481,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
              ( elem_by_elem_config_buffer_arg != nullptr ) )
         ? ctx->assign_elem_by_elem_config_buffer_arg(
             *elem_by_elem_config_buffer_arg )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_elem_by_elem_config_index_arg)(
@@ -2507,7 +2490,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
         ? ctx->assign_elem_by_elem_config_index_arg( elem_by_elem_config_index )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_slot_size_arg)(
@@ -2515,7 +2498,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
         ? ctx->assign_slot_size_arg( slot_size )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_assign_status_flags_arg)(
@@ -2525,7 +2508,7 @@ void NS(ClContext_clear)( ::NS(ClContext)* SIXTRL_RESTRICT ctx )
 
     return ( ctx != nullptr )
         ? ctx->assign_status_flags_arg( temp_buffer )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ========================================================================= */
@@ -2548,7 +2531,7 @@ bool NS(ClContext_has_track_until_kernel)(
     ::NS(arch_kernel_id_t) const kernel_id )
 {
     return ( ctx != nullptr ) ? ctx->set_track_until_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(ClContext_track_until)(
@@ -2556,7 +2539,7 @@ bool NS(ClContext_has_track_until_kernel)(
     ::NS(context_num_turns_t) const until_turn )
 {
     return ( ctx != nullptr ) ? ctx->track_until( until_turn )
-        : st::TRACK_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(ClContext_track_until_for_particle_set)(
@@ -2569,7 +2552,7 @@ bool NS(ClContext_has_track_until_kernel)(
     return ( ctx != nullptr )
         ? ctx->track_until( until_turn, particle_set_index,
             num_particles_in_set, restore_particle_set_index )
-        : st::TRACK_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2584,7 +2567,7 @@ bool NS(ClContext_has_track_line_kernel)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->track_line_kernel_id()
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_track_line_kernel_id)(
@@ -2593,7 +2576,7 @@ bool NS(ClContext_has_track_line_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_track_line_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(ClContext_track_line)(
@@ -2617,7 +2600,7 @@ bool NS(ClContext_has_track_line_kernel)(
         ? ctx->track_line( line_begin_idx, line_end_idx, finish_turn,
             particle_set_index, num_particles_in_set,
             restore_particle_set_index )
-        : st::TRACK_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2633,7 +2616,8 @@ bool NS(ClContext_has_track_elem_by_elem_kernel)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->track_elem_by_elem_kernel_id() : st::ARCH_ILLEGAL_KERNEL_ID;
+        ? ctx->track_elem_by_elem_kernel_id()
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_track_elem_by_elem_kernel_id)(
@@ -2642,7 +2626,7 @@ bool NS(ClContext_has_track_elem_by_elem_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_track_elem_by_elem_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(ClContext_track_elem_by_elem)(
@@ -2650,7 +2634,7 @@ bool NS(ClContext_has_track_elem_by_elem_kernel)(
     ::NS(buffer_size_t) const until_turn )
 {
     return ( ctx != nullptr ) ? ctx->track_elem_by_elem( until_turn )
-        : st::TRACK_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(track_status_t) NS(ClContext_track_elem_by_elem_for_particle_set)(
@@ -2663,7 +2647,7 @@ bool NS(ClContext_has_track_elem_by_elem_kernel)(
     return ( ctx != nullptr )
         ? ctx->track_elem_by_elem( until_turn, particle_set_index,
             num_particles_in_set, restore_particle_set_index )
-        : st::TRACK_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::TRACK_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2679,7 +2663,7 @@ bool NS(ClContext_has_assign_beam_monitor_output_kernel)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->assign_beam_monitor_output_kernel_id()
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_assign_beam_monitor_output_kernel_id)(
@@ -2688,7 +2672,7 @@ bool NS(ClContext_has_assign_beam_monitor_output_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_assign_beam_monitor_output_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(ClContext_assign_beam_monitor_output)(
@@ -2699,7 +2683,7 @@ bool NS(ClContext_has_assign_beam_monitor_output_kernel)(
     return ( ctx != nullptr )
         ? ctx->assign_beam_monitor_output(
             min_turn_id, out_buffer_index_offset )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2715,7 +2699,7 @@ bool NS(ClContext_has_assign_elem_by_elem_output_kernel)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->assign_elem_by_elem_output_kernel_id()
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_assign_elem_by_elem_output_kernel_id)(
@@ -2724,7 +2708,7 @@ bool NS(ClContext_has_assign_elem_by_elem_output_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_assign_elem_by_elem_output_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(arch_status_t) NS(ClContext_assign_elem_by_elem_output)(
@@ -2733,7 +2717,7 @@ bool NS(ClContext_has_assign_elem_by_elem_output_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->assign_elem_by_elem_output( out_buffer_index_offset )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -2750,7 +2734,7 @@ bool NS(ClContext_has_clear_beam_monitor_output_kernel)(
 {
     return (ctx != nullptr )
         ? ctx->clear_beam_monitor_output_kernel_id()
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_clear_beam_monitor_output_kernel_id)(
@@ -2759,14 +2743,15 @@ bool NS(ClContext_has_clear_beam_monitor_output_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_clear_beam_monitor_output_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 ::NS(ctrl_status_t) NS(ClContext_clear_beam_monitor_output)(
     ::NS(ClContext)*  SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->clear_beam_monitor_output() : st::ARCH_STATUS_GENERAL_FAILURE;
+        ? ctx->clear_beam_monitor_output()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ========================================================================= */
@@ -2781,7 +2766,7 @@ bool NS(ClContext_has_assign_addresses_kernel)(
     const ::NS(ClContext) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->assign_addresses_kernel_id()
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_status_t) NS(ClContext_set_assign_addresses_kernel_id)(
@@ -2790,7 +2775,7 @@ bool NS(ClContext_has_assign_addresses_kernel)(
 {
     return ( ctx != nullptr )
         ? ctx->set_assign_addresses_kernel_id( kernel_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 NS(arch_status_t) NS(ClContext_assign_addresses)(
@@ -2805,7 +2790,7 @@ NS(arch_status_t) NS(ClContext_assign_addresses)(
              ( dest_buffer_arg != nullptr ) && ( src_buffer_arg != nullptr ) )
         ? ctx->assign_addresses( *assign_items_arg,
             *dest_buffer_arg, dest_buffer_id, *src_buffer_arg, src_buffer_id )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ========================================================================= */
@@ -2871,4 +2856,3 @@ void NS(ClContext_skip_beam_beam_tracking)(
 }
 
 #endif /* !defined( __CUDACC__ ) */
-/* end: sixtracklib/opencl/internal/context.cpp */

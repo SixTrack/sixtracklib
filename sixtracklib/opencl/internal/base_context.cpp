@@ -3195,31 +3195,32 @@ namespace SIXTRL_CXX_NAMESPACE
 
 ::NS(arch_size_t) NS(OpenCL_get_num_all_nodes)( void )
 {
-    return st::ctx_t::NUM_ALL_NODES();
+    return SIXTRL_CXX_NAMESPACE::ctx_t::NUM_ALL_NODES();
 }
 
 ::NS(arch_size_t) NS(OpenCL_get_all_nodes)(
     NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
     NS(arch_size_t) const max_num_node_ids )
 {
-    return st::ctx_t::GET_ALL_NODES(
+    return SIXTRL_CXX_NAMESPACE::ctx_t::GET_ALL_NODES(
         out_node_ids_begin, max_num_node_ids );
 }
 
 void NS(OpenCL_print_all_nodes)( void )
 {
-    st::ctx_t::PRINT_ALL_NODES();
+    SIXTRL_CXX_NAMESPACE::ctx_t::PRINT_ALL_NODES();
 }
 
 ::NS(arch_size_t) NS(OpenCL_get_all_nodes_required_str_capacity)( void )
 {
-    return st::ctx_t::GET_ALL_NODES_REQUIRED_STRING_CAPACITY();
+    return SIXTRL_CXX_NAMESPACE::ctx_t::GET_ALL_NODES_REQUIRED_STRING_CAPACITY();
 }
 
 ::NS(arch_status_t) NS(OpenCL_get_all_nodes_as_string)(
     char* SIXTRL_RESTRICT out_node_info_str,
     ::NS(arch_size_t) const out_node_info_str_capacity )
 {
+    namespace st = SIXTRL_CXX_NAMESPACE;
     st::st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
     if( ( out_node_info_str != nullptr ) &&
@@ -3245,14 +3246,15 @@ void NS(OpenCL_print_all_nodes)( void )
 ::NS(arch_size_t) NS(OpenCL_num_available_nodes)(
     char const* SIXTRL_RESTRICT env_variable_name )
 {
-    return st::ctx_t::NUM_AVAILABLE_NODES( nullptr, env_variable_name );
+    return SIXTRL_CXX_NAMESPACE::ctx_t::NUM_AVAILABLE_NODES(
+        nullptr, env_variable_name );
 }
 
 ::NS(arch_size_t) NS(OpenCL_num_available_nodes_detailed)(
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name )
 {
-    return st::ctx_t::NUM_AVAILABLE_NODES(
+    return SIXTRL_CXX_NAMESPACE::ctx_t::NUM_AVAILABLE_NODES(
         filter_str, env_variable_name );
 }
 
@@ -3260,7 +3262,7 @@ void NS(OpenCL_print_all_nodes)( void )
     ::NS(ComputeNodeId)* SIXTRL_RESTRICT out_node_ids_begin,
     ::NS(arch_size_t) const max_num_node_ids )
 {
-    return st::ctx_t::GET_AVAILABLE_NODES(
+    return SIXTRL_CXX_NAMESPACE::ctx_t::GET_AVAILABLE_NODES(
         out_node_ids_begin, max_num_node_ids );
 }
 
@@ -3271,27 +3273,28 @@ void NS(OpenCL_print_all_nodes)( void )
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name )
 {
-    return st::ctx_t::GET_AVAILABLE_NODES(
+    return SIXTRL_CXX_NAMESPACE::ctx_t::GET_AVAILABLE_NODES(
         out_node_ids_begin, max_num_node_ids, skip_first_num_nodes,
             filter_str, env_variable_name );
 }
 
 void NS(OpenCL_print_available_nodes)( void )
 {
-    st::ctx_t::PRINT_AVAILABLE_NODES();
+    SIXTRL_CXX_NAMESPACE::ctx_t::PRINT_AVAILABLE_NODES();
 }
 
 void NS(OpenCL_print_available_nodes_detailed)(
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name )
 {
-    st::ctx_t::PRINT_AVAILABLE_NODES( filter_str, env_variable_name );
+    SIXTRL_CXX_NAMESPACE::ctx_t::PRINT_AVAILABLE_NODES( filter_str, env_variable_name );
 }
 
 ::NS(arch_size_t) NS(OpenCL_get_available_nodes_required_str_capacity)(
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name )
 {
+    namespace st = SIXTRL_CXX_NAMESPACE;
     return st::ctx_t::GET_AVAILABLE_NODES_REQUIRED_STRING_CAPACITY(
         filter_str, env_variable_name );
 }
@@ -3302,8 +3305,9 @@ void NS(OpenCL_print_available_nodes_detailed)(
     char const* SIXTRL_RESTRICT filter_str,
     char const* SIXTRL_RESTRICT env_variable_name )
 {
+    namespace st = SIXTRL_CXX_NAMESPACE;
     using ctx_t = st::ClContextBase;
-    st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+    st::st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
     if( ( out_node_info_str != nullptr ) &&
         ( out_node_info_str_capacity > st_size_t{ 0 } ) )
@@ -3327,8 +3331,7 @@ void NS(OpenCL_print_available_nodes_detailed)(
 
 ::NS(ClContextBase)* NS(ClContextBase_create)()
 {
-    ::NS(ClContextBase)* ptr_base_ctx = new st::ClContextBase;
-    return ptr_base_ctx;
+    return new SIXTRL_CXX_NAMESPACE::ClContextBase;
 }
 
 ::NS(arch_size_t) NS(ClContextBase_get_num_available_nodes)(
@@ -3360,7 +3363,7 @@ NS(ClContextBase_get_available_nodes_info_begin)(
 ::NS(context_node_id_t) NS(ClContextBase_get_default_node_id)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT context )
 {
-    st::ctx_t::node_id_t default_node_id;
+    SIXTRL_CXX_NAMESPACE::ctx_t::node_id_t default_node_id;
     ::NS(ComputeNodeId_preset)( &default_node_id );
     ::NS(context_node_info_t) const* default_node_info =
         ::NS(ClContextBase_get_default_node_info)( context );
@@ -3527,7 +3530,8 @@ void NS(ClContextBase_clear)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx )
     NS(ClContextBase)* SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr )
-        ? ctx->reinit_default_programs() : st::ARCH_STATUS_GENERAL_FAILURE;
+        ? ctx->reinit_default_programs()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 bool NS(ClContextBase_select_node)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -3557,7 +3561,7 @@ bool NS(ClContextBase_select_node_by_index)(
 
     if( ctx != nullptr )
     {
-        using node_id_t = st::ctx_t::node_id_t;
+        using node_id_t = SIXTRL_CXX_NAMESPACE::ctx_t::node_id_t;
         node_id_t const* ptr_node_id = ctx->ptrAvailableNodesId( node_id_str );
 
         if( ( ptr_node_id == nullptr ) || ( !ctx->selectNode( *ptr_node_id ) ) )
@@ -3578,7 +3582,7 @@ bool NS(ClContextBase_select_node_by_index)(
     if( ( node_id != nullptr ) &&
         ( ::NS(ComputeNodeId_is_valid)( node_id ) ) )
     {
-        ctx = new st::ClContextBase( *node_id );
+        ctx = new SIXTRL_CXX_NAMESPACE::ClContextBase( *node_id );
 
         if( ( ctx != nullptr ) && ( !ctx->hasSelectedNode() ) )
         {
@@ -3640,7 +3644,7 @@ char const* NS(ClContextBase_default_compile_options)(
 {
     return ( ctx != nullptr )
         ? ctx->addProgramFile( path_to_program_file, compile_options )
-        : st::ARCH_ILLEGAL_PROGRAM_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_PROGRAM_ID;
 }
 
 bool NS(ClContextBase_compile_program)(
@@ -3778,7 +3782,7 @@ bool NS(ClContextBase_is_program_compiled)(
 {
     return ( ctx != nullptr )
         ? ctx->enableKernel( kernel_name, program_id )
-        : st::ARCH_ILLEGAL_KERNEL_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_KERNEL_ID;
 }
 
 ::NS(arch_size_t) NS(ClContextBase_get_num_available_kernels)(
@@ -3877,7 +3881,7 @@ NS(ClContextBase_get_kernel_preferred_work_group_size_multiple)(
     ::NS(arch_size_t) const arg_index )
 {
     return ( ctx != nullptr ) ? ctx->kernelArgumentType( kernel_id, arg_index )
-        : st::ctx_t::ARG_TYPE_INVALID;
+        : SIXTRL_CXX_NAMESPACE::ctx_t::ARG_TYPE_INVALID;
 }
 
 ::NS(ClArgument) const* NS(ClContextBase_get_const_ptr_kernel_argument)(
@@ -3951,7 +3955,7 @@ void NS(ClContextBase_assign_kernel_argument_value)(
 {
     return ( ctx != nullptr )
         ? ctx->calculateKernelNumWorkItems( kernel_id, min_num_work_items )
-        : st::ctx_t::size_type{ 0 };
+        : SIXTRL_CXX_NAMESPACE::ctx_t::size_type{ 0 };
 }
 
 bool NS(ClContextBase_run_kernel)( ::NS(ClContextBase)* SIXTRL_RESTRICT ctx,
@@ -4066,7 +4070,7 @@ bool NS(ClContextBase_has_remapping_program)(
     const ::NS(ClContextBase) *const SIXTRL_RESTRICT ctx )
 {
     return ( ctx != nullptr ) ? ctx->remapping_program_id()
-        : st::ARCH_ILLEGAL_PROGRAM_ID;
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_PROGRAM_ID;
 }
 
 cl_program NS(ClContextBase_get_program)(
@@ -4213,11 +4217,6 @@ void NS(ClContextBase_set_feature_flag)(
     return ( ctx != nullptr )
         ? ctx->feature_flag_repr_as_cstr(
             out_str, out_str_capacity, str, prefix, sep )
-        : st::ARCH_STATUS_GENERAL_FAILURE;
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
-
 #endif /* !defined( __CUDACC__ )  */
-
-/* end: sixtracklib/opencl/internal/cl_context_base.cpp */
-
-
