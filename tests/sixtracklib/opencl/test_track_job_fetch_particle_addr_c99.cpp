@@ -91,15 +91,15 @@ TEST( C99OpenCLTrackTrackJobFetchParticleAddr, BasicUsage )
         std::cout << "\r\n";
 
         st_status_t status = st::ARCH_STATUS_SUCCESS;
-        ASSERT_TRUE( ::NS(TrackJob_can_fetch_particle_addresses)( track_job ) );
+        ASSERT_TRUE( ::NS(TrackJob_can_fetch_particles_addr)( track_job ) );
 
-        if( !::NS(TrackJob_has_particle_addresses)( track_job ) )
+        if( !::NS(TrackJob_has_particles_addr)( track_job ) )
         {
             status = NS(TrackJob_fetch_particle_addresses)( track_job );
         }
 
         ASSERT_TRUE( status == st::ARCH_STATUS_SUCCESS );
-        ASSERT_TRUE( ::NS(TrackJob_has_particle_addresses)( track_job ) );
+        ASSERT_TRUE( ::NS(TrackJob_has_particles_addr)( track_job ) );
         ASSERT_TRUE( ::NS(TrackJob_get_const_particles_addr_buffer)(
                         track_job ) );
 
@@ -128,8 +128,8 @@ TEST( C99OpenCLTrackTrackJobFetchParticleAddr, BasicUsage )
 
         status = ::NS(TrackJob_clear_all_particle_addresses)( track_job );
         ASSERT_TRUE(  status == st::ARCH_STATUS_SUCCESS );
-        ASSERT_TRUE(  ::NS(TrackJob_can_fetch_particle_addresses)( track_job ) );
-        ASSERT_TRUE( !::NS(TrackJob_has_particle_addresses)( track_job ) );
+        ASSERT_TRUE(  ::NS(TrackJob_can_fetch_particles_addr)( track_job ) );
+        ASSERT_TRUE( !::NS(TrackJob_has_particles_addr)( track_job ) );
 
         ::NS(TrackJob_delete)( track_job );
         track_job  = nullptr;
