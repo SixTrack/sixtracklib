@@ -1143,7 +1143,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
                       cmp_output_buffer.getNumObjects() );
 
         /* TODO: Fix FMA / math optimization differences with Intel OpenCL Env */
-        double const ABS_ERR = double{ 5e-11 };
+        double const ABS_DIFF = double{ 5e-11 };
 
         if( ::NS(Particles_buffers_compare_values)(
                 ptr_output_buffer->getCApiPtr(),
