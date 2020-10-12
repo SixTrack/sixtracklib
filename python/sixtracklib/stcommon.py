@@ -1424,15 +1424,15 @@ st_TrackJob_particle_addresses = sixtracklib.st_TrackJob_particle_addresses
 st_TrackJob_particle_addresses.argtypes = [st_TrackJob_p,st_buffer_size_t]
 st_TrackJob_particle_addresses.restype = st_ParticlesAddr_p
 
-st_TrackJob_can_fetch_particle_addresses = \
-    sixtracklib.st_TrackJob_can_fetch_particle_addresses
-st_TrackJob_can_fetch_particle_addresses.argtypes = [st_TrackJob_p]
-st_TrackJob_can_fetch_particle_addresses.restype = ct.c_bool
+st_TrackJob_can_fetch_particles_addr = \
+    sixtracklib.st_TrackJob_can_fetch_particles_addr
+st_TrackJob_can_fetch_particles_addr.argtypes = [st_TrackJob_p]
+st_TrackJob_can_fetch_particles_addr.restype = ct.c_bool
 
-st_TrackJob_has_particle_addresses = \
-    sixtracklib.st_TrackJob_has_particle_addresses
-st_TrackJob_has_particle_addresses.argtypes = [st_TrackJob_p]
-st_TrackJob_has_particle_addresses.restype = ct.c_bool
+st_TrackJob_has_particles_addr = \
+    sixtracklib.st_TrackJob_has_particles_addr
+st_TrackJob_has_particles_addr.argtypes = [st_TrackJob_p]
+st_TrackJob_has_particles_addr.restype = ct.c_bool
 
 st_TrackJob_fetch_particle_addresses = \
     sixtracklib.st_TrackJob_fetch_particle_addresses
