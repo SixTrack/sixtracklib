@@ -399,7 +399,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         return status;
     }
-=======
+
     /* --------------------------------------------------------------------- */
 
     tjob_t::cl_arg_t const* tjob_t::ptr_const_argument_by_buffer_id(
@@ -1637,7 +1637,7 @@ namespace SIXTRL_CXX_NAMESPACE
 NS(TrackJobCl)* NS(TrackJobCl_create)(
     const char *const SIXTRL_RESTRICT device_id_str )
 {
-    return new st::TrackJobCl( device_id_str, nullptr );
+    return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str, nullptr );
 }
 
 NS(TrackJobCl)*
@@ -1645,7 +1645,7 @@ NS(TrackJobCl_create_from_config_str)(
     const char *const SIXTRL_RESTRICT device_id_str,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    return new st::TrackJobCl( device_id_str, config_str );
+    return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str, config_str );
 }
 
 NS(TrackJobCl)* NS(TrackJobCl_new)(
@@ -1653,7 +1653,7 @@ NS(TrackJobCl)* NS(TrackJobCl_new)(
     NS(Buffer)* SIXTRL_RESTRICT particles_buffer,
     NS(Buffer)* SIXTRL_RESTRICT beam_elements_buffer )
 {
-    return new st::TrackJobCl( device_id_str,
+    return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str,
         particles_buffer, beam_elements_buffer );
 }
 
@@ -1664,7 +1664,7 @@ NS(TrackJobCl)* NS(TrackJobCl_new_with_output)(
     NS(Buffer)* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const until_turn_elem_by_elem )
 {
-    using tjob_t = st::TrackJobCl;
+    using tjob_t = SIXTRL_CXX_NAMESPACE::TrackJobCl;
     return new tjob_t( device_id_str, particles_buffer,
         tjob_t::DefaultNumParticleSetIndices(),
         tjob_t::DefaultParticleSetIndicesBegin(),
@@ -1681,7 +1681,7 @@ NS(TrackJobCl)* NS(TrackJobCl_new_detailed)(
     NS(buffer_size_t) const until_turn_elem_by_elem,
     const char *const SIXTRL_RESTRICT config_str )
 {
-    return new st::TrackJobCl( device_id_str,
+    return new SIXTRL_CXX_NAMESPACE::TrackJobCl( device_id_str,
         particles_buffer, num_particle_sets, particle_set_indices_begin,
         beam_elements_buffer, output_buffer, until_turn_elem_by_elem,
         config_str );
@@ -1695,7 +1695,7 @@ SIXTRL_EXTERN bool NS(TrackJobCl_reset)(
 {
     if( job != nullptr )
     {
-        st::st_size_t const
+        SIXTRL_CXX_NAMESPACE::st_size_t const
             until_turn_elem_by_elem = job->numElemByElemTurns();
         return job->reset( particles_buffer, beam_elements_buffer,
                            output_buffer, until_turn_elem_by_elem );
@@ -1744,7 +1744,7 @@ NS(track_status_t) NS(TrackJobCl_track_until_turn)(
     NS(buffer_size_t) const until_turn )
 {
     SIXTRL_ASSERT( track_job != nullptr );
-    return st::track( *track_job, until_turn );
+    return SIXTRL_CXX_NAMESPACE::track( *track_job, until_turn );
 }
 
 NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
@@ -1752,7 +1752,7 @@ NS(track_status_t) NS(TrackJobCl_track_elem_by_elem)(
     NS(buffer_size_t) const until_turn )
 {
     SIXTRL_ASSERT( track_job != nullptr );
-    return st::trackElemByElem( *track_job, until_turn );
+    return SIXTRL_CXX_NAMESPACE::trackElemByElem( *track_job, until_turn );
 }
 
 NS(track_status_t) NS(TrackJobCl_track_line)(
@@ -1762,7 +1762,7 @@ NS(track_status_t) NS(TrackJobCl_track_line)(
     bool const finish_turn )
 {
     SIXTRL_ASSERT( track_job != nullptr );
-    return st::trackLine(
+    return SIXTRL_CXX_NAMESPACE::trackLine(
         *track_job, line_begin_idx, line_end_idx, finish_turn );
 }
 
@@ -1891,6 +1891,7 @@ std::uintptr_t NS(TrackJobCl_get_opencl_queue_addr)(
 {
     return ( track_job != nullptr )
         ? track_job->opencl_queue_addr() : std::uintptr_t{ 0 };
+}
 
 /* ------------------------------------------------------------------------- */
 
