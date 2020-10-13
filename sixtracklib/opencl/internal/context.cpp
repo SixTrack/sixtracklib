@@ -1918,7 +1918,8 @@ namespace SIXTRL_CXX_NAMESPACE
             size_t{ 6 }, // track_elem_elem
             size_t{ 4 }, // assign_be_mon
             size_t{ 1 }, // clear_be_mon
-            size_t{ 4 }  // assign_elem_by_elem
+            size_t{ 4 }, // assign_elem_by_elem
+            size_t{ 2 }  // fetch_particles_addr
         };
 
         uint64_t const slot_size_arg = static_cast< uint64_t >( slot_size );
