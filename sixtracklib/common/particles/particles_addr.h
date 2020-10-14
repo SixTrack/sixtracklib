@@ -576,10 +576,10 @@ SIXTRL_INLINE int NS(ParticlesAddr_compare_values)(
     }
     else if( lhs != SIXTRL_NULLPTR )
     {
-        return 1;
+        cmp_result = 1;
     }
 
-    return -1;
+    return cmp_result;
 }
 
 /* ------------------------------------------------------------------------- */
