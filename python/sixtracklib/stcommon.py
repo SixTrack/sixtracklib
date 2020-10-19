@@ -522,7 +522,7 @@ class st_ParticlesAddr(ct.Structure):
         ("mass0", ct.c_uint64),
         ("beta0", ct.c_uint64),
         ("gamma0", ct.c_uint64),
-        ("p0C", ct.c_uint64),
+        ("p0c", ct.c_uint64),
         ("s", ct.c_uint64),
         ("x", ct.c_uint64),
         ("y", ct.c_uint64),
