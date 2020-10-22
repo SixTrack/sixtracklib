@@ -6515,6 +6515,9 @@ def Math_q_gauss_cq(q):
     assert q < float(3)
     return st_Math_q_gauss_cq(ct.c_double(q))
 
+def Math_sqrt_beta_from_gauss_sigma(sigma):
+    assert sigma > 0
+    return st_Math_q_gauss_sqrt_beta_from_gauss_sigma(ct.c_double(sigma))
 
 def Math_q_gauss(x, q, sqrt_beta, mu=None):
     assert q < float(3)
