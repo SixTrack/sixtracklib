@@ -62,7 +62,12 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
 
 
+    # -------------------------------------------------------------------------
+    # test_qgauss:
 
+    add_test( NAME Python_Math_QGauss
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_qgauss.py
+        WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
 
 endif()
 
