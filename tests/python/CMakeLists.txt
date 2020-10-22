@@ -18,7 +18,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_cbuffer_st_buffer:
 
-    add_test( NAME Python_Common_Buffer_StBufferTests
+    add_test( NAME Python_Common_Buffer_StBuffer
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_cbuffer_st_buffer.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
@@ -26,7 +26,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_output_buffer:
 
-    add_test( NAME Python_Common_Output_OutputBufferTests
+    add_test( NAME Python_Common_Output_OutputBuffer
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_output_buffer.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
@@ -34,7 +34,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_track_job_setup:
 
-    add_test( NAME Python_CPU_TrackJob_SetupTests
+    add_test( NAME Python_CPU_TrackJob_Setup
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_setup.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
@@ -42,7 +42,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_track_job_cpu:
 
-    add_test( NAME Python_CPU_TrackJob_InitTests
+    add_test( NAME Python_CPU_TrackJob_Init
         COMMAND ${PYTHON_EXECUTABLE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
@@ -50,14 +50,14 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # -------------------------------------------------------------------------
     # test_track_job_cpu_stored_buffer:
 
-    add_test( NAME Python_CPU_TrackJob_StoredBufferTests
+    add_test( NAME Python_CPU_TrackJob_StoredBuffer
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_stored_buffer.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
 
     # -------------------------------------------------------------------------
     # test_track_job_cpu_assign_address_items:
 
-    add_test( NAME Python_CPU_TrackJob_AssignAddressItemsTests
+    add_test( NAME Python_CPU_TrackJob_AssignAddressItems
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_track_job_cpu_assign_address_items.py
         WORKING_DIRECTORY ${PYTHON_TESTS_WORKDIR} )
 
