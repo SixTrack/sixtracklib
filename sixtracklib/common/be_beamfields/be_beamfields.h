@@ -1573,7 +1573,7 @@ NS(SCInterpolatedProfile)* NS(SCInterpolatedProfile_add_copy)(
 
 #endif /* !defined( _GPUCODE ) */
 
-SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCInterpolatedProfile_copy)( 
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(SCInterpolatedProfile_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(SCInterpolatedProfile)* SIXTRL_RESTRICT dest,
     SIXTRL_BE_ARGPTR_DEC const NS(SCInterpolatedProfile)
         *const SIXTRL_RESTRICT src ) SIXTRL_NOEXCEPT;
@@ -3386,21 +3386,27 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(LineDensityProfileData_interpolate_value)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData) *const
         SIXTRL_RESTRICT data, SIXTRL_REAL_T const z ) SIXTRL_NOEXCEPT
 {
-    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( z >= NS(LineDensityProfileData_z_min)( data ) );
-    SIXTRL_ASSERT( z <= NS(LineDensityProfileData_z_max)( data ) );
+    SIXTRL_REAL_T result = ( SIXTRL_REAL_T )0;
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_values_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_y_equ)( z,
-        NS(LineDensityProfileData_z0)( data ),
-        NS(LineDensityProfileData_dz)( data ),
-        NS(LineDensityProfileData_const_values_begin)( data ),
-        NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        NS(LineDensityProfileData_num_values)( data ),
-        NS(LineDensityProfileData_method)( data ) );
+    if( ( z <= NS(LineDensityProfileData_z_max)( data ) ) &&
+        ( z >= NS(LineDensityProfileData_z_min)( data ) ) )
+    {
+        result = NS(Math_interpol_y_equ)( z,
+            NS(LineDensityProfileData_z0)( data ),
+            NS(LineDensityProfileData_dz)( data ),
+            NS(LineDensityProfileData_const_values_begin)( data ),
+            NS(LineDensityProfileData_const_derivatives_begin)( data ),
+            NS(LineDensityProfileData_num_values)( data ),
+            NS(LineDensityProfileData_method)( data ) );
+    }
+
+    return result;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T
@@ -3408,21 +3414,27 @@ NS(LineDensityProfileData_interpolate_1st_derivative)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData) *const
         SIXTRL_RESTRICT data, SIXTRL_REAL_T const z ) SIXTRL_NOEXCEPT
 {
-    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( z >= NS(LineDensityProfileData_z_min)( data ) );
-    SIXTRL_ASSERT( z <= NS(LineDensityProfileData_z_max)( data ) );
+    SIXTRL_REAL_T result = ( SIXTRL_REAL_T )0;
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_values_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_yp_equ)( z,
-        NS(LineDensityProfileData_z0)( data ),
-        NS(LineDensityProfileData_dz)( data ),
-        NS(LineDensityProfileData_const_values_begin)( data ),
-        NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        NS(LineDensityProfileData_num_values)( data ),
-        NS(LineDensityProfileData_method)( data ) );
+    if( ( z <= NS(LineDensityProfileData_z_max)( data ) ) &&
+        ( z >= NS(LineDensityProfileData_z_min)( data ) ) )
+    {
+        result = NS(Math_interpol_yp_equ)( z,
+            NS(LineDensityProfileData_z0)( data ),
+            NS(LineDensityProfileData_dz)( data ),
+            NS(LineDensityProfileData_const_values_begin)( data ),
+            NS(LineDensityProfileData_const_derivatives_begin)( data ),
+            NS(LineDensityProfileData_num_values)( data ),
+            NS(LineDensityProfileData_method)( data ) );
+    }
+
+    return result;
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T
@@ -3430,21 +3442,27 @@ NS(LineDensityProfileData_interpolate_2nd_derivative)(
     SIXTRL_BUFFER_DATAPTR_DEC const NS(LineDensityProfileData) *const
         SIXTRL_RESTRICT data, SIXTRL_REAL_T const z ) SIXTRL_NOEXCEPT
 {
-    SIXTRL_ASSERT( data != SIXTRL_NULLPTR );
-    SIXTRL_ASSERT( z >= NS(LineDensityProfileData_z_min)( data ) );
-    SIXTRL_ASSERT( z <= NS(LineDensityProfileData_z_max)( data ) );
+    SIXTRL_REAL_T result = ( SIXTRL_REAL_T )0;
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_values_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
+
     SIXTRL_ASSERT( NS(LineDensityProfileData_derivatives_addr)( data ) !=
                    ( NS(buffer_addr_t) )0 );
 
-    return NS(Math_interpol_ypp_equ)( z,
-        NS(LineDensityProfileData_z0)( data ),
-        NS(LineDensityProfileData_dz)( data ),
-        NS(LineDensityProfileData_const_values_begin)( data ),
-        NS(LineDensityProfileData_const_derivatives_begin)( data ),
-        NS(LineDensityProfileData_num_values)( data ),
-        NS(LineDensityProfileData_method)( data ) );
+    if( ( z <= NS(LineDensityProfileData_z_max)( data ) ) &&
+        ( z >= NS(LineDensityProfileData_z_min)( data ) ) )
+    {
+        result = NS(Math_interpol_ypp_equ)( z,
+            NS(LineDensityProfileData_z0)( data ),
+            NS(LineDensityProfileData_dz)( data ),
+            NS(LineDensityProfileData_const_values_begin)( data ),
+            NS(LineDensityProfileData_const_derivatives_begin)( data ),
+            NS(LineDensityProfileData_num_values)( data ),
+            NS(LineDensityProfileData_method)( data ) );
+    }
+
+    return result;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
