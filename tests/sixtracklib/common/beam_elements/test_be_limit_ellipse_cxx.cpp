@@ -72,7 +72,6 @@ TEST( CXXCommonBeamElementLimitEllipse, BasicUsage )
         l4->getCApiPtr(), limit.getCApiPtr(), EPS ) );
 }
 
-
 TEST( CXXCommonBeamElementLimitRect, ApertureCheck )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
@@ -242,5 +241,3 @@ TEST( CXXCommonBeamElementLimitRect, ApertureCheck )
                      expected_state_after_track[ ii ] );
     }
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_rect_cxx.cpp */

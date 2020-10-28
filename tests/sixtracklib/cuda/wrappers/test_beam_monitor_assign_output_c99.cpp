@@ -146,7 +146,8 @@ TEST( C99_CudaWrappersBeamMonitorAssignOutputTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
-                ptr_kernel_config, ptr_node_info, num_beam_monitors );
+                ptr_kernel_config, ptr_node_info, num_beam_monitors,
+                    size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 

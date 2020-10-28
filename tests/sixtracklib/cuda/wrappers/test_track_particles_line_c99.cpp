@@ -135,7 +135,8 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
             status_t status =
             ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
                 ptr_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -390,7 +391,8 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
-                ptr_assign_kernel_config, ptr_node_info, num_beam_monitors );
+                ptr_assign_kernel_config, ptr_node_info, num_beam_monitors,
+                    size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -409,7 +411,8 @@ TEST( C99_CudaWrappersTrackParticlesLineTests,
 
             status = ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
                 ptr_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 

@@ -128,7 +128,7 @@ TEST( C99_CudaWrappersElemByElemAssignOutputTests,
 
             status_t status =
             ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
-                ptr_kernel_config, ptr_node_info );
+                ptr_kernel_config, ptr_node_info, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 

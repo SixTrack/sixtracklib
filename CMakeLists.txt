@@ -106,16 +106,21 @@ message( STATUS "---- cmake_module_path: ${CMAKE_MODULE_PATH}" )
 
 include(CheckLanguage)
 
+include( SetupGit )
 include( SetupFeatures )
 include( SetupC99 )
 include( SetupCxx )
 include( SetupPython )
-include( SetupGit )
 
 # ------------------------------------------------------------------------------
 # Unit-testing:
 
 include( SetupUnitTesting )
+
+# ------------------------------------------------------------------------------
+# toml:
+
+include( SetupToml )
 
 # ------------------------------------------------------------------------------
 # MPFR4:

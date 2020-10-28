@@ -15,35 +15,39 @@ SIXTRL_STATIC SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_generic_track_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track );
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block );
 
 
 NS(arch_status_t) NS(CudaKernelConfig_configure_track_until_turn_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track )
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block )
 {
-    return NS(CudaKernelConfig_configure_generic_track_kernel)(
-        kernel_config, node_info, total_num_particles_to_track );
+    return NS(CudaKernelConfig_configure_generic_track_kernel)( kernel_config,
+        node_info, total_num_particles_to_track, threads_per_block );
 }
 
 NS(arch_status_t)
 NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track )
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block )
 {
-    return NS(CudaKernelConfig_configure_generic_track_kernel)(
-        kernel_config, node_info, total_num_particles_to_track );
+    return NS(CudaKernelConfig_configure_generic_track_kernel)( kernel_config,
+        node_info, total_num_particles_to_track, threads_per_block );
 }
 
 NS(arch_status_t) NS(CudaKernelConfig_configure_track_line_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track )
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block )
 {
-    return NS(CudaKernelConfig_configure_generic_track_kernel)(
-        kernel_config, node_info, total_num_particles_to_track );
+    return NS(CudaKernelConfig_configure_generic_track_kernel)( kernel_config,
+        node_info, total_num_particles_to_track, threads_per_block );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -51,18 +55,17 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_track_line_kernel)(
 NS(arch_status_t) NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const num_particle_sets )
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const threads_per_block )
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
      if( ( kernel_config != SIXTRL_NULLPTR ) &&
-        ( node_info != SIXTRL_NULLPTR ) )
+         ( threads_per_block > ( NS(buffer_size_t) )0u ) &&
+         ( node_info != SIXTRL_NULLPTR ) )
     {
         NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
-
-        NS(buffer_size_t) threads_per_block = ( NS(buffer_size_t) )128;
-
 
         NS(buffer_size_t) num_blocks = num_particle_sets / threads_per_block;
 
@@ -92,16 +95,17 @@ NS(arch_status_t)
 NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const num_beam_monitors )
+    NS(buffer_size_t) const num_beam_monitors,
+    NS(buffer_size_t) const threads_per_block )
 {
     ( void )num_beam_monitors;
 
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
      if( ( kernel_config != SIXTRL_NULLPTR ) &&
+         ( threads_per_block > ( NS(buffer_size_t) )0u ) &&
          ( node_info != SIXTRL_NULLPTR ) )
     {
-        NS(buffer_size_t) const threads_per_block = ( NS(buffer_size_t) )1u;
         NS(buffer_size_t) const num_blocks = ( NS(buffer_size_t) )1u;
 
         NS(buffer_size_t) const warp_size =
@@ -127,16 +131,16 @@ NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
 NS(arch_status_t)
 NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
-    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info )
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
+    NS(buffer_size_t) const threads_per_block )
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
      if( ( kernel_config != SIXTRL_NULLPTR ) &&
+         ( threads_per_block > ( NS(buffer_size_t) )0u ) &&
          ( node_info != SIXTRL_NULLPTR ) )
     {
-        NS(buffer_size_t) const threads_per_block = ( NS(buffer_size_t) )1u;
         NS(buffer_size_t) const num_blocks = ( NS(buffer_size_t) )1u;
-
         NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
 
@@ -194,18 +198,17 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_assign_address_kernel)(
 NS(arch_status_t) NS(CudaKernelConfig_configure_generic_track_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track )
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block )
 {
     NS(arch_status_t) status = NS(ARCH_STATUS_GENERAL_FAILURE);
 
      if( ( kernel_config != SIXTRL_NULLPTR ) &&
-        ( node_info != SIXTRL_NULLPTR ) )
+         ( threads_per_block > ( NS(buffer_size_t) )0u ) &&
+         ( node_info != SIXTRL_NULLPTR ) )
     {
         NS(buffer_size_t) const warp_size =
             NS(CudaNodeInfo_get_warp_size)( node_info );
-
-        NS(buffer_size_t) threads_per_block = ( NS(buffer_size_t) )128;
-
 
         NS(buffer_size_t) num_blocks =
             total_num_particles_to_track / threads_per_block;
@@ -236,7 +239,5 @@ NS(arch_status_t) NS(CudaKernelConfig_configure_generic_track_kernel)(
 
     return status;
 }
-
-
 
 /* end: sixtracklib/cuda/control/default_kernel_config.c */

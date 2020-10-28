@@ -16,9 +16,9 @@ if( GTEST_FOUND )
     # --------------------------------------------------------------------------
     # test_be_drift_common_cxx:
 
-    add_executable( test_be_drift_common_cxx    test_be_drift_cxx.cpp )
-    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} test_be_drift_common_cxx )
-    add_test( CXX_CommonBeamElementDriftTests   test_be_drift_common_cxx )
+    add_executable( test_be_drift_common_cxx      test_be_drift_cxx.cpp )
+    set( UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS}   test_be_drift_common_cxx )
+    add_test( CXX_Common_BeamElements_Drift_Tests test_be_drift_common_cxx )
 
     # ==========================================================================
     # test_be_multipole_common_c99:

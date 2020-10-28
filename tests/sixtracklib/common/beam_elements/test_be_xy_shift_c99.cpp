@@ -227,4 +227,3 @@ TEST( C99CommonBeamElementXYShift, MinimalAddToBufferCopyRemapRead )
     ::NS(Buffer_delete)( eb );
     ::NS(Buffer_free)( &cmp_buffer );
 }
-

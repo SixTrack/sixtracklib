@@ -38,5 +38,3 @@ TEST( CXXCommonBeamElementDipoleEdge, BasicUsage )
     ASSERT_TRUE( 0 == ::NS(DipoleEdge_compare_values)(
         e4->getCApiPtr(), e1.getCApiPtr() ) );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_cxx.cpp */

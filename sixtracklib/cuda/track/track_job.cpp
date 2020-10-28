@@ -9,6 +9,7 @@
     #include <cstddef>
     #include <cstdlib>
     #include <stdexcept>
+    #include <sstream>
 
     #include <cuda_runtime_api.h>
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
@@ -32,6 +33,8 @@
     #include "sixtracklib/cuda/control/default_kernel_config.h"
     #include "sixtracklib/cuda/wrappers/track_job_wrappers.h"
 
+    #include "external/toml11/toml.hpp"
+
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE ) && \
@@ -43,10 +46,14 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
         using tjob_t = st::CudaTrackJob;
+        using base_tjob_t = st::TrackJobNodeCtrlArgBase;
         using st_size_t = tjob_t::size_type;
         using st_status_t = tjob_t::status_t;
         using st_track_status_t = tjob_t::track_status_t;
     }
+
+    constexpr st_size_t tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK;
+    constexpr st_size_t tjob_t::DEFAULT_THREADS_PER_BLOCK;
 
     /* --------------------------------------------------------------------- */
 
@@ -59,8 +66,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( err == ::cudaSuccess ) && ( temp_num_devices > int{ 0 } ) )
         {
-            num_available_nodes = static_cast< st_size_t >(
-                temp_num_devices );
+            num_available_nodes = static_cast< st_size_t >( temp_num_devices );
         }
 
         return num_available_nodes;
@@ -121,64 +127,95 @@ namespace SIXTRL_CXX_NAMESPACE
 
     tjob_t::CudaTrackJob( const char *const SIXTRL_RESTRICT config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
-        st_status_t status = this->doPrepareControllerCudaImpl( config_str );
+        st_status_t status = st::ARCH_STATUS_SUCCESS;
+
+        if( config_str != nullptr )
+        {
+            status = this->doParseConfigStrCudaImpl( config_str );
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareControllerCudaImpl( config_str );
+        }
+
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = this->doPrepareDefaultKernelsCudaImpl( config_str );
         }
+
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
     }
 
     tjob_t::CudaTrackJob( std::string const& SIXTRL_RESTRICT_REF config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
-        st_status_t status = this->doPrepareControllerCudaImpl(
-            config_str.c_str() );
+        st_status_t status = st::ARCH_STATUS_SUCCESS;
+
+        if( !config_str.empty() )
+        {
+            status = this->doParseConfigStrCudaImpl( config_str.c_str() );
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = this->doPrepareControllerCudaImpl( config_str.c_str() );
+        }
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
             status = this->doPrepareDefaultKernelsCudaImpl( config_str.c_str() );
         }
+
+        SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
+        ( void )status;
     }
 
     tjob_t::CudaTrackJob(
-        const char *const SIXTRL_RESTRICT SIXTRL_UNUSED( node_id_str ),
+        const char *const SIXTRL_RESTRICT node_id_str,
         c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         c_buffer_t* SIXTRL_RESTRICT beam_elements_buffer,
         c_buffer_t* SIXTRL_RESTRICT output_buffer,
         size_type const until_turn_elem_by_elem,
         const char *const SIXTRL_RESTRICT config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
-        st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer,
-            tjob_t::DefaultParticleSetIndicesBegin(),
-                tjob_t::DefaultParticleSetIndicesEnd(),
-                   beam_elements_buffer, output_buffer,
-                       until_turn_elem_by_elem );
+        st_status_t const status = this->doInitCudaTrackJob( node_id_str,
+            particles_buffer, tjob_t::DefaultParticleSetIndicesBegin(),
+                tjob_t::DefaultParticleSetIndicesEnd(), beam_elements_buffer,
+                    output_buffer, until_turn_elem_by_elem, config_str );
+
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
     }
 
     tjob_t::CudaTrackJob(
-        std::string const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( node_id_str ),
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
         buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         buffer_t& SIXTRL_RESTRICT_REF beam_elements_buffer,
         buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         size_type const until_turn_elem_by_elem,
         std::string const& config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
-        st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer,
-                tjob_t::DefaultParticleSetIndicesBegin(),
-                    tjob_t::DefaultParticleSetIndicesEnd(),
-                        beam_elements_buffer, ptr_output_buffer,
-                            until_turn_elem_by_elem );
+        st_status_t const status = this->doInitCudaTrackJob( node_id_str,
+            particles_buffer, tjob_t::DefaultParticleSetIndicesBegin(),
+                tjob_t::DefaultParticleSetIndicesEnd(), beam_elements_buffer,
+                    ptr_output_buffer, until_turn_elem_by_elem, config_str );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
@@ -194,7 +231,7 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     tjob_t::CudaTrackJob(
-        std::string const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( node_id_str ),
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
         tjob_t::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         st_size_t const particle_set_index,
         tjob_t::buffer_t& SIXTRL_RESTRICT_REF belems_buffer,
@@ -202,15 +239,17 @@ namespace SIXTRL_CXX_NAMESPACE
         st_size_t const until_turn_elem_by_elem,
         std::string const& config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
         st_size_t const* psets_begin = &particle_set_index;
         st_size_t const* psets_end = psets_begin;
         std::advance( psets_end, st_size_t{ 1 } );
 
-        st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer, psets_begin, psets_end, belems_buffer,
-                ptr_output_buffer, until_turn_elem_by_elem );
+        st_status_t const status = this->doInitCudaTrackJob( node_id_str,
+            particles_buffer, psets_begin, psets_end, belems_buffer,
+                ptr_output_buffer, until_turn_elem_by_elem, config_str );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
@@ -225,8 +264,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     }
 
-    tjob_t::CudaTrackJob(
-        char const* SIXTRL_RESTRICT SIXTRL_UNUSED( node_id_str ),
+    tjob_t::CudaTrackJob( char const* SIXTRL_RESTRICT node_id_str,
         tjob_t::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         st_size_t const particle_set_index,
         tjob_t::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
@@ -234,22 +272,24 @@ namespace SIXTRL_CXX_NAMESPACE
         st_size_t const until_turn_elem_by_elem,
         char const* SIXTRL_RESTRICT config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
         st_size_t const* psets_begin = &particle_set_index;
         st_size_t const* psets_end = psets_begin;
         std::advance( psets_end, st_size_t{ 1 } );
 
-        st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer, psets_begin, psets_end, belems_buffer,
-                ptr_output_buffer, until_turn_elem_by_elem );
+        st_status_t const status = this->doInitCudaTrackJob( node_id_str,
+            particles_buffer, psets_begin, psets_end, belems_buffer,
+                ptr_output_buffer, until_turn_elem_by_elem, config_str );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
     }
 
     tjob_t::CudaTrackJob(
-        std::string const& SIXTRL_RESTRICT_REF SIXTRL_UNUSED( node_id_str ),
+        std::string const& SIXTRL_RESTRICT_REF node_id_str,
         tjob_t::buffer_t& SIXTRL_RESTRICT_REF particles_buffer,
         st_size_t const num_particle_sets,
         st_size_t const* SIXTRL_RESTRICT pset_indices_begin,
@@ -258,7 +298,9 @@ namespace SIXTRL_CXX_NAMESPACE
         st_size_t const until_turn_elem_by_elem,
         std::string const& config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str.c_str() ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
         st_size_t const* pset_indices_end = pset_indices_begin;
 
@@ -268,15 +310,16 @@ namespace SIXTRL_CXX_NAMESPACE
         }
 
         st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer, pset_indices_begin, pset_indices_end,
-                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+            node_id_str, particles_buffer, pset_indices_begin, pset_indices_end,
+                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem,
+                    config_str );
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
     }
 
     tjob_t::CudaTrackJob(
-        char const* SIXTRL_RESTRICT SIXTRL_UNUSED( node_id_str ),
+        char const* SIXTRL_RESTRICT node_id_str,
         tjob_t::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
         st_size_t const num_particle_sets,
         st_size_t const* SIXTRL_RESTRICT pset_indices_begin,
@@ -285,27 +328,35 @@ namespace SIXTRL_CXX_NAMESPACE
         st_size_t const until_turn_elem_by_elem,
         char const* SIXTRL_RESTRICT config_str ) :
             st::TrackJobNodeCtrlArgBase( st::ARCHITECTURE_CUDA,
-                SIXTRL_ARCHITECTURE_CUDA_STR, config_str )
+                SIXTRL_ARCHITECTURE_CUDA_STR, config_str ),
+        m_track_threads_per_block( tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK ),
+        m_default_threads_per_block( tjob_t::DEFAULT_THREADS_PER_BLOCK )
     {
+        st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         st_size_t const* pset_indices_end = pset_indices_begin;
 
-        if( pset_indices_end != nullptr )
+        if( ( pset_indices_end != nullptr ) &&
+            ( num_particle_sets > st_size_t{ 0 } ) )
         {
             std::advance( pset_indices_end, num_particle_sets );
+            status = this->doInitCudaTrackJob( node_id_str, particles_buffer,
+                pset_indices_begin, pset_indices_end, belems_buffer,
+                    ptr_output_buffer, until_turn_elem_by_elem, config_str );
         }
-
-        st_status_t const status = this->doInitCudaTrackJob(
-            config_str, particles_buffer, pset_indices_begin, pset_indices_end,
-                belems_buffer, ptr_output_buffer, until_turn_elem_by_elem );
+        else
+        {
+            status = this->doInitCudaTrackJob( node_id_str, particles_buffer,
+                tjob_t::DefaultParticleSetIndicesBegin(),
+                tjob_t::DefaultParticleSetIndicesEnd(),
+                    belems_buffer, ptr_output_buffer, until_turn_elem_by_elem,
+                        config_str );
+        }
 
         SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
         ( void )status;
     }
 
-    tjob_t::~CudaTrackJob() SIXTRL_NOEXCEPT
-    {
-
-    }
+    tjob_t::~CudaTrackJob() SIXTRL_NOEXCEPT {}
 
     /* ===================================================================== */
 
@@ -317,7 +368,7 @@ namespace SIXTRL_CXX_NAMESPACE
     tjob_t::cuda_controller_t& tjob_t::cudaController()
     {
         return const_cast< tjob_t::cuda_controller_t& >( static_cast<
-            CudaTrackJob const& >( *this ).cudaController() );
+            tjob_t const& >( *this ).cudaController() );
     }
 
     tjob_t::cuda_controller_t const& tjob_t::cudaController() const
@@ -330,11 +381,10 @@ namespace SIXTRL_CXX_NAMESPACE
         return *this->ptrCudaController();
     }
 
-    tjob_t::cuda_controller_t*
-    tjob_t::ptrCudaController() SIXTRL_NOEXCEPT
+    tjob_t::cuda_controller_t* tjob_t::ptrCudaController() SIXTRL_NOEXCEPT
     {
         return const_cast< tjob_t::cuda_controller_t* >( static_cast<
-            CudaTrackJob const& >( *this ).ptrCudaController() );
+            tjob_t const& >( *this ).ptrCudaController() );
     }
 
     tjob_t::cuda_controller_t const*
@@ -533,6 +583,16 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->doGetPtrCudaArgument( this->ptrParticlesAddrArgBase() );
     }
 
+    st_size_t tjob_t::default_threads_per_block() const SIXTRL_NOEXCEPT
+    {
+        return this->m_default_threads_per_block;
+    }
+
+    st_size_t tjob_t::default_track_threads_per_block() const SIXTRL_NOEXCEPT
+    {
+        return this->m_track_threads_per_block;
+    }
+
     /* --------------------------------------------------------------------- */
 
     tjob_t::cuda_argument_t const* tjob_t::ptr_const_argument_by_buffer_id(
@@ -689,16 +749,14 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::doPrepareParticlesStructures(
         tjob_t::c_buffer_t* SIXTRL_RESTRICT ptr_pbuffer )
     {
-        using _base_t = tjob_t::_base_track_job_t;
-        return ( ( _base_t::doPrepareParticlesStructures( ptr_pbuffer ) ) &&
+        return ( ( base_tjob_t::doPrepareParticlesStructures( ptr_pbuffer ) ) &&
                  ( this->doPrepareParticlesStructuresCudaImpl( ptr_pbuffer ) ) );
     }
 
     st_status_t tjob_t::doPrepareBeamElementsStructures(
         tjob_t::c_buffer_t* SIXTRL_RESTRICT belems )
     {
-        using _base_t = tjob_t::_base_track_job_t;
-        return ( ( _base_t::doPrepareBeamElementsStructures( belems ) ) &&
+        return ( ( base_tjob_t::doPrepareBeamElementsStructures( belems ) ) &&
                  ( this->doPrepareBeamElementsStructuresCudaImpl( belems ) ) );
     }
 
@@ -708,9 +766,7 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::c_buffer_t* SIXTRL_RESTRICT output,
         st_size_t const until_turn_elem_by_elem )
     {
-        using _base_t = tjob_t::_base_track_job_t;
-
-        st_status_t status = _base_t::doPrepareOutputStructures(
+        st_status_t status = base_tjob_t::doPrepareOutputStructures(
                 pbuffer, belems, output, until_turn_elem_by_elem );
 
         if( ( status == st::ARCH_STATUS_SUCCESS ) &&
@@ -729,11 +785,8 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::particle_index_t const min_turn_id,
         st_size_t const output_buffer_offset_index )
     {
-        using _base_t = tjob_t::_base_track_job_t;
-
-        st_status_t status =
-            _base_t::doAssignOutputBufferToBeamMonitors( belems, output,
-                min_turn_id, output_buffer_offset_index );
+        st_status_t status = base_tjob_t::doAssignOutputBufferToBeamMonitors(
+            belems, output, min_turn_id, output_buffer_offset_index );
 
         if( ( status == st::ARCH_STATUS_SUCCESS ) && ( this->hasBeamMonitorOutput() ) )
         {
@@ -749,11 +802,8 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::c_buffer_t* SIXTRL_RESTRICT output,
         st_size_t const output_buffer_offset_index )
     {
-        using _base_t = tjob_t::_base_track_job_t;
-
-        st_status_t status =
-        _base_t::doAssignOutputBufferToElemByElemConfig( elem_by_elem_conf,
-            output, output_buffer_offset_index );
+        st_status_t status = base_tjob_t::doAssignOutputBufferToElemByElemConfig(
+            elem_by_elem_conf, output, output_buffer_offset_index );
 
         if( ( status == st::ARCH_STATUS_SUCCESS ) &&
             ( this->hasElemByElemOutput() ) )
@@ -775,7 +825,15 @@ namespace SIXTRL_CXX_NAMESPACE
             pbuffer, belems, output, until_turn_elem_by_elem );
     }
 
-    /* --------------------------------------------------------------------- */
+    bool tjob_t::doParseConfigStr(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        return ( ( base_tjob_t::doParseConfigStr( config_str ) ) &&
+                 (  st::ARCH_STATUS_SUCCESS ==
+                    this->doParseConfigStrCudaImpl( config_str ) ) );
+    }
+
+    /* ----------------------------------------------------------------- */
 
     st_size_t tjob_t::do_add_stored_buffer(
         tjob_t::buffer_store_t&& assigned_buffer_handle )
@@ -820,28 +878,24 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* --------------------------------------------------------------------- */
 
-    st_status_t
-    tjob_t::doSetAssignOutputToBeamMonitorsKernelId(
+    st_status_t tjob_t::doSetAssignOutputToBeamMonitorsKernelId(
         tjob_t::kernel_id_t const id )
     {
         return this->doSetAssignOutputToBeamMonitorsKernelIdCudaImpl( id );
     }
 
-    st_status_t
-    tjob_t::doSetAssignOutputToElemByElemConfigKernelId(
+    st_status_t tjob_t::doSetAssignOutputToElemByElemConfigKernelId(
         tjob_t::kernel_id_t const id )
     {
         return this->doSetAssignOutputToElemByElemConfigKernelIdCudaImpl( id );
     }
 
-    st_status_t
-    tjob_t::doSetTrackUntilKernelId( tjob_t::kernel_id_t const id )
+    st_status_t tjob_t::doSetTrackUntilKernelId( tjob_t::kernel_id_t const id )
     {
         return this->doSetTrackUntilKernelIdCudaImpl( id );
     }
 
-    st_status_t
-    tjob_t::doSetTrackLineKernelId( tjob_t::kernel_id_t const id )
+    st_status_t tjob_t::doSetTrackLineKernelId( tjob_t::kernel_id_t const id )
     {
         return this->doSetTrackLineKernelIdCudaImpl( id );
     }
@@ -907,7 +961,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool const requires_exact_match )
     {
         return const_cast< tjob_t::cuda_argument_t& >( static_cast<
-            CudaTrackJob const& >( *this ).doGetRefCudaArgument( ptr_base_arg,
+            tjob_t const& >( *this ).doGetRefCudaArgument( ptr_base_arg,
                 arg_name, requires_exact_match ) );
     }
 
@@ -927,7 +981,7 @@ namespace SIXTRL_CXX_NAMESPACE
         bool const requires_exact_match ) SIXTRL_NOEXCEPT
     {
         return const_cast< tjob_t::cuda_argument_t* >( static_cast<
-            CudaTrackJob const& >( *this ).doGetPtrCudaArgument(
+            tjob_t const& >( *this ).doGetPtrCudaArgument(
                 ptr_base_arg, requires_exact_match ) );
     }
 
@@ -937,14 +991,12 @@ namespace SIXTRL_CXX_NAMESPACE
         char const* SIXTRL_RESTRICT config_str )
     {
         st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        using cuda_ctrl_t       = tjob_t::cuda_controller_t;
+        using cuda_ctrl_store_t = tjob_t::cuda_ctrl_store_t;
 
-        using _this_t           = st::CudaTrackJob;
-        using cuda_ctrl_t       = _this_t::cuda_controller_t;
-        using cuda_ctrl_store_t = _this_t::cuda_ctrl_store_t;
-
-        using cuda_arg_t        = _this_t::cuda_argument_t;
-        using cuda_arg_store_t  = _this_t::cuda_arg_store_t;
-        using debug_register_t  = _this_t::debug_register_t;
+        using cuda_arg_t        = tjob_t::cuda_argument_t;
+        using cuda_arg_store_t  = tjob_t::cuda_arg_store_t;
+        using debug_register_t  = tjob_t::debug_register_t;
 
         SIXTRL_ASSERT( this->ptrControllerBase() == nullptr );
 
@@ -976,17 +1028,14 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::doPrepareDefaultKernelsCudaImpl(
         char const* SIXTRL_RESTRICT SIXTRL_UNUSED( config_str ) )
     {
-        using _this_t = st::CudaTrackJob;
-//         using _base_t = _this_t::_base_track_job_t;
-        using size_t  = _this_t::size_type;
-        using cuda_ctrl_t = _this_t::cuda_controller_t;
-//         using cuda_kernel_config_t = _this_t::cuda_kernel_config_t;
-        using kernel_id_t = _this_t::kernel_id_t;
-        using cuda_node_info_t = _this_t::cuda_node_info_t;
-        using node_index_t = _this_t::node_index_t;
+        using tjob_t = st::CudaTrackJob;
+        using size_t  = st_size_t;
+        using cuda_ctrl_t = tjob_t::cuda_controller_t;
+        using kernel_id_t = tjob_t::kernel_id_t;
+        using cuda_node_info_t = tjob_t::cuda_node_info_t;
+        using node_index_t = tjob_t::node_index_t;
 
         st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
         if( ( ptr_cuda_ctrl != nullptr ) &&
@@ -1118,14 +1167,11 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::doPrepareParticlesStructuresCudaImpl(
         tjob_t::c_buffer_t* SIXTRL_RESTRICT particles_buffer )
     {
-        using _this_t = st::CudaTrackJob;
-
-        using cuda_ctrl_t      = _this_t::cuda_controller_t;
-        using cuda_arg_t       = _this_t::cuda_argument_t;
-        using store_base_arg_t = _this_t::stored_arg_base_t;
+        using cuda_ctrl_t      = tjob_t::cuda_controller_t;
+        using cuda_arg_t       = tjob_t::cuda_argument_t;
+        using store_base_arg_t = tjob_t::stored_arg_base_t;
 
         st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
         if( ( ptr_cuda_ctrl != nullptr ) && ( particles_buffer != nullptr ) )
@@ -1200,13 +1246,11 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::doPrepareBeamElementsStructuresCudaImpl(
          tjob_t::c_buffer_t* SIXTRL_RESTRICT belems_buffer )
     {
-        using _this_t          = st::CudaTrackJob;
-        using cuda_ctrl_t      = _this_t::cuda_controller_t;
-        using cuda_arg_t       = _this_t::cuda_argument_t;
-        using store_base_arg_t = _this_t::stored_arg_base_t;
+        using cuda_ctrl_t      = tjob_t::cuda_controller_t;
+        using cuda_arg_t       = tjob_t::cuda_argument_t;
+        using store_base_arg_t = tjob_t::stored_arg_base_t;
 
         st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
         if( ( ptr_cuda_ctrl != nullptr ) && ( belems_buffer != nullptr ) )
@@ -1238,19 +1282,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
     st_status_t tjob_t::doPrepareOutputStructuresCudaImpl(
         tjob_t::c_buffer_t* SIXTRL_RESTRICT particles_buffer,
-        tjob_t::c_buffer_t* SIXTRL_RESTRICT SIXTRL_UNUSED( belems_buffer ),
+        tjob_t::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
         tjob_t::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         st_size_t const )
     {
-        using _this_t          = st::CudaTrackJob;
-        using cuda_ctrl_t      = _this_t::cuda_controller_t;
-        using cuda_arg_t       = _this_t::cuda_argument_t;
-        using store_base_arg_t = _this_t::stored_arg_base_t;
-//         using elem_config_t    = _this_t::elem_by_elem_config_t;
-//         using ctrl_status_t    = _this_t::status_t;
+        using cuda_ctrl_t      = tjob_t::cuda_controller_t;
+        using cuda_arg_t       = tjob_t::cuda_argument_t;
+        using store_base_arg_t = tjob_t::stored_arg_base_t;
+//         using elem_config_t    = tjob_t::elem_by_elem_config_t;
+//         using ctrl_status_t    = st_status_t;
 
         st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
-
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
 
         if( ( ptr_cuda_ctrl != nullptr ) && ( output_buffer != nullptr ) &&
@@ -1358,17 +1400,16 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::doAssignOutputBufferToBeamMonitorsCudaImpl(
         tjob_t::c_buffer_t* SIXTRL_RESTRICT belems_buffer,
         tjob_t::c_buffer_t* SIXTRL_RESTRICT output_buffer,
-        tjob_t::particle_index_t const SIXTRL_UNUSED( min_turn_id ),
+        tjob_t::particle_index_t const min_turn_id,
         st_size_t const output_buffer_offset_index )
     {
-        using _this_t            = st::CudaTrackJob;
-        using cuda_ctrl_t        = _this_t::cuda_controller_t;
-        using cuda_arg_t         = _this_t::cuda_argument_t;
-        using cuda_kernel_conf_t = _this_t::cuda_kernel_config_t;
-        using kernel_id_t        = _this_t::kernel_id_t;
-        using ctrl_status_t      = _this_t::status_t;
-//         using size_t             = _this_t::size_type;
-        using particle_index_t   = _this_t::particle_index_t;
+        using cuda_ctrl_t        = tjob_t::cuda_controller_t;
+        using cuda_arg_t         = tjob_t::cuda_argument_t;
+        using cuda_kernel_conf_t = tjob_t::cuda_kernel_config_t;
+        using kernel_id_t        = tjob_t::kernel_id_t;
+        using ctrl_status_t      = st_status_t;
+//         using size_t             = st_size_t;
+        using particle_index_t   = tjob_t::particle_index_t;
 
         ctrl_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
@@ -1406,7 +1447,6 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( controller_ready ) && ( output_ready ) &&
             ( belems_ready ) && ( kernel_conf != nullptr ) )
         {
-            //size_t const offset = this->beamMonitorsOutputBufferOffset();
             particle_index_t const min_turn_id = this->minInitialTurnId();
 
             if( !this->isInDebugMode() )
@@ -1440,13 +1480,12 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::c_buffer_t* SIXTRL_RESTRICT output_buffer,
         st_size_t const output_buffer_offset_index )
     {
-        using _this_t            = st::CudaTrackJob;
-        using cuda_ctrl_t        = _this_t::cuda_controller_t;
-        using cuda_arg_t         = _this_t::cuda_argument_t;
-        using cuda_kernel_conf_t = _this_t::cuda_kernel_config_t;
-        using kernel_id_t        = _this_t::kernel_id_t;
-        using ctrl_status_t      = _this_t::status_t;
-//         using size_t             = _this_t::size_type;
+        using tjob_t            = st::CudaTrackJob;
+        using cuda_ctrl_t        = tjob_t::cuda_controller_t;
+        using cuda_arg_t         = tjob_t::cuda_argument_t;
+        using cuda_kernel_conf_t = tjob_t::cuda_kernel_config_t;
+        using kernel_id_t        = tjob_t::kernel_id_t;
+        using ctrl_status_t      = st_status_t;
 
         ctrl_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
         cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
@@ -1518,17 +1557,13 @@ namespace SIXTRL_CXX_NAMESPACE
 
     st_status_t tjob_t::doFetchParticleAddresses()
     {
-        using _this_t            = st::CudaTrackJob;
-        using cuda_ctrl_t        = _this_t::cuda_controller_t;
-        using cuda_arg_t         = _this_t::cuda_argument_t;
-        using cuda_kernel_conf_t = _this_t::cuda_kernel_config_t;
-        using kernel_id_t        = _this_t::kernel_id_t;
-//         using ctrl_status_t      = _this_t::status_t;
-//         using size_t             = _this_t::size_type;
-//         using particle_index_t   = _this_t::particle_index_t;
-//         using debug_register_t     = _this_t::debug_register_t;
-        using buffer_t           = _this_t::buffer_t;
-        using c_buffer_t         = _this_t::c_buffer_t;
+        using tjob_t            = st::CudaTrackJob;
+        using cuda_ctrl_t        = tjob_t::cuda_controller_t;
+        using cuda_arg_t         = tjob_t::cuda_argument_t;
+        using cuda_kernel_conf_t = tjob_t::cuda_kernel_config_t;
+        using kernel_id_t        = tjob_t::kernel_id_t;
+        using buffer_t           = tjob_t::buffer_t;
+        using c_buffer_t         = tjob_t::c_buffer_t;
 
         status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
@@ -1608,8 +1643,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     st_track_status_t tjob_t::doTrackLine(
             st_size_t const be_begin_index,
-            st_size_t const be_end_index,
-            bool const finish_turn )
+            st_size_t const be_end_index, bool const finish_turn )
     {
         return st::trackLine(
             *this, be_begin_index, be_end_index, finish_turn );
@@ -1623,12 +1657,9 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer,
         st_size_t const until_turn_elem_by_elem )
     {
-        using _this_t = st::CudaTrackJob;
-        using _base_t = _this_t::_base_track_job_t;
-        using output_buffer_flag_t = _this_t::output_buffer_flag_t;
+        using output_buffer_flag_t = tjob_t::output_buffer_flag_t;
 
-        st_status_t status =
-            _base_t::doPrepareParticlesStructures( pbuffer );
+        st_status_t status = base_tjob_t::doPrepareParticlesStructures( pbuffer );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
@@ -1667,7 +1698,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( requires_output_buffer ) || ( ptr_output_buffer != nullptr ) )
         {
-            status = _base_t::doPrepareOutputStructures( pbuffer,
+            status = base_tjob_t::doPrepareOutputStructures( pbuffer,
                 belem_buffer, ptr_output_buffer, until_turn_elem_by_elem );
 
             if( ( status == st::ARCH_STATUS_SUCCESS ) &&
@@ -1688,7 +1719,7 @@ namespace SIXTRL_CXX_NAMESPACE
         {
             if( ::NS(OutputBuffer_requires_elem_by_elem_output)( out_buffer_flags ) )
             {
-                status = _base_t::doAssignOutputBufferToElemByElemConfig(
+                status = base_tjob_t::doAssignOutputBufferToElemByElemConfig(
                     this->ptrElemByElemConfig(), this->ptrCOutputBuffer(),
                         this->elemByElemOutputBufferOffset() );
 
@@ -1705,7 +1736,7 @@ namespace SIXTRL_CXX_NAMESPACE
             {
                 if( status == st::ARCH_STATUS_SUCCESS )
                 {
-                    status = _base_t::doAssignOutputBufferToBeamMonitors(
+                    status = base_tjob_t::doAssignOutputBufferToBeamMonitors(
                     belem_buffer, this->ptrCOutputBuffer(),
                     this->minInitialTurnId(),
                     this->beamMonitorsOutputBufferOffset() );
@@ -1732,13 +1763,79 @@ namespace SIXTRL_CXX_NAMESPACE
         return status;
     }
 
+    st_status_t tjob_t::doParseConfigStrCudaImpl(
+        const char *const SIXTRL_RESTRICT config_str )
+    {
+        st_status_t status = st::ARCH_STATUS_SUCCESS;
+
+        if( ( config_str != nullptr ) &&
+            ( std::strlen( config_str ) > st_size_t{ 0 } ) )
+        {
+            status = st::ARCH_STATUS_SUCCESS;
+
+            std::stringstream a2str;
+            a2str << config_str;
+
+            bool has_cuda_table = false;
+            toml::value data;
+
+            try
+            {
+                data = toml::parse( a2str );
+            }
+            catch( toml::exception& exp )
+            {
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
+            }
+
+            if( status != st::ARCH_STATUS_SUCCESS ) return status;
+
+            try
+            {
+                auto const& cuda = toml::find( data, "cuda" );
+
+                this->m_default_threads_per_block = toml::find_or(
+                    cuda, "threads_per_block",
+                        tjob_t::DEFAULT_THREADS_PER_BLOCK );
+
+                this->m_track_threads_per_block = toml::find_or(
+                    cuda, "track_threads_per_block",
+                        this->m_default_threads_per_block );
+
+                if( ( this->m_default_threads_per_block ==
+                        st_size_t{ 0 } ) ||
+                    ( ( this->m_default_threads_per_block %
+                        tjob_t::cuda_kernel_config_t::DEFAULT_WARP_SIZE ) !=
+                        st_size_t{ 0 } ) )
+                {
+                    this->m_default_threads_per_block =
+                        tjob_t::DEFAULT_THREADS_PER_BLOCK;
+                }
+
+                if( ( this->m_track_threads_per_block ==
+                        st_size_t{ 0 } ) ||
+                    ( ( this->m_track_threads_per_block %
+                        tjob_t::cuda_kernel_config_t::DEFAULT_WARP_SIZE ) !=
+                        st_size_t{ 0 } ) )
+                {
+                    this->m_track_threads_per_block =
+                        tjob_t::DEFAULT_TRACK_THREADS_PER_BLOCK;
+                }
+            }
+            catch( toml::exception& exp )
+            {
+                status = st::ARCH_STATUS_GENERAL_FAILURE;
+            }
+        }
+
+        return status;
+    }
+
     /* --------------------------------------------------------------------- */
 
-    st_status_t
-    tjob_t::doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+    st_status_t tjob_t::doSetAssignOutputToBeamMonitorsKernelIdCudaImpl(
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-        using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
         using size_t          = st_size_t;
@@ -1746,17 +1843,21 @@ namespace SIXTRL_CXX_NAMESPACE
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
-        cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
+        tjob_t::cuda_controller_t* ptr_cuda_ctrl = this->ptrCudaController();
 
         node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->selectedNodeIndex()
-            : cuda_ctrl_t::UNDEFINED_INDEX;
+            : tjob_t::cuda_controller_t::UNDEFINED_INDEX;
 
         node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
 
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
+        tjob_t::cuda_kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
+
+        SIXTRL_ASSERT( this->m_default_threads_per_block > size_t{ 0 } );
+        SIXTRL_ASSERT( ( this->m_default_threads_per_block %
+                         kernel_config_t::DEFAULT_WARP_SIZE ) == size_t{ 0 } );
 
         size_t num_beam_monitors = size_t{ 0 };
 
@@ -1769,27 +1870,25 @@ namespace SIXTRL_CXX_NAMESPACE
             num_beam_monitors = size_t{ 1 };
         }
 
-        status_t status =
+        st_status_t status =
         ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
-            kernel_conf, node_info, num_beam_monitors );
+            kernel_conf, node_info, num_beam_monitors,
+                this->m_default_threads_per_block );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetAssignOutputToBeamMonitorsKernelId(
+            status = base_tjob_t::doSetAssignOutputToBeamMonitorsKernelId(
                 kernel_id );
         }
 
         return status;
     }
 
-    st_status_t
-    tjob_t::doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+    st_status_t tjob_t::doSetAssignOutputToElemByElemConfigKernelIdCudaImpl(
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-//         using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
-//         using status_t        = st_status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
@@ -1805,52 +1904,65 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
 
-        return
+        SIXTRL_ASSERT( this->m_default_threads_per_block > size_t{ 0 } );
+        SIXTRL_ASSERT( ( this->m_default_threads_per_block %
+            kernel_config_t::DEFAULT_WARP_SIZE ) == size_t{ 0 } );
+
+        st_status_t status =
         ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
-            kernel_conf, node_info );
-    }
-
-    st_status_t tjob_t::doSetTrackUntilKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
-    {
-        using _base_t         = tjob_t::_base_track_job_t;
-        using cuda_ctrl_t     = tjob_t::cuda_controller_t;
-        using kernel_config_t = tjob_t::cuda_kernel_config_t;
-        using status_t        = st_status_t;
-        using node_index_t    = cuda_ctrl_t::node_index_t;
-        using node_info_t     = cuda_ctrl_t::node_info_t;
-
-        cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
-
-        node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->selectedNodeIndex()
-            : cuda_ctrl_t::UNDEFINED_INDEX;
-
-        node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
-
-        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
-            ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
-
-        status_t status =
-        ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
-            kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
+            kernel_conf, node_info, this->m_default_threads_per_block );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetTrackUntilKernelId( kernel_id );
+            status =
+            base_tjob_t::doSetAssignOutputToElemByElemConfigKernelId( kernel_id );
+        }
+
+        return status;
+    }
+
+    st_status_t tjob_t::doSetTrackUntilKernelIdCudaImpl(
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
+    {
+        using cuda_ctrl_t     = tjob_t::cuda_controller_t;
+        using kernel_config_t = tjob_t::cuda_kernel_config_t;
+        using node_index_t    = cuda_ctrl_t::node_index_t;
+        using node_info_t     = cuda_ctrl_t::node_info_t;
+
+        cuda_ctrl_t* ptr_cuda_ctrl = this->ptrCudaController();
+
+        node_index_t const selected_node_index = ( ptr_cuda_ctrl != nullptr )
+            ? ptr_cuda_ctrl->selectedNodeIndex()
+            : cuda_ctrl_t::UNDEFINED_INDEX;
+
+        node_info_t const* node_info = ( ptr_cuda_ctrl != nullptr )
+            ? ptr_cuda_ctrl->ptrNodeInfo( selected_node_index ) : nullptr;
+
+        kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
+            ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
+
+        SIXTRL_ASSERT( this->m_track_threads_per_block > st_size_t{ 0 } );
+        SIXTRL_ASSERT( st_size_t{ 0 } == this->m_track_threads_per_block %
+                         kernel_config_t::DEFAULT_WARP_SIZE );
+
+        st_status_t status =
+        ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
+            kernel_conf, node_info, this->totalNumParticlesInParticleSets(),
+                this->m_track_threads_per_block );
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            status = base_tjob_t::doSetTrackUntilKernelId( kernel_id );
         }
 
         return status;
     }
 
     st_status_t tjob_t::doSetTrackLineKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-        using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
-        using status_t        = st_status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
@@ -1866,25 +1978,27 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
 
-        status_t status =
-        ::NS(CudaKernelConfig_configure_track_line_kernel)(
-            kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
+        SIXTRL_ASSERT( this->m_track_threads_per_block > st_size_t{ 0 } );
+        SIXTRL_ASSERT( st_size_t{ 0 } == this->m_track_threads_per_block %
+                         kernel_config_t::DEFAULT_WARP_SIZE );
+
+        st_status_t status = ::NS(CudaKernelConfig_configure_track_line_kernel)(
+            kernel_conf, node_info, this->totalNumParticlesInParticleSets(),
+                this->m_track_threads_per_block );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetTrackLineKernelId( kernel_id );
+            status = base_tjob_t::doSetTrackLineKernelId( kernel_id );
         }
 
         return status;
     }
 
     st_status_t tjob_t::doSetTrackElemByElemKernelIdCudaImpl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-        using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
-        using status_t        = st_status_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
@@ -1900,27 +2014,28 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
 
-        status_t status =
+        SIXTRL_ASSERT( this->m_track_threads_per_block > st_size_t{ 0 } );
+        SIXTRL_ASSERT( st_size_t{ 0 } == this->m_track_threads_per_block %
+                       kernel_config_t::DEFAULT_WARP_SIZE );
+
+        st_status_t status =
         ::NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
-            kernel_conf, node_info, this->totalNumParticlesInParticleSets() );
+            kernel_conf, node_info, this->totalNumParticlesInParticleSets(),
+                this->m_track_threads_per_block );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetTrackElemByElemKernelId( kernel_id );
+            status = base_tjob_t::doSetTrackElemByElemKernelId( kernel_id );
         }
 
         return status;
     }
 
-    st_status_t
-    tjob_t::doSetFetchParticlesAddressesKernelIdCudaImpl(
-            tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+    st_status_t tjob_t::doSetFetchParticlesAddressesKernelIdCudaImpl(
+            tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-        using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
-        using status_t        = st_status_t;
-        using size_t          = st_size_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
@@ -1935,6 +2050,10 @@ namespace SIXTRL_CXX_NAMESPACE
 
         kernel_config_t* kernel_conf = ( ptr_cuda_ctrl != nullptr )
             ? ptr_cuda_ctrl->ptrKernelConfig( kernel_id ) : nullptr;
+
+        SIXTRL_ASSERT( this->m_default_threads_per_block > st_size_t{ 0 } );
+        SIXTRL_ASSERT( st_size_t{ 0 } == this->m_default_threads_per_block %
+                         kernel_config_t::DEFAULT_WARP_SIZE );
 
         size_t num_particle_sets = size_t{ 0 };
 
@@ -1948,25 +2067,24 @@ namespace SIXTRL_CXX_NAMESPACE
                 this->ptrCParticlesBuffer() );
         }
 
-        status_t status = ::NS(CudaKernelConfig_configure_track_line_kernel)(
-            kernel_conf, node_info, num_particle_sets );
+        st_status_t status =
+        ::NS(CudaKernelConfig_configure_track_line_kernel)( kernel_conf,
+            node_info, num_particle_sets, this->m_default_threads_per_block );
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doSetFetchParticlesAddressesKernelId( kernel_id );
+            status = base_tjob_t::doSetFetchParticlesAddressesKernelId( kernel_id );
         }
 
         return status;
     }
 
     st_status_t tjob_t::do_set_assign_addresses_kernel_id_cuda_impl(
-        tjob_t::kernel_id_t const kernel_id ) SIXTRL_HOST_FN
+        tjob_t::kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT
     {
-        using _base_t         = tjob_t::_base_track_job_t;
         using cuda_ctrl_t     = tjob_t::cuda_controller_t;
         using kernel_config_t = tjob_t::cuda_kernel_config_t;
         using status_t        = st_status_t;
-//         using size_t          = st_size_t;
         using node_index_t    = cuda_ctrl_t::node_index_t;
         using node_info_t     = cuda_ctrl_t::node_info_t;
 
@@ -1987,7 +2105,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::do_set_assign_addresses_kernel_id( kernel_id );
+            status = base_tjob_t::do_set_assign_addresses_kernel_id( kernel_id );
         }
 
         return status;
@@ -2065,7 +2183,7 @@ namespace SIXTRL_CXX_NAMESPACE
     st_status_t tjob_t::do_push_stored_buffer_cuda_impl(
         st_size_t const buffer_id )
     {
-        tjob_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+        st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
         tjob_t::buffer_store_t* ptr_stored_buffer =
                 this->do_get_ptr_buffer_store( buffer_id );
@@ -2348,8 +2466,7 @@ namespace SIXTRL_CXX_NAMESPACE
     st_track_status_t trackLine(
         CudaTrackJob& SIXTRL_RESTRICT_REF trackjob,
         st_size_t const belem_begin_id,
-        st_size_t const belem_end_id,
-        bool const finish_turn )
+        st_size_t const belem_end_id, bool const finish_turn )
     {
         using track_job_t     = CudaTrackJob;
         using controller_t    = track_job_t::cuda_controller_t;

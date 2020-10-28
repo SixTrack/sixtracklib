@@ -38,5 +38,3 @@ TEST( C99CommonBeamElementDipoleEdge, BasicUsage )
 
     ::NS(Buffer_delete)( eb );
 }
-
-/* end: tests/sixtracklib/common/beam_elements/test_be_limit_c99.cpp */

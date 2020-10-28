@@ -80,7 +80,6 @@ TEST( C99CommonBeamElementLimitRect, BasicUsage )
     ASSERT_TRUE( std::fabs( ::NS(LimitRect_min_x)( l3 ) -
         ( -::NS(LimitRect_max_y)( l3 ) ) ) < EPS );
 
-
     be_limit_t* l4 = ::NS(LimitRect_add_copy)( eb, &limit );
 
     ASSERT_TRUE( l4 != nullptr );

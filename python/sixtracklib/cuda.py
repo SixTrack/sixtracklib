@@ -558,6 +558,8 @@ if SIXTRACKLIB_MODULES.get("cuda", False):
         st_CudaTrackJob_has_particles_addr_arg,
         st_CudaTrackJob_get_ptr_particles_addr_arg,
         st_Controller_select_node,
+        st_CudaTrackJob_default_threads_per_block,
+        st_CudaTrackJob_default_track_threads_per_block,
     )
 
     class CudaTrackJob(TrackJobBaseNew):
@@ -695,6 +697,16 @@ if SIXTRACKLIB_MODULES.get("cuda", False):
             return CudaController(
                 ptr_controller=_ptr_cuda_ctrl, owns_ptr=False
             )
+
+        @property
+        def default_threads_per_block(self):
+            return st_CudaTrackJob_default_threads_per_block(
+                self._ptr_track_job)
+
+        @property
+        def default_track_threads_per_block(self):
+            return st_CudaTrackJob_default_track_threads_per_block(
+                self._ptr_track_job)
 
 
 else:

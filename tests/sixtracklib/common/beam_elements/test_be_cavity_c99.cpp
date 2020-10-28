@@ -259,5 +259,3 @@ TEST( C99CommonBeamElementCavity, MinimalAddToBufferCopyRemapRead )
     NS(Buffer_delete)( eb );
     NS(Buffer_free)( &cmp_buffer );
 }
-
-/* end: tests/sixtracklib/common/test_be_cavity_c99.cpp */

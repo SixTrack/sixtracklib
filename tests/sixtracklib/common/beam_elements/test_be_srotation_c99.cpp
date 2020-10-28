@@ -276,5 +276,3 @@ TEST( C99CommonBeamElementSRotation, MinimalAddToBufferCopyRemapRead )
     NS(Buffer_delete)( eb );
     NS(Buffer_free)( &cmp_buffer );
 }
-
-/* end: tests/sixtracklib/common/test_be_srotation_c99.cpp */
