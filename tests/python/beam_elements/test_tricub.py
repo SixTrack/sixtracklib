@@ -108,4 +108,11 @@ def test_kicks(
 
 
 if __name__ == "__main__":
-    test_kicks(cmp_file_name="precomputed_kicks.pickle", abs_tol=1e-15)
+    if st.config.TRACK_TRICUB == "enabled":
+        test_kicks(
+            cmp_file_name="precomputed_kicks.pickle",
+            rel_tol=1e-12,
+            abs_tol=1e-13,
+        )
+    else:
+        print("Disabled TriCub beam-element -> skip test")
