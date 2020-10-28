@@ -1668,7 +1668,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( status == st::ARCH_STATUS_SUCCESS )
         {
-            status = _base_t::doPrepareBeamElementsStructures( belem_buffer );
+            status = base_tjob_t::doPrepareBeamElementsStructures( belem_buffer );
         }
 
         if( status == st::ARCH_STATUS_SUCCESS )
