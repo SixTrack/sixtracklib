@@ -1753,6 +1753,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_num_particle_sets_in_buffer( st_size_t{ 0 } ),
         m_num_beam_elements_in_buffer( st_size_t{ 0 } ),
         m_elem_by_elem_config_index( st_size_t{ 0 } ),
+        m_num_stored_buffers( st_size_t{ 0 } ),
         m_default_elem_by_elem_order( ::NS(ELEM_BY_ELEM_ORDER_DEFAULT) ),
         m_total_num_particles( tjob_t::num_particles_t{ 0 } ),
         m_total_num_particles_in_sets( tjob_t::num_particles_t{ 0 } ),
@@ -1798,6 +1799,7 @@ namespace SIXTRL_CXX_NAMESPACE
         m_num_particle_sets_in_buffer( other.m_num_particle_sets_in_buffer ),
         m_num_beam_elements_in_buffer( other.m_num_beam_elements_in_buffer ),
         m_elem_by_elem_config_index( other.m_elem_by_elem_config_index ),
+        m_num_stored_buffers( other.m_num_stored_buffers ),
         m_default_elem_by_elem_order( other.m_default_elem_by_elem_order ),
         m_total_num_particles( other.m_total_num_particles ),
         m_total_num_particles_in_sets( other.m_total_num_particles_in_sets ),
@@ -1874,6 +1876,7 @@ namespace SIXTRL_CXX_NAMESPACE
             std::move( other.m_num_beam_elements_in_buffer ) ),
         m_elem_by_elem_config_index(
             std::move( other.m_elem_by_elem_config_index ) ),
+        m_num_stored_buffers( std::move( other.m_num_stored_buffers ) ),
         m_default_elem_by_elem_order(
             std::move( other.m_default_elem_by_elem_order ) ),
         m_total_num_particles( std::move( other.m_total_num_particles ) ),
@@ -1992,6 +1995,8 @@ namespace SIXTRL_CXX_NAMESPACE
 
             this->m_elem_by_elem_config_index =
                 rhs.m_elem_by_elem_config_index;
+
+            this->m_num_stored_buffers = rhs.m_num_stored_buffers;
 
             this->m_default_elem_by_elem_order =
                 rhs.m_default_elem_by_elem_order;
