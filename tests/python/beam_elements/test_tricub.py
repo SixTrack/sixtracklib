@@ -23,14 +23,14 @@ def test_kicks(
     path_to_cmp_file = os.path.join(path_to_testdir, "tricub", cmp_file_name)
     assert os.path.exists(path_to_cmp_file)
 
-    with open(path_to_cmp_file, "r") as fp:
+    with open(path_to_cmp_file, "rb") as fp:
         n_part, prng_seed, kicks = pickle.load(fp)
 
     assert n_part > 0
     assert prng_seed is not None
     assert kicks is not None
 
-    np.random.seed(prng_seed)
+    np.random.seed(int(prng_seed))
 
     lattice = st.Elements()
     tc_index = lattice.cbuffer.n_objects
