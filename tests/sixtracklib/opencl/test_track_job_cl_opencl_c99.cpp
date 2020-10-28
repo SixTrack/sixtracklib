@@ -940,6 +940,7 @@ TEST( C99_TrackJobClTests, CreateTrackJobTrackLineCompare )
 
         ::NS(TrackJobCl_collect)( job );
 
+        /* TODO: Fix FMA / math optimization differences with Intel OpenCL Env */
         double const ABS_ERR = double{ 5e-11 };
 
         if( ( 0 != ::NS(Particles_compare_values)( cmp_particles, particles ) ) &&

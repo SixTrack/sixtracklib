@@ -67,10 +67,9 @@ target_include_directories( sixtrack_cuda_host
     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
     PUBLIC  $<BUILD_INTERFACE:${SIXTRACKL_CUDA_INCLUDE_DIRS}> )
 
-set_target_properties( sixtrack_cuda_host PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( sixtrack_cuda_host PROPERTIES LINKER_LANGUAGE C )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD 11 )
-set_target_properties( sixtrack_cuda_host PROPERTIES CXX_STANDARD_REQUIRED ON )
+set_target_properties( sixtrack_cuda_host PROPERTIES
+    POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE C CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON )
 
 # target_compile_options( sixtrack_cuda_host BEFORE PUBLIC
 #         ${SIXTRACKLIB_CXX_FLAGS} )
@@ -179,5 +178,3 @@ if( SIXTRACKL_ENABLE_CXX )
                  DESTINATION ${SIXTRACKLIB_CUDA_INSTALL_PATH} )
     endif()
 endif()
-
-# end: sixtracklib/cuda/CMakeLists.txt

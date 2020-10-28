@@ -1142,7 +1142,8 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
         ASSERT_TRUE( ptr_output_buffer->getNumObjects() ==
                       cmp_output_buffer.getNumObjects() );
 
-        double const ABS_ERR = double{ 5e-11 };
+        /* TODO: Fix FMA / math optimization differences with Intel OpenCL Env */
+        double const ABS_DIFF = double{ 5e-11 };
 
         if( ::NS(Particles_buffers_compare_values)(
                 ptr_output_buffer->getCApiPtr(),
@@ -1150,7 +1151,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
         {
             if( ::NS(Particles_buffers_compare_values_with_treshold)(
                 ptr_output_buffer->getCApiPtr(),
-                cmp_output_buffer.getCApiPtr(), ABS_ERR ) != 0 )
+                cmp_output_buffer.getCApiPtr(), ABS_DIFF ) != 0 )
             {
                 size_t const nn = cmp_output_buffer.getNumObjects();
                 buffer_t diff_buffer;
@@ -1171,7 +1172,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
 
                     if( 0 != ::NS(Particles_compare_values_with_treshold)(
                             cmp->getCApiPtr(), trk_particles->getCApiPtr(),
-                                ABS_ERR ) )
+                                ABS_DIFF ) )
                     {
                         size_t const diff_index = diff_buffer.getNumObjects();
 
@@ -1246,7 +1247,7 @@ TEST( CXXOpenCLTrackJobClTests, TrackParticles )
                             cmp_output_buffer.getCApiPtr() ) == 0 ) ||
             ( ::NS(Particles_buffers_compare_values_with_treshold)(
                     ptr_output_buffer->getCApiPtr(),
-                    cmp_output_buffer.getCApiPtr(), ABS_ERR ) == 0 ) );
+                    cmp_output_buffer.getCApiPtr(), ABS_DIFF ) == 0 ) );
     }
 
     if( num_nodes == size_t{ 0 } )

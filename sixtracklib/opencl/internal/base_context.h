@@ -13,6 +13,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/generated/path.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/context/compute_arch.h"
     #include "sixtracklib/opencl/cl.h"
@@ -50,13 +51,14 @@ namespace SIXTRL_CXX_NAMESPACE
         using device_id_t       = ::NS(comp_node_id_num_t);
         using status_t          = ::NS(arch_status_t);
 
-        using kernel_id_t       = ::NS(ctrl_kernel_id_t);
-        using program_id_t      = ::NS(ctrl_kernel_id_t);
-        using kernel_arg_id_t   = int64_t;
-        using kernel_arg_type_t = uint32_t;
-        using status_flag_t     = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
-        using cl_buffer_t       = cl::Buffer;
-        using cl_argument_t     = SIXTRL_CXX_NAMESPACE::ClArgument;
+        using kernel_id_t         = ::NS(ctrl_kernel_id_t);
+        using program_id_t        = ::NS(ctrl_kernel_id_t);
+        using kernel_arg_id_t     = int64_t;
+        using kernel_arg_type_t   = uint32_t;
+        using program_path_type_t = uint64_t;
+        using status_flag_t       = SIXTRL_CXX_NAMESPACE::arch_debugging_t;
+        using cl_buffer_t         = cl::Buffer;
+        using cl_argument_t       = SIXTRL_CXX_NAMESPACE::ClArgument;
 
         protected:
         using feature_flags_map_t  = std::map< std::string, std::string >;
@@ -83,6 +85,12 @@ namespace SIXTRL_CXX_NAMESPACE
             kernel_arg_type_t{ 0xffffffff };
 
         static constexpr size_type MIN_NUM_REMAP_BUFFER_ARGS = size_type{ 2 };
+
+        static constexpr program_path_type_t PROGRAM_PATH_RELATIVE =
+            program_path_type_t{ 0 };
+
+        static constexpr program_path_type_t PROGRAM_PATH_ABSOLUTE =
+            program_path_type_t{ 1 };
 
         /* ***************************************************************** */
 
@@ -478,6 +486,36 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN virtual ~ClContextBase() SIXTRL_NOEXCEPT;
 
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN std::string const&
+            default_path_to_kernel_dir_str() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN char const*
+            default_to_kernel_dir() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void set_default_path_to_kernel_dir(
+            std::string const& SIXTRL_RESTRICT_REF default_path );
+
+        SIXTRL_HOST_FN void set_default_path_to_kernel_dir(
+            char const* SIXTRL_RESTRICT default_path );
+
+        /* ----------------------------------------------------------------- */
+
+        SIXTRL_HOST_FN std::string const&
+            default_sixtrlib_inc_dir_str() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN char const*
+            default_sixtrlib_inc_dir() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void set_default_sixtrlib_inc_dir(
+            std::string const& SIXTRL_RESTRICT_REF default_path );
+
+        SIXTRL_HOST_FN void set_default_sixtrlib_inc_dir(
+            char const* SIXTRL_RESTRICT default_path );
+
+        /* ----------------------------------------------------------------- */
+
         SIXTRL_HOST_FN size_type numAvailableNodes() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN node_info_t const*
@@ -583,29 +621,36 @@ namespace SIXTRL_CXX_NAMESPACE
             defaultCompileOptions() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN program_id_t addProgramCode(
-            std::string const& source_code );
-
-        SIXTRL_HOST_FN program_id_t addProgramCode( char const* source_code );
+            std::string const& SIXTRL_RESTRICT_REF source_code );
 
         SIXTRL_HOST_FN program_id_t addProgramCode(
-            std::string const& source_code,
-            std::string const& compile_options );
+            char const* SIXTRL_RESTRICT source_code );
 
-        SIXTRL_HOST_FN program_id_t addProgramCode( char const* source_code,
-                                     char const* compile_options );
+        SIXTRL_HOST_FN program_id_t addProgramCode(
+            std::string const& SIXTRL_RESTRICT_REF source_code,
+            std::string const& SIXTRL_RESTRICT_REF compile_options );
 
-        SIXTRL_HOST_FN program_id_t addProgramFile(
-            std::string const& path_to_program );
-
-        SIXTRL_HOST_FN program_id_t addProgramFile(
-            char const* path_to_program );
+        SIXTRL_HOST_FN program_id_t addProgramCode(
+            char const* SIXTRL_RESTRICT source_code,
+            char const* SIXTRL_RESTRICT compile_options );
 
         SIXTRL_HOST_FN program_id_t addProgramFile(
-            std::string const& path_to_program,
-            std::string const& compile_options );
+            std::string const& SIXTRL_RESTRICT_REF path_to_program,
+            program_path_type_t const path_type = PROGRAM_PATH_ABSOLUTE );
 
-        SIXTRL_HOST_FN program_id_t addProgramFile( char const* path_to_program,
-            char const* compile_options );
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            char const* SIXTRL_RESTRICT path_to_program,
+            program_path_type_t const path_type = PROGRAM_PATH_ABSOLUTE );
+
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            std::string const& SIXTRL_RESTRICT_REF path_to_program,
+            std::string const& SIXTRL_RESTRICT_REF compile_options,
+            program_path_type_t const path_type = PROGRAM_PATH_ABSOLUTE );
+
+        SIXTRL_HOST_FN program_id_t addProgramFile(
+            char const* SIXTRL_RESTRICT path_to_program,
+            char const* SIXTRL_RESTRICT compile_options,
+            program_path_type_t const path_type = PROGRAM_PATH_ABSOLUTE );
 
         SIXTRL_HOST_FN bool compileProgram( program_id_t const program_id );
 
@@ -685,6 +730,10 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN void assignKernelArgument( kernel_id_t const kernel_id,
             size_type const arg_index, cl_argument_t& SIXTRL_RESTRICT_REF arg );
 
+        SIXTRL_HOST_FN void assignKernelArgumentRawPtr(
+            kernel_id_t const kernel_id, size_type const arg_index,
+            size_type const arg_size, void* ptr );
+
         template< typename T >
         SIXTRL_HOST_FN void assignKernelArgumentPtr(
             kernel_id_t const kernel_id, size_type const arg_index,
@@ -698,7 +747,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     ClContextBase::ARG_TYPE_RAW_PTR, arg_index, nullptr );
 
             cl::Kernel* kernel = this->openClKernel( kernel_id );
-            if( kernel != nullptr ) kernel->setArg( arg_index, ptr );
+            if( kernel != nullptr ) kernel->setArg( arg_index, *ptr );
         }
 
         SIXTRL_HOST_FN void assignKernelArgumentRawPtr(
@@ -776,7 +825,10 @@ namespace SIXTRL_CXX_NAMESPACE
         openClKernel( kernel_id_t const kernel_id ) SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cl::CommandQueue* openClQueue() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN std::uintptr_t openClQueueAddr() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN cl::Context* openClContext() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN std::uintptr_t openClContextAddr() const SIXTRL_NOEXCEPT;
 
         SIXTRL_HOST_FN cl_buffer_t const&
         internalStatusFlagsBuffer() const SIXTRL_NOEXCEPT;
@@ -872,6 +924,18 @@ namespace SIXTRL_CXX_NAMESPACE
         static SIXTRL_HOST_FN status_t GetAllowedNodesFromEnvVariable(
             std::vector< node_id_t >& allowed_node_ids,
             char const* SIXTRL_RESTRICT env_variable_name = nullptr );
+
+        static SIXTRL_HOST_FN std::string GetDefaultPathKernelDir()
+        {
+            std::ostringstream a2str;
+            a2str << NS(PATH_TO_BASE_DIR) << "sixtracklib/opencl/kernels/";
+            return a2str.str();
+        }
+
+        static SIXTRL_HOST_FN std::string GetDefaultSixTrlLibIncludeDir()
+        {
+            return std::string{ NS(PATH_TO_SIXTRL_INCLUDE_DIR) };
+        }
 
         using program_data_t = struct ProgramData
         {
@@ -1142,6 +1206,8 @@ namespace SIXTRL_CXX_NAMESPACE
         std::vector< program_data_t >   m_program_data;
         std::vector< kernel_data_t  >   m_kernel_data;
 
+        std::string                     m_default_path_to_kernel_dir;
+        std::string                     m_default_sixtrlib_inc_dir;
         std::string                     m_default_compile_options;
         std::string                     m_config_str;
 
@@ -1208,7 +1274,7 @@ NS(OpenCL_get_all_nodes_as_string)(
     char* SIXTRL_RESTRICT out_node_info_str,
     NS(arch_size_t) const out_node_info_str_capacity );
 
-/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
 NS(OpenCL_num_available_nodes)( char const* SIXTRL_RESTRICT env_variable_name );
@@ -1256,6 +1322,30 @@ NS(OpenCL_get_available_nodes_as_string)(
 /* ************************************************************************* */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)* NS(ClContextBase_create)();
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_default_to_kernel_dir)( const NS(ClContextBase) *const
+    SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ClContextBase_set_default_path_to_kernel_dir)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT default_path );
+
+/* ------------------------------------------------------------------------- */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN char const*
+NS(ClContextBase_default_sixtrlib_inc_dir)( const NS(ClContextBase) *const
+    SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void
+NS(ClContextBase_set_default_sixtrlib_inc_dir)(
+    NS(ClContextBase)* SIXTRL_RESTRICT ctx,
+    char const* SIXTRL_RESTRICT default_path );
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
 NS(ClContextBase_get_num_available_nodes)(
@@ -1617,8 +1707,14 @@ SIXTRL_EXTERN SIXTRL_HOST_FN cl_kernel NS(ClContextBase_get_kernel)(
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_command_queue NS(ClContextBase_get_queue)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN uintptr_t NS(ClContextBase_get_queue_addr)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT;
+
 SIXTRL_EXTERN SIXTRL_HOST_FN cl_context NS(ClContextBase_get_opencl_context)(
     NS(ClContextBase)* SIXTRL_RESTRICT ctx );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN uintptr_t NS(ClContextBase_get_opencl_context_addr)(
+    const NS(ClContextBase) *const SIXTRL_RESTRICT ctx ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClContextBase)*
 NS(ClContextBase_new_on_selected_node_id_str)(

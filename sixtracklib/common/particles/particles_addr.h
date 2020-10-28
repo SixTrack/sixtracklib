@@ -177,7 +177,7 @@ NS(Particles_managed_buffer_store_all_addresses_debug)(
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT paddr_buffer,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT pbuffer,
     NS(buffer_size_t) const slot_size,
-    SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
+    SIXTRL_ARGPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_error_flag );
 
 
 /* ------------------------------------------------------------------------- */
@@ -455,16 +455,131 @@ SIXTRL_INLINE int NS(ParticlesAddr_compare_values)(
     SIXTRL_PARTICLE_ARGPTR_DEC const NS(ParticlesAddr) *const
         SIXTRL_RESTRICT rhs )
 {
+    int cmp_result = -1;
+
     if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
     {
-        return memcmp( lhs, rhs, sizeof( NS(ParticlesAddr) ) );
+        cmp_result = ( lhs->num_particles == rhs->num_particles )
+            ? 0 : ( ( lhs->num_particles > rhs->num_particles ) ? +1 : -1 );
+
+        if( ( cmp_result == 0 ) && ( lhs->q0_addr != rhs->q0_addr ) )
+        {
+            cmp_result = ( lhs->q0_addr > rhs->q0_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->mass0_addr != rhs->mass0_addr ) )
+        {
+            cmp_result = ( lhs->mass0_addr > rhs->mass0_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->beta0_addr != rhs->beta0_addr ) )
+        {
+            cmp_result = ( lhs->beta0_addr > rhs->beta0_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->gamma0_addr != rhs->gamma0_addr ) )
+        {
+            cmp_result = ( lhs->gamma0_addr > rhs->gamma0_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->p0c_addr != rhs->p0c_addr ) )
+        {
+            cmp_result = ( lhs->p0c_addr > rhs->p0c_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->s_addr != rhs->s_addr ) )
+        {
+            cmp_result = ( lhs->s_addr > rhs->s_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->x_addr != rhs->x_addr ) )
+        {
+            cmp_result = ( lhs->x_addr > rhs->x_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->y_addr != rhs->y_addr ) )
+        {
+            cmp_result = ( lhs->y_addr > rhs->y_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->px_addr != rhs->px_addr ) )
+        {
+            cmp_result = ( lhs->px_addr > rhs->px_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->py_addr != rhs->py_addr ) )
+        {
+            cmp_result = ( lhs->py_addr > rhs->py_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->zeta_addr != rhs->zeta_addr ) )
+        {
+            cmp_result = ( lhs->zeta_addr > rhs->zeta_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->psigma_addr != rhs->psigma_addr ) )
+        {
+            cmp_result = ( lhs->psigma_addr > rhs->psigma_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->delta_addr != rhs->delta_addr ) )
+        {
+            cmp_result = ( lhs->delta_addr > rhs->delta_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->rpp_addr != rhs->rpp_addr ) )
+        {
+            cmp_result = ( lhs->rpp_addr > rhs->rpp_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->rvv_addr != rhs->rvv_addr ) )
+        {
+            cmp_result = ( lhs->rvv_addr > rhs->rvv_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->chi_addr != rhs->chi_addr ) )
+        {
+            cmp_result = ( lhs->chi_addr > rhs->chi_addr ) ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) &&
+            ( lhs->charge_ratio_addr != rhs->charge_ratio_addr ) )
+        {
+            cmp_result = ( lhs->charge_ratio_addr > rhs->charge_ratio_addr )
+                ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) &&
+            ( lhs->particle_id_addr != rhs->particle_id_addr ) )
+        {
+            cmp_result = ( lhs->particle_id_addr > rhs->particle_id_addr )
+                ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) &&
+            ( lhs->at_element_id_addr != rhs->at_element_id_addr ) )
+        {
+            cmp_result = ( lhs->at_element_id_addr > rhs->at_element_id_addr )
+                ? +1 : -1;
+        }
+
+        if( ( cmp_result == 0 ) && ( lhs->at_turn_addr != rhs->at_turn_addr ) )
+        {
+            cmp_result = ( lhs->at_turn_addr > rhs->at_turn_addr ) ? +1 : -1;
+        }
+
+
+        if( ( cmp_result == 0 ) && ( lhs->state_addr != rhs->state_addr ) )
+        {
+            cmp_result = ( lhs->state_addr > rhs->state_addr ) ? +1 : -1;
+        }
     }
     else if( lhs != SIXTRL_NULLPTR )
     {
-        return 1;
+        cmp_result = 1;
     }
 
-    return -1;
+    return cmp_result;
 }
 
 /* ------------------------------------------------------------------------- */

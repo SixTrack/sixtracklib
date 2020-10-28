@@ -242,6 +242,29 @@ if( GTEST_FOUND )
     add_test( CXX_OpenCL_Track_ClTrackJob_UpdateBeamElementsRegion
               test_track_job_update_region_opencl_cxx )
 
+    # ==========================================================================
+    # test_track_job_fetch_particle_addr_opencl_c99:
+
+    add_executable( test_track_job_fetch_particle_addr_opencl_c99
+                    test_track_job_fetch_particle_addr_c99.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_fetch_particle_addr_opencl_c99 )
+
+    add_test( CXX_OpenCL_Track_TrackJob_FetchParticleAddr
+              test_track_job_fetch_particle_addr_opencl_c99 )
+
+    # test_track_job_fetch_particle_addr_opencl_cxx:
+
+    add_executable( test_track_job_fetch_particle_addr_opencl_cxx
+                    test_track_job_fetch_particle_addr_cxx.cpp )
+
+    set( CXX_UNIT_TEST_TARGETS ${CXX_UNIT_TEST_TARGETS}
+         test_track_job_fetch_particle_addr_opencl_cxx )
+
+    add_test( CXX_OpenCL_Track_TrackJob_FetchParticleAddr
+              test_track_job_fetch_particle_addr_opencl_cxx )
+
     # *************************************************************************
     # Set all properties:
 

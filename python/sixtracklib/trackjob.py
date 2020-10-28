@@ -1300,6 +1300,7 @@ class TrackJob(object):
         self._ptr_c_beam_elements_buffer = st.st_NullBuffer
         self._output_buffer = None
         self._ptr_c_output_buffer = st.st_NullBuffer
+        self._arch = None
         self._stored_buffers = {}
         self._last_status = st_ARCH_STATUS_SUCCESS.value
         self._last_track_status = st_TRACK_SUCCESS.value
@@ -1418,6 +1419,8 @@ class TrackJob(object):
         ):
             raise ValueError("Unknown architecture {0}".format(arch,))
 
+        self._arch = arch
+
         if device_id is not None:
             if config_str is None:
                 config_str = device_id
@@ -1487,6 +1490,10 @@ class TrackJob(object):
     @property
     def last_track_status(self):
         return self._last_track_status
+
+    @property
+    def arch(self):
+        return self._arch
 
     @property
     def output_buffer(self):
@@ -1582,6 +1589,35 @@ class TrackJob(object):
     @property
     def has_particle_addresses(self):
         return st.st_TrackJob_has_particles_addr(self.ptr_st_track_job)
+
+    def fetch_particle_addresses(self):
+        last_status = st.st_TrackJob_fetch_particle_addresses(
+            self.ptr_st_track_job )
+        raise_error_if_status_not_success( last_status,
+            "unsuccessful fetching particle addresses op; " +
+            "status:{0}".format( last_status) )
+        return self
+
+    def clear_particle_addresses(self, particle_set_index=0):
+        last_status = st.st_TrackJob_clear_particle_addresses(
+            self.ptr_st_track_job, st_buffer_size_t(particle_set_index))
+        raise_error_if_status_not_success( last_status,
+            "unsuccessful clearing of particle addresses op; " +
+            "particle_set_index={0}, status:{1}".format(
+                particle_set_index, last_status))
+        return self
+
+    def clear_all_particle_addresses(self):
+        last_status = st.st_TrackJob_clear_all_particle_addresses(
+            self.ptr_st_track_job)
+        raise_error_if_status_not_success( last_status,
+            "unsuccessful clearing all particle addresses op; " +
+            "status:{0}".format(last_status))
+        return self
+
+    def get_particle_addresses(self, particle_set_index=0):
+        return st.st_TrackJob_particle_addresses(
+            self.ptr_st_track_job, st_buffer_size_t(particle_set_index))
 
     def type(self):
         return st.st_TrackJob_get_type_id(self.ptr_st_track_job)
@@ -2150,6 +2186,15 @@ class TrackJob(object):
 
         return self
 
+    @property
+    def opencl_context_addr(self):
+        return 0 if self._arch != "opencl" else \
+            st.st_TrackJobCl_get_opencl_context_addr( self.ptr_st_track_job )
+
+    @property
+    def opencl_queue_addr(self):
+        return 0 if self._arch != "opencl" else \
+            st.st_TrackJobCl_get_opencl_queue_addr( self.ptr_st_track_job )
     # -------------------------------------------------------------------------
 
     def add_stored_buffer(
@@ -2261,7 +2306,3 @@ class TrackJob(object):
                 f"unable to get argument for stored buffer on arch {arch_str}"
             )
         return ptr_arg
-
-
-
-# end: python/sixtracklib/trackjob.py

@@ -40,6 +40,7 @@
     #include "sixtracklib/common/output/output_buffer.h"
     #include "sixtracklib/common/particles/particles_addr.h"
     #include "sixtracklib/common/internal/stl_buffer_helper.hpp"
+    #include "sixtracklib/common/internal/compiler_attributes.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -47,10 +48,12 @@ namespace SIXTRL_CXX_NAMESPACE
 {
     namespace
     {
-        namespace st      = SIXTRL_CXX_NAMESPACE;
-        using tjob_t      = st::TrackJobBase;
-        using st_size_t   = st_size_t;
-        using st_status_t = tjob_t::status_t;
+        namespace st            = SIXTRL_CXX_NAMESPACE;
+        using tjob_t            = st::TrackJobBase;
+        using st_size_t         = st_size_t;
+        using st_status_t       = tjob_t::status_t;
+        using st_track_status_t = tjob_t::track_status_t;
+        using paddr_t           = tjob_t::particles_addr_t;
     }
 
     constexpr st_size_t tjob_t::ILLEGAL_BUFFER_ID;
@@ -77,8 +80,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return st::TRACK_JOB_DEFAULT_NUM_PARTICLE_SETS;
     }
 
-    st_size_t const*
-    tjob_t::DefaultParticleSetIndicesBegin() SIXTRL_NOEXCEPT
+    st_size_t const* tjob_t::DefaultParticleSetIndicesBegin() SIXTRL_NOEXCEPT
     {
         st_size_t const* ptr = &st::TRACK_JOB_DEFAULT_PARTICLE_SET_INDICES[ 0 ];
         return ptr;
@@ -113,7 +115,6 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doCollect( st::TRACK_JOB_IO_PARTICLES );
     }
 
-
     void tjob_t::collectBeamElements()
     {
         this->doCollect( st::TRACK_JOB_IO_BEAM_ELEMENTS );
@@ -122,6 +123,12 @@ namespace SIXTRL_CXX_NAMESPACE
     void tjob_t::collectOutput()
     {
         this->doCollect( st::TRACK_JOB_IO_OUTPUT );
+    }
+
+    st_status_t tjob_t::collectParticlesAddresses()
+    {
+        this->doCollect( st::TRACK_JOB_IO_PARTICLES_ADDR );
+        return st::ARCH_STATUS_SUCCESS;
     }
 
     void tjob_t::enableCollectParticles()  SIXTRL_NOEXCEPT
@@ -213,20 +220,96 @@ namespace SIXTRL_CXX_NAMESPACE
         this->doPush( st::TRACK_JOB_IO_OUTPUT );
     }
 
+    void tjob_t::pushParticlesAddresses()
+    {
+        this->doPush( st::TRACK_JOB_IO_PARTICLES_ADDR );
+    }
+
     /* --------------------------------------------------------------------- */
 
-    tjob_t::track_status_t tjob_t::track( st_size_t const until_turn )
+    bool tjob_t::canFetchParticleAddresses() const SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr );
+    }
+
+    bool tjob_t::hasParticleAddresses() const SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( ( !this->m_has_particle_addresses ) ||
+            ( ( this->m_has_particle_addresses ) &&
+              ( this->canFetchParticleAddresses() ) ) );
+
+        return this->m_has_particle_addresses;
+    }
+
+    paddr_t const* tjob_t::particleAddresses( st_size_t const index ) const SIXTRL_NOEXCEPT
+    {
+        paddr_t const* ptr_paddr = nullptr;
+
+        if( ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer()->getNumObjects() > index ) &&
+            ( this->hasParticleAddresses() ) )
+        {
+            ptr_paddr = ::NS(ParticlesAddr_buffer_get_const_particle_addr)(
+                this->doGetPtrParticlesAddrBuffer()->getCApiPtr(), index );
+        }
+
+        return ptr_paddr;
+    }
+
+    st_status_t tjob_t::fetchParticleAddresses()
+    {
+        st_status_t status = this->doFetchParticleAddresses();
+
+        if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+            ( this->requiresCollecting() ) )
+        {
+            status = this->collectParticlesAddresses();
+        }
+
+        if( status == st::ARCH_STATUS_SUCCESS )
+        {
+            this->doSetHasParticleAddressesFlag( true );
+        }
+
+        return status;
+    }
+
+    st_status_t tjob_t::clearParticleAddresses( st_size_t const index )
+    {
+        return this->doClearParticleAddresses( index );
+    }
+
+    st_status_t tjob_t::clearAllParticleAddresses()
+    {
+        return this->doClearAllParticleAddresses();
+    }
+
+    tjob_t::buffer_t const*
+    tjob_t::ptrParticleAddressesBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->doGetPtrParticlesAddrBuffer();
+    }
+
+    tjob_t::c_buffer_t const*
+    tjob_t::ptrCParticleAddressesBuffer() const SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr )
+            ? this->doGetPtrParticlesAddrBuffer()->getCApiPtr() : nullptr;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    st_track_status_t tjob_t::track( st_size_t const until_turn )
     {
         return this->doTrackUntilTurn( until_turn );
     }
 
-    tjob_t::track_status_t tjob_t::trackElemByElem(
-        st_size_t const until_turn )
+    st_track_status_t tjob_t::trackElemByElem( st_size_t const until_turn )
     {
         return this->doTrackElemByElem( until_turn );
     }
 
-    tjob_t::track_status_t tjob_t::trackLine(
+    st_track_status_t tjob_t::trackLine(
         st_size_t const beam_elements_begin_index,
         st_size_t const beam_elements_end_index, bool const finish_turn )
     {
@@ -311,8 +394,6 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         using buffer_t   = tjob_t::buffer_t;
         using c_buffer_t = tjob_t::c_buffer_t;
-        using size_t = st_size_t;
-
         bool success = false;
 
         buffer_t*   ptr_particles_buffer   = this->ptrOutputBuffer();
@@ -323,7 +404,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
         if( ( ptr_c_particles_buffer != nullptr ) &&
             ( !::NS(Buffer_needs_remapping)( ptr_c_particles_buffer ) ) &&
-            ( static_cast< size_t >( ::NS(Buffer_get_num_of_objects)(
+            ( static_cast< st_size_t >( ::NS(Buffer_get_num_of_objects)(
                 ptr_c_particles_buffer ) ) > particle_set_index ) &&
             ( ptr_c_beam_elem_buffer != nullptr ) &&
             ( !::NS(Buffer_needs_remapping)( ptr_c_beam_elem_buffer ) ) )
@@ -360,7 +441,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Buffer_clear)( ptr_c_output_buffer, true );
                 }
 
-                size_t particle_set_indices[ 1 ] = { size_t{ 0 } };
+                st_size_t particle_set_indices[ 1 ] = { st_size_t{ 0 } };
                 particle_set_indices[ 0 ] = particle_set_index;
 
                 success = this->reset( *ptr_particles_buffer,
@@ -376,7 +457,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     ::NS(Buffer_clear)( ptr_c_output_buffer, true );
                 }
 
-                success = this->reset( ptr_c_particles_buffer, size_t{ 1 },
+                success = this->reset( ptr_c_particles_buffer, st_size_t{ 1 },
                     &particle_set_index, ptr_c_beam_elem_buffer,
                         ptr_c_output_buffer, this->untilTurnElemByElem() );
             }
@@ -485,8 +566,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return end_ptr;
     }
 
-    st_size_t tjob_t::particleSetIndex(
-        st_size_t const n ) const
+    st_size_t tjob_t::particleSetIndex( st_size_t const n ) const
     {
         SIXTRL_ASSERT( this->m_num_particles_in_sets.size() ==
                        this->m_particle_set_indices.size() );
@@ -563,9 +643,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     tjob_t::buffer_t* tjob_t::ptrParticlesBuffer() SIXTRL_NOEXCEPT
     {
-        using ptr_t   = tjob_t::buffer_t*;
-
-        return const_cast< ptr_t >( static_cast< tjob_t const& >(
+        return const_cast< tjob_t::buffer_t* >( static_cast< tjob_t const& >(
             *this ).ptrParticlesBuffer() );
     }
 
@@ -581,13 +659,12 @@ namespace SIXTRL_CXX_NAMESPACE
 
     tjob_t::c_buffer_t* tjob_t::ptrCParticlesBuffer() SIXTRL_NOEXCEPT
     {
-        using ptr_t   = tjob_t::c_buffer_t*;
-
-        return const_cast< ptr_t >( static_cast< tjob_t const& >(
+        return const_cast< tjob_t::c_buffer_t* >( static_cast< tjob_t const& >(
             *this ).ptrCParticlesBuffer() );
     }
 
-    tjob_t::c_buffer_t const* tjob_t::ptrCParticlesBuffer() const SIXTRL_NOEXCEPT
+    tjob_t::c_buffer_t const*
+    tjob_t::ptrCParticlesBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_particles_buffer == nullptr ) ||
@@ -597,17 +674,28 @@ namespace SIXTRL_CXX_NAMESPACE
         return this->m_ptr_c_particles_buffer;
     }
 
+    tjob_t::buffer_t* tjob_t::ptrParticleAddressesBuffer() SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr )
+            ? this->doGetPtrParticlesAddrBuffer() : nullptr;
+    }
+
+    tjob_t::c_buffer_t* tjob_t::ptrCParticleAddressesBuffer() SIXTRL_NOEXCEPT
+    {
+        return ( this->doGetPtrParticlesAddrBuffer() != nullptr )
+            ? this->doGetPtrParticlesAddrBuffer()->getCApiPtr() : nullptr;
+    }
+
     /* --------------------------------------------------------------------- */
 
     tjob_t::buffer_t* tjob_t::ptrBeamElementsBuffer() SIXTRL_NOEXCEPT
     {
-        using ptr_t   = tjob_t::buffer_t*;
-
-        return const_cast< ptr_t >( static_cast< tjob_t const& >(
+        return const_cast< tjob_t::buffer_t* >( static_cast< tjob_t const& >(
             *this ).ptrBeamElementsBuffer() );
     }
 
-    tjob_t::buffer_t const* tjob_t::ptrBeamElementsBuffer() const SIXTRL_NOEXCEPT
+    tjob_t::buffer_t const*
+    tjob_t::ptrBeamElementsBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_beam_elem_buffer == nullptr ) ||
@@ -619,9 +707,7 @@ namespace SIXTRL_CXX_NAMESPACE
 
     tjob_t::c_buffer_t* tjob_t::ptrCBeamElementsBuffer() SIXTRL_NOEXCEPT
     {
-        using ptr_t   = tjob_t::c_buffer_t*;
-
-        return const_cast< ptr_t >( static_cast< tjob_t const& >(
+        return const_cast< tjob_t::c_buffer_t* >( static_cast< tjob_t const& >(
             *this ).ptrCBeamElementsBuffer() );
     }
 
@@ -663,7 +749,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    tjob_t::particles_addr_t const* tjob_t::particles_addr(
+    paddr_t const* tjob_t::particles_addr(
         st_size_t const ) const SIXTRL_NOEXCEPT
     {
         return nullptr;
@@ -1261,7 +1347,7 @@ namespace SIXTRL_CXX_NAMESPACE
             *this ).ptrOutputBuffer() );
     }
 
-    tjob_t::buffer_t* tjob_t::ptrOutputBuffer() const SIXTRL_NOEXCEPT
+    tjob_t::buffer_t const* tjob_t::ptrOutputBuffer() const SIXTRL_NOEXCEPT
     {
         SIXTRL_ASSERT(
             ( this->m_ptr_output_buffer == nullptr ) ||
@@ -1308,11 +1394,8 @@ namespace SIXTRL_CXX_NAMESPACE
     st_size_t const* tjob_t::beamMonitorIndicesEnd() const SIXTRL_NOEXCEPT
     {
         st_size_t const* end_ptr = this->beamMonitorIndicesBegin();
-        if( end_ptr != nullptr )
-        {
-            std::advance( end_ptr, this->numBeamMonitors() );
-        }
-
+        st_size_t const num_be_monitors = this->numBeamMonitors();
+        if( end_ptr != nullptr ) std::advance( end_ptr, num_be_monitors );
         return end_ptr;
     }
 
@@ -1396,15 +1479,13 @@ namespace SIXTRL_CXX_NAMESPACE
             : nullptr;
     }
 
-    bool
-    tjob_t::elemByElemRolling() const SIXTRL_NOEXCEPT
+    bool tjob_t::elemByElemRolling() const SIXTRL_NOEXCEPT
     {
         return ::NS(ElemByElemConfig_is_rolling)(
             this->ptrElemByElemConfig() );
     }
 
-    bool
-    tjob_t::defaultElemByElemRolling() const SIXTRL_NOEXCEPT
+    bool tjob_t::defaultElemByElemRolling() const SIXTRL_NOEXCEPT
     {
         return this->m_default_elem_by_elem_rolling;
     }
@@ -1450,12 +1531,12 @@ namespace SIXTRL_CXX_NAMESPACE
         m_min_initial_turn_id( tjob_t::particle_index_t{ 0 } ),
         m_max_initial_turn_id( tjob_t::particle_index_t{ 0 } ),
         m_until_turn_elem_by_elem( st_size_t{ 0 } ),
-        m_collect_flags(
-            st::TRACK_JOB_IO_DEFAULT_FLAGS ),
+        m_collect_flags( st::TRACK_JOB_IO_DEFAULT_FLAGS ),
         m_requires_collect( true ),
         m_default_elem_by_elem_rolling( true ),
         m_has_beam_monitor_output( false ),
         m_has_elem_by_elem_output( false ),
+        m_has_particle_addresses( false ),
         m_debug_mode( false )
     {
         if( type_str != nullptr ) this->m_type_str = type_str;
@@ -1564,6 +1645,7 @@ namespace SIXTRL_CXX_NAMESPACE
             o.m_default_elem_by_elem_rolling ) ),
         m_has_beam_monitor_output( std::move( o.m_has_beam_monitor_output ) ),
         m_has_elem_by_elem_output( std::move( o.m_has_elem_by_elem_output ) ),
+        m_has_particle_addresses( std::move( o.m_has_particle_addresses ) ),
         m_debug_mode( std::move( o.m_debug_mode ) )
     {
         o.m_type_str.clear();
@@ -1598,7 +1680,8 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_total_num_particles_in_sets =
                 rhs.m_total_num_particles_in_sets;
 
-            this->m_num_stored_buffers         = rhs.m_num_stored_buffers;
+            this->m_num_stored_buffers = rhs.m_num_stored_buffers;
+
             this->m_default_elem_by_elem_order =
                 rhs.m_default_elem_by_elem_order;
 
@@ -1618,7 +1701,7 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_elem_by_elem_output = rhs.m_has_elem_by_elem_output;
             this->m_requires_collect        = rhs.m_requires_collect;
             this->m_collect_flags           = rhs.m_collect_flags;
-            this->m_assign_address_items     = rhs.m_assign_address_items;
+            this->m_assign_address_items    = rhs.m_assign_address_items;
             this->m_stored_buffers          = rhs.m_stored_buffers;
 
             if( rhs.ownsOutputBuffer() )
@@ -1737,6 +1820,9 @@ namespace SIXTRL_CXX_NAMESPACE
             this->m_has_elem_by_elem_output =
                 std::move( rhs.m_has_elem_by_elem_output );
 
+            this->m_has_particle_addresses =
+                std::move( rhs.m_has_particle_addresses );
+
             this->m_debug_mode = std::move( rhs.m_debug_mode );
 
             rhs.m_type_str.clear();
@@ -1760,20 +1846,74 @@ namespace SIXTRL_CXX_NAMESPACE
     void tjob_t::doCollect( collect_flag_t const ) {}
     void tjob_t::doPush( push_flag_t const ) {}
 
-    tjob_t::track_status_t tjob_t::doTrackUntilTurn( size_type const )
+    /* --------------------------------------------------------------------- */
+
+    st_status_t tjob_t::doFetchParticleAddresses()
     {
-        return tjob_t::track_status_t{ -1 };
+        return st::ARCH_STATUS_GENERAL_FAILURE;
     }
 
-    tjob_t::track_status_t tjob_t::doTrackElemByElem( size_type const )
+    st_status_t tjob_t::doClearParticleAddressesBaseImpl(
+        st_size_t const index )
     {
-        return tjob_t::track_status_t{ -1 };
+        st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( ( this->doGetPtrParticlesAddrBuffer() != nullptr ) &&
+            ( this->doGetPtrParticlesAddrBuffer()->getNumObjects() > index ) )
+        {
+            status = ::NS(ParticlesAddr_buffer_clear_single)(
+                this->doGetPtrParticlesAddrBuffer()->getCApiPtr(), index );
+
+            this->doSetHasParticleAddressesFlag( false );
+        }
+
+        return status;
     }
 
-    tjob_t::track_status_t
-    tjob_t::doTrackLine( size_type const, size_type const, bool const )
+    st_status_t tjob_t::doClearParticleAddresses(
+        st_size_t const index )
     {
-        return tjob_t::track_status_t{ -1 };
+        return this->doClearParticleAddressesBaseImpl( index );
+    }
+
+    st_status_t tjob_t::doClearAllParticleAddressesBaseImpl()
+    {
+        st_status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
+
+        if( this->doGetPtrParticlesAddrBuffer() != nullptr )
+        {
+            status = ::NS(ParticlesAddr_buffer_clear_all)(
+                this->doGetPtrParticlesAddrBuffer()->getCApiPtr() );
+
+            this->doSetHasParticleAddressesFlag( false );
+        }
+
+        return status;
+    }
+
+    st_status_t tjob_t::doClearAllParticleAddresses()
+    {
+        return this->doClearAllParticleAddressesBaseImpl();
+    }
+
+    st_track_status_t tjob_t::doTrackUntilTurn(
+        st_size_t const SIXTRL_UNUSED( until_turn ) )
+    {
+        return st_track_status_t{ -1 };
+    }
+
+    st_track_status_t tjob_t::doTrackElemByElem(
+        st_size_t const SIXTRL_UNUSED( until_turn_elem_by_elem ) )
+    {
+        return st_track_status_t{ -1 };
+    }
+
+    st_track_status_t tjob_t::doTrackLine(
+        st_size_t const SIXTRL_UNUSED( be_idx_begin ) ,
+        st_size_t const SIXTRL_UNUSED( be_idx_end ),
+        bool const SIXTRL_UNUSED( finish_turn ) )
+    {
+        return st_track_status_t{ -1 };
     }
 
     /* --------------------------------------------------------------------- */
@@ -1793,7 +1933,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( ( pb != nullptr ) && ( ( nn > ZERO ) || ( nn == ZERO ) ) &&
             ( !::NS(Buffer_needs_remapping)( pb ) ) && ( num_psets >= nn ) )
         {
-            int ret = int{ -1 };
+            tjob_t::status_t status = st::ARCH_STATUS_GENERAL_FAILURE;
 
             st_size_t const first_index = ( nn > ZERO )
                 ? this->particleSetIndex( ZERO ) : ZERO;
@@ -1803,21 +1943,35 @@ namespace SIXTRL_CXX_NAMESPACE
 
             if( ( nn <= ONE ) && ( first_index == ZERO ) )
             {
-                ret = ::NS(Particles_get_min_max_attributes)(
-                        ::NS(Particles_buffer_get_const_particles)( pb, ZERO ),
-                        &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
-                        &min_turn_id, &max_turn_id );
+                status = ::NS(Particles_get_min_max_attributes)(
+                    ::NS(Particles_buffer_get_const_particles)( pb, ZERO ),
+                    &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
+                    &min_turn_id, &max_turn_id );
             }
             else if( nn > ZERO )
             {
-                ret =
+                status =
                 ::NS(Particles_buffer_get_min_max_attributes_of_particles_set)(
                     pb, nn, this->particleSetIndicesBegin(),
                     &min_part_id, &max_part_id, &min_elem_id, &max_elem_id,
                     &min_turn_id, &max_turn_id );
             }
 
-            if( ret == int{ 0 } )
+            if( this->doGetPtrParticlesAddrBuffer() == nullptr )
+            {
+                this->doUpdateStoredParticlesAddrBuffer( tjob_t::ptr_buffer_t{
+                    new tjob_t::buffer_t } );
+            }
+
+            if( ( status == st::ARCH_STATUS_SUCCESS ) &&
+                ( this->doGetPtrParticlesAddrBuffer() != nullptr )  )
+            {
+                status =
+                ::NS(ParticlesAddr_prepare_buffer_based_on_particles_buffer)(
+                    this->doGetPtrParticlesAddrBuffer()->getCApiPtr(), pb );
+            }
+
+            if( status == st::ARCH_STATUS_SUCCESS )
             {
                 this->doSetMinParticleId( min_part_id );
                 this->doSetMaxParticleId( max_part_id );
@@ -2223,7 +2377,6 @@ namespace SIXTRL_CXX_NAMESPACE
         st_size_t const until_turn_elem_by_elem )
     {
         using output_buffer_flag_t = tjob_t::output_buffer_flag_t;
-
         bool success = this->doPrepareParticlesStructures( particles_buffer );
 
         if( success )
@@ -2287,9 +2440,7 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::c_buffer_t* SIXTRL_RESTRICT ptr_output_buffer )
     {
         bool success = false;
-        using flags_t = tjob_t::output_buffer_flag_t;
-
-        flags_t const flags =
+        tjob_t::output_buffer_flag_t const flags =
         ::NS(OutputBuffer_required_for_tracking_of_particle_sets)(
             this->ptrCParticlesBuffer(), this->numParticleSets(),
                 this->particleSetIndicesBegin(),
@@ -2784,8 +2935,7 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_be_mon_output_buffer_offset = output_buffer_offset;
     }
 
-    void tjob_t::doSetUntilTurnElemByElem(
-        tjob_t::particle_index_t const
+    void tjob_t::doSetUntilTurnElemByElem( tjob_t::particle_index_t const
             until_turn_elem_by_elem ) SIXTRL_NOEXCEPT
     {
         this->m_until_turn_elem_by_elem = until_turn_elem_by_elem;
@@ -2865,6 +3015,34 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_max_initial_turn_id = max_turn_id;
     }
 
+    /* --------------------------------------------------------------------- */
+
+    tjob_t::buffer_t const*
+    tjob_t::doGetPtrParticlesAddrBuffer() const SIXTRL_NOEXCEPT
+    {
+        return this->m_particles_addr_buffer.get();
+    }
+
+    tjob_t::buffer_t*
+    tjob_t::doGetPtrParticlesAddrBuffer() SIXTRL_NOEXCEPT
+    {
+        return this->m_particles_addr_buffer.get();
+    }
+
+    void tjob_t::doUpdateStoredParticlesAddrBuffer(
+        tjob_t::ptr_buffer_t&& ptr_buffer ) SIXTRL_NOEXCEPT
+    {
+        this->m_particles_addr_buffer = std::move( ptr_buffer );
+    }
+
+    void tjob_t::doSetHasParticleAddressesFlag(
+            bool const has_particle_addresses ) SIXTRL_NOEXCEPT
+    {
+        this->m_has_particle_addresses = has_particle_addresses;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     void tjob_t::doUpdateStoredOutputBuffer(
         tjob_t::ptr_buffer_t&& ptr_output_buffer ) SIXTRL_NOEXCEPT
     {
@@ -2876,12 +3054,6 @@ namespace SIXTRL_CXX_NAMESPACE
         tjob_t::ptr_buffer_t&& ptr_elem_by_elem_buffer ) SIXTRL_NOEXCEPT
     {
         this->m_elem_by_elem_buffer = std::move( ptr_elem_by_elem_buffer );
-    }
-
-    void tjob_t::doUpdateStoredParticlesAddrBuffer(
-        tjob_t::ptr_buffer_t&& ptr_particles_addr_buffer ) SIXTRL_NOEXCEPT
-    {
-        this->m_particles_addr_buffer = std::move( ptr_particles_addr_buffer );
     }
 
     tjob_t::buffer_store_t* tjob_t::doGetPtrBufferStore(
@@ -3036,6 +3208,12 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_elem_by_elem_buffer.reset( nullptr );
         this->m_particles_addr_buffer.reset( nullptr );
 
+        if( this->doGetPtrParticlesAddrBuffer() != nullptr )
+        {
+            this->doGetPtrParticlesAddrBuffer()->clear( true );
+            this->doGetPtrParticlesAddrBuffer()->reset();
+        }
+
         this->m_ptr_particles_buffer         = nullptr;
         this->m_ptr_beam_elem_buffer         = nullptr;
         this->m_ptr_output_buffer            = nullptr;
@@ -3060,6 +3238,8 @@ namespace SIXTRL_CXX_NAMESPACE
         this->m_default_elem_by_elem_rolling = true;
         this->m_has_beam_monitor_output      = false;
         this->m_has_elem_by_elem_output      = false;
+
+        this->doSetHasParticleAddressesFlag( false );
     }
 
     void tjob_t::doParseConfigStrBaseImpl(
@@ -3070,4 +3250,3 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 #endif /* defined( __cplusplus ) */
-/* end: sixtracklib/common/internal/track_job_base.cpp */

@@ -16,6 +16,7 @@
     #include "sixtracklib/common/definitions.h"
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
+    #include "sixtracklib/common/particles/particles_addr.h"
     #include "sixtracklib/common/internal/track_job_base.h"
     #include "sixtracklib/common/track_job.h"
 
@@ -166,6 +167,12 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN cl_arg_t*
         ptrElemByElemConfigBufferArg() SIXTRL_NOEXCEPT;
 
+        SIXTRL_HOST_FN cl_arg_t& particles_addr_arg() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl_arg_t const& particles_addr_arg() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl_arg_t* ptr_particles_addr_arg() SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN cl_arg_t const*
+            ptr_particles_addr_arg() const SIXTRL_NOEXCEPT;
+
         SIXTRL_HOST_FN status_t updateBeamElementsRegion(
             size_type const offset, size_type const length,
             void const* SIXTRL_RESTRICT new_value );
@@ -175,6 +182,9 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type const* SIXTRL_RESTRICT offsets,
             size_type const* SIXTRL_RESTRICT lengths,
             void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_values );
+
+        SIXTRL_HOST_FN std::uintptr_t opencl_context_addr() const SIXTRL_NOEXCEPT;
+        SIXTRL_HOST_FN std::uintptr_t opencl_queue_addr() const SIXTRL_NOEXCEPT;
 
         /* ----------------------------------------------------------------- */
 
@@ -204,8 +214,6 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN cl_arg_t& stored_buffer_argument(
             size_type const buffer_id );
 
-        /* ----------------------------------------------------------------- */
-
         protected:
 
         using ptr_cl_context_t = std::unique_ptr< cl_context_t >;
@@ -218,6 +226,8 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual bool doPrepareContext(
             char const* SIXTRL_RESTRICT device_id_str,
             const char *const SIXTRL_RESTRICT ptr_config_str );
+
+        SIXTRL_HOST_FN status_t doFetchParticleAddresses() override;
 
         SIXTRL_HOST_FN bool doPrepareParticlesStructures(
             c_buffer_t* SIXTRL_RESTRICT ptr_particles_buffer ) override;
@@ -306,6 +316,9 @@ namespace SIXTRL_CXX_NAMESPACE
             ptr_cl_arg_t&& cl_assign_items_buffer_arg );
 
         SIXTRL_HOST_FN void doUpdateStoredClParticlesAddrArg(
+            ptr_cl_arg_t&& particles_addr_arg );
+
+        SIXTRL_HOST_FN status_t do_update_stored_particles_addr_arg(
             ptr_cl_arg_t&& particles_addr_arg );
 
         private:
@@ -578,6 +591,14 @@ NS(TrackJobCl_update_beam_elements_regions)(
     NS(arch_size_t) const* offsets, NS(arch_size_t) const* lengths,
     void const* SIXTRL_RESTRICT const* SIXTRL_RESTRICT new_value );
 
+SIXTRL_EXTERN SIXTRL_HOST_FN uintptr_t
+NS(TrackJobCl_get_opencl_context_addr)( const NS(TrackJobCl) *const
+    SIXTRL_RESTRICT track_job ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN uintptr_t
+NS(TrackJobCl_get_opencl_queue_addr)( const NS(TrackJobCl) *const
+    SIXTRL_RESTRICT track_job ) SIXTRL_NOEXCEPT;
+
 /* ----------------------------------------------------------------- */
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument) const*
@@ -599,8 +620,6 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(ClArgument)*
 NS(TrackJobCl_stored_buffer_argument)(
     NS(TrackJobCl)* SIXTRL_RESTRICT job,
     NS(buffer_size_t) const buffer_id );
-
-/* ----------------------------------------------------------------- */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -628,9 +647,9 @@ namespace SIXTRL_CXX_NAMESPACE
         TrackJobCl::size_type const until_turn_elem_by_elem,
         const char *const SIXTRL_RESTRICT config_str )
     {
-        using _base_t = SIXTRL_CXX_NAMESPACE::TrackJobBase;
-        using _size_t = _base_t::size_type;
-        using flags_t = ::NS(output_buffer_flag_t);
+        using base_t    = SIXTRL_CXX_NAMESPACE::TrackJobBase;
+        using st_size_t = base_t::size_type;
+        using flags_t   = ::NS(output_buffer_flag_t);
 
         bool success  = false;
         this->doSetRequiresCollectFlag( true );
@@ -638,7 +657,7 @@ namespace SIXTRL_CXX_NAMESPACE
         if( config_str != nullptr )
         {
             this->doSetConfigStr( config_str );
-            _base_t::doParseConfigStr( this->ptrConfigStr() );
+            base_t::doParseConfigStr( this->ptrConfigStr() );
             this->doParseConfigStrOclImpl( this->ptrConfigStr() );
         }
 
@@ -656,9 +675,9 @@ namespace SIXTRL_CXX_NAMESPACE
         }
         else if( success )
         {
-            _size_t const fallback_pset_indices[] =
+            st_size_t const fallback_pset_indices[] =
             {
-                _size_t{ 0 }, _size_t{ 0 }
+                st_size_t{ 0 }, st_size_t{ 0 }
             };
 
             this->doSetParticleSetIndices( &fallback_pset_indices[ 0 ],
@@ -828,7 +847,4 @@ namespace SIXTRL_CXX_NAMESPACE
 }
 
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
-
 #endif /* SIXTRL_SIXTRACKLIB_OPENCL_TRACK_CL_JOB_H__ */
-
-/* end: sixtracklib/opencl/track_job.h */
