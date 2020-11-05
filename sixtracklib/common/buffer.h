@@ -11,6 +11,7 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/generated/modules.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
@@ -443,6 +444,22 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT offsets,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT sizes,
     SIXTRL_ARGPTR_DEC NS(buffer_size_t) const* SIXTRL_RESTRICT counts );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_STATIC SIXTRL_FN bool NS(Buffer_can_add_trivial_object)(
+        SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+        NS(buffer_size_t) const object_size,
+        SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_objects,
+        SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_slots );
+
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+    NS(Buffer_add_trivial_object)(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+        SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
+        NS(buffer_size_t) const object_size,
+        NS(object_type_id_t) const type_id );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
@@ -1467,6 +1484,17 @@ SIXTRL_INLINE bool NS(Buffer_can_add_object)(
     return success;
 }
 
+SIXTRL_INLINE bool NS(Buffer_can_add_trivial_object)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const  SIXTRL_RESTRICT buffer,
+    NS(buffer_size_t) const object_size,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_objects,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_num_slots )
+{
+    return NS(Buffer_can_add_object)( buffer, object_size,
+        ( NS(buffer_size_t) )0u, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
+            requ_num_objects, requ_num_slots, SIXTRL_NULLPTR );
+}
+
 SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
 NS(Buffer_add_object)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
@@ -1518,6 +1546,18 @@ NS(Buffer_add_object)(
     }
 
     return ptr_added_object;
+}
+
+SIXTRL_INLINE SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+NS(Buffer_add_trivial_object)(
+        SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+        SIXTRL_ARGPTR_DEC const void *const SIXTRL_RESTRICT object_handle,
+        NS(buffer_size_t) const object_size,
+        NS(object_type_id_t) const type_id )
+{
+    return NS(Buffer_add_object)( buffer, object_handle, object_size, type_id,
+        ( NS(buffer_size_t) )0u, SIXTRL_NULLPTR, SIXTRL_NULLPTR,
+            SIXTRL_NULLPTR );
 }
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )

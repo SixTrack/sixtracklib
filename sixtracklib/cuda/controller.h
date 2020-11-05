@@ -20,6 +20,65 @@ extern "C" {
 
 #if !defined( _GPUCODE )
 
+/* ------------------------------------------------------------------------ */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(Cuda_get_num_all_nodes)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(Cuda_get_all_nodes)(
+    NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Cuda_print_all_nodes)( void );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t) NS(Cuda_num_available_nodes)(
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(Cuda_num_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(Cuda_get_available_nodes)(
+    NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(Cuda_get_available_nodes_detailed)(
+    NS(NodeId)* SIXTRL_RESTRICT out_node_ids_begin,
+    NS(arch_size_t) const max_num_node_ids,
+    NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Cuda_print_available_nodes)( void );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(Cuda_print_available_nodes_detailed)(
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+/* -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(Cuda_get_available_node_id_strs)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    NS(arch_size_t) const max_num_node_ids,
+    NS(arch_size_t) const node_id_str_capacity );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(Cuda_get_available_node_id_strs_detailed)(
+    char** SIXTRL_RESTRICT out_node_id_strs,
+    NS(arch_size_t) const max_num_node_ids,
+    NS(arch_size_t) const node_id_str_capacity,
+    NS(node_id_str_fmt_t) const node_id_str_format,
+    NS(arch_size_t) const skip_first_num_nodes,
+    char const* SIXTRL_RESTRICT filter_str,
+    char const* SIXTRL_RESTRICT env_variable_name );
+
+/* ------------------------------------------------------------------------ */
+
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(CudaController)*
 NS(CudaController_create)( void );
 

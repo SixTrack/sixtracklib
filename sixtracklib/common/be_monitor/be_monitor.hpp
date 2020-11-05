@@ -366,14 +366,13 @@ namespace SIXTRL_CXX_NAMESPACE
     BeamMonitor::getNumOfBeamMonitorObjects( BeamMonitor::buffer_t&
         SIXTRL_RESTRICT_REF belements_buffer ) SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_num_of_beam_monitor_objects)(
-            &belements_buffer );
+        return ::NS(BeamMonitor_num_monitors_in_buffer)( &belements_buffer );
     }
 
     SIXTRL_INLINE void BeamMonitor::clearAll( BeamMonitor::buffer_t&
         SIXTRL_RESTRICT_REF belements_buffer ) SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_clear_all)( &belements_buffer );
+        ::NS(BeamMonitor_reset_all_in_buffer)( &belements_buffer );
     }
 
     #endif /* !defined( _GPUCODE ) */
@@ -383,20 +382,19 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE BeamMonitor::type_id_t
     BeamMonitor::getTypeId() const SIXTRL_NOEXCEPT
     {
-        return ::NS(OBJECT_TYPE_BEAM_MONITOR);
+        return ::NS(BeamMonitor_type_id)();
     }
 
     SIXTRL_INLINE BeamMonitor::size_type
     BeamMonitor::getNumDataPtrs() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_num_dataptrs)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_num_dataptrs)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE BeamMonitor::size_type
     BeamMonitor::getNumSlots( size_type const slot_size ) const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_num_slots)(
-            this->getCApiPtr(), slot_size );
+        return ::NS(BeamMonitor_num_slots)( this->getCApiPtr(), slot_size );
     }
 
     SIXTRL_INLINE BeamMonitor::c_api_t const*
@@ -425,19 +423,19 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE BeamMonitor::turn_t
     BeamMonitor::getNumStores() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_num_stores)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_num_stores)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE BeamMonitor::turn_t
     BeamMonitor::getStart() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_start)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_start)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE BeamMonitor::turn_t
     BeamMonitor::getSkip() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_skip)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_skip)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE bool BeamMonitor::isRolling() const SIXTRL_NOEXCEPT
@@ -458,19 +456,19 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE BeamMonitor::address_t
     BeamMonitor::getOutAddress() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_out_address)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_out_address)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE BeamMonitor::index_t
     BeamMonitor::getMinParticleId() const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_min_particle_id)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_min_particle_id)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE BeamMonitor::index_t
     BeamMonitor::getMaxParticleId()  const SIXTRL_NOEXCEPT
     {
-        return ::NS(BeamMonitor_get_max_particle_id)( this->getCApiPtr() );
+        return ::NS(BeamMonitor_max_particle_id)( this->getCApiPtr() );
     }
 
     /* ----------------------------------------------------------------- */
@@ -541,7 +539,7 @@ namespace SIXTRL_CXX_NAMESPACE
         BeamMonitor::index_t const max_particle_id ) SIXTRL_NOEXCEPT
     {
         ::NS(BeamMonitor_set_max_particle_id)(
-            this->getCApiPtr(), min_particle_id );
+            this->getCApiPtr(), max_particle_id );
 
         return;
     }

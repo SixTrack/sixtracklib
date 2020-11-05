@@ -201,7 +201,7 @@ namespace SIXTRL_CXX_NAMESPACE
         CpuTrackJob::size_type const until_turn_elem_by_elem,
         std::string const& config_str ) : SIXTRL_CXX_NAMESPACE::TrackJobBaseNew(
             SIXTRL_CXX_NAMESPACE::ARCHITECTURE_CPU,
-            SIXTRL_ARCHITECTURE_CPU_STR, config_str )
+            SIXTRL_ARCHITECTURE_CPU_STR, config_str.c_str() )
     {
         using _base_track_job_t = SIXTRL_CXX_NAMESPACE::TrackJobBaseNew;
 

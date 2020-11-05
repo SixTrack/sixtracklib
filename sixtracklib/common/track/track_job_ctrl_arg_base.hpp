@@ -104,6 +104,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         /* ---------------------------------------------------------------- */
 
+        SIXTRL_HOST_FN bool has_assign_addresses_kernel() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN kernel_id_t
+            assign_addresses_kernel_id() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN status_t set_assign_addresses_kernel_id(
+            kernel_id_t const kernel_id );
+
+        /* ---------------------------------------------------------------- */
+
         SIXTRL_HOST_FN controller_base_t const*
         ptrControllerBase() const SIXTRL_NOEXCEPT;
 
@@ -181,6 +191,9 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN virtual status_t
         doSetFetchParticlesAddressesKernelId( kernel_id_t const id );
 
+        SIXTRL_HOST_FN virtual status_t
+        do_set_assign_addresses_kernel_id( kernel_id_t const id );
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN virtual status_t doPrepareController(
@@ -240,6 +253,14 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_HOST_FN argument_base_t*
         ptrDebugRegisterArgBase() SIXTRL_NOEXCEPT;
 
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        SIXTRL_HOST_FN argument_base_t const*
+        ptr_address_assign_items_arg_base() const SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN argument_base_t*
+        ptr_address_assign_items_arg_base() SIXTRL_NOEXCEPT;
+
         /* ----------------------------------------------------------------- */
 
         SIXTRL_HOST_FN void doUpdateStoredController(
@@ -264,6 +285,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
         SIXTRL_HOST_FN void doUpdateStoredDebugRegisterArg(
             stored_arg_base_t&& ptr_debug_flag_arg ) SIXTRL_NOEXCEPT;
+
+        SIXTRL_HOST_FN void do_update_stored_address_assign_items_arg(
+            stored_arg_base_t&& ptr_address_assign_items_arg ) SIXTRL_NOEXCEPT;
 
         private:
 
@@ -307,6 +331,10 @@ namespace SIXTRL_CXX_NAMESPACE
         doSetFetchParticlesAddressesKernelIdCtrlArgBaseImpl(
             kernel_id_t const id );
 
+        SIXTRL_HOST_FN status_t
+        do_set_assign_addresses_kernel_id_ctrl_arg_base_impl(
+            kernel_id_t const id );
+
         stored_ctrl_base_t      m_stored_controller;
 
         stored_arg_base_t       m_stored_particles_arg;
@@ -315,6 +343,7 @@ namespace SIXTRL_CXX_NAMESPACE
         stored_arg_base_t       m_stored_elem_by_elem_conf_arg;
         stored_arg_base_t       m_stored_particles_addr_arg;
         stored_arg_base_t       m_stored_debug_flag_arg;
+        stored_arg_base_t       m_stored_assign_addres_items_arg;
 
         kernel_id_t             m_assign_output_bemon_kernel_id;
         kernel_id_t             m_assign_output_elem_by_elem_kernel_id;
@@ -322,6 +351,7 @@ namespace SIXTRL_CXX_NAMESPACE
         kernel_id_t             m_track_line_kernel_id;
         kernel_id_t             m_track_elem_by_elem_kernel_id;
         kernel_id_t             m_fetch_particles_addr_kernel_id;
+        kernel_id_t             m_assign_addresses_kernel_id;
     };
 }
 

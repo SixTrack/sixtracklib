@@ -90,7 +90,7 @@ TEST( C99_CudaWrappersBeamMonitorAssignOutputTests,
 
     size_t const num_beam_monitors = size_t{ 2 };
 
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)(
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)(
         beam_elements_buffer) == num_beam_monitors );
 
     /* -------------------------------------------------------------------- */
@@ -146,7 +146,8 @@ TEST( C99_CudaWrappersBeamMonitorAssignOutputTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
-                ptr_kernel_config, ptr_node_info, num_beam_monitors );
+                ptr_kernel_config, ptr_node_info, num_beam_monitors,
+                    size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 

@@ -2,19 +2,14 @@
 # tests/sixtracklib/testlib/common/output/CMakeLists.txt
 
 set( SIXTRL_TESTLIB_COMMON_OUTPUT_C99_HEADERS
-     assign_be_monitor_ctrl_arg.h
-     assign_elem_by_elem_ctrl_arg.h
-)
+     assign_be_monitor_ctrl_arg.h assign_elem_by_elem_ctrl_arg.h )
 
 set( SIXTRL_TESTLIB_COMMON_OUTPUT_C99_SOURCES
-     assign_be_monitor_ctrl_arg.c
-     assign_elem_by_elem_ctrl_arg.c
-)
+     assign_be_monitor_ctrl_arg.c assign_elem_by_elem_ctrl_arg.c )
 
 add_library( sixtrack_test_common_output_c99 OBJECT
-             ${SIXTRL_TESTLIB_COMMON_OUTPUT_C99_HEADERS}
-             ${SIXTRL_TESTLIB_COMMON_OUTPUT_C99_SOURCES}
-)
+    ${SIXTRL_TESTLIB_COMMON_OUTPUT_C99_HEADERS}
+    ${SIXTRL_TESTLIB_COMMON_OUTPUT_C99_SOURCES} )
 
 target_include_directories( sixtrack_test_common_output_c99 PRIVATE
     PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
@@ -25,7 +20,8 @@ set_target_properties( sixtrack_test_common_output_c99 PROPERTIES
     C_STANDARD 99 C_STANDARD_REQUIRED ON )
 
 target_compile_options( sixtrack_test_common_output_c99 PRIVATE
-        ${SIXTRACKLIB_C99_FLAGS} ${SIXOUTPUTLIB_CPU_FLAGS} )
+    ${SIXTRACKLIB_C99_FLAGS} ${SIXOUTPUTLIB_CPU_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # pass on sixoutput_test_common_output_c99 and

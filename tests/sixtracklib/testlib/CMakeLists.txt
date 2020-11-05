@@ -57,9 +57,8 @@ set_target_properties( sixtrack_test PROPERTIES C_STANDARD 99 )
 set_target_properties( sixtrack_test PROPERTIES C_STANDARD_REQUIRED ON )
 set_target_properties( sixtrack_test PROPERTIES DEBUG_POSTFIX d )
 
-target_compile_options( sixtrack_test
-                        PRIVATE -Wall -Werror -pedantic -ansi
-                        ${SIXTRACKLIB_CPU_FLAGS} )
+target_compile_options( sixtrack_test PRIVATE ${SIXTRACKLIB_C99_FLAGS}
+    ${SIXTRACKL_C99_AUTOVEC_FLAGS} ${SIXTRACKLIB_CPU_FLAGS} )
 
 # ------------------------------------------------------------------------------
 # provide a copy of the library to the python module if it is defined!

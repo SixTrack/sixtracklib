@@ -163,6 +163,14 @@ NS(CudaTrackJob_get_ptr_const_particles_addr_arg)(
 
 /* ------------------------------------------------------------------------- */
 
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(CudaTrackJob_default_threads_per_block)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_size_t)
+NS(CudaTrackJob_default_track_threads_per_block)(
+    const NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job );
+
 #endif /* !defined( _GPUCODE ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

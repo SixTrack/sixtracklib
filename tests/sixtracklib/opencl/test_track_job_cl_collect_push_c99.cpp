@@ -14,7 +14,7 @@
 #include "sixtracklib/common/particles.h"
 #include "sixtracklib/common/track_job.h"
 
-TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
+TEST( C99TrackJobClCollectPush, TestCollectAndPush )
 {
     using track_job_t        = ::NS(TrackJobCl);
     using buffer_t           = ::NS(Buffer);
@@ -154,15 +154,15 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         SIXTRL_ASSERT( particles != nullptr );
 
         buffer_t* eb = ::NS(Buffer_new_from_copy)( init_eb );
-        e01_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 0 );
-        e02_cavity = ::NS(BeamElements_buffer_get_cavity)( eb, 1 );
-        e03_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 2 );
-        e04_limit_rect = ::NS(BeamElements_buffer_get_limit_rect)( eb, 3 );
-        e05_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 4 );
-        e06_monitor = ::NS(BeamElements_buffer_get_beam_monitor)( eb, 5 );
-        e07_drift  = ::NS(BeamElements_buffer_get_drift)( eb, 6 );
-        e08_limit_ell = ::NS(BeamElements_buffer_get_limit_ellipse)( eb, 7 );
-        e09_monitor = ::NS(BeamElements_buffer_get_beam_monitor)( eb, 8 );
+        e01_drift  = ::NS(Drift_from_buffer)( eb, 0 );
+        e02_cavity = ::NS(Cavity_from_buffer)( eb, 1 );
+        e03_drift  = ::NS(Drift_from_buffer)( eb, 2 );
+        e04_limit_rect = ::NS(LimitRect_from_buffer)( eb, 3 );
+        e05_drift  = ::NS(Drift_from_buffer)( eb, 4 );
+        e06_monitor = ::NS(BeamMonitor_from_buffer)( eb, 5 );
+        e07_drift  = ::NS(Drift_from_buffer)( eb, 6 );
+        e08_limit_ell = ::NS(LimitEllipse_from_buffer)( eb, 7 );
+        e09_monitor = ::NS(BeamMonitor_from_buffer)( eb, 8 );
 
         ASSERT_TRUE( e01_drift      != nullptr );
         ASSERT_TRUE( e02_cavity     != nullptr );
@@ -185,38 +185,38 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         buffer_t* copy_of_eb = ::NS(Buffer_new_from_copy)( eb );
         SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( copy_of_eb ) == ::NS(Buffer_get_num_of_objects)( eb ) );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) != e01_drift );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) != e02_cavity );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) != e03_drift );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) != e04_limit_rect );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 4 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 4 ) != e05_drift );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) != e06_monitor );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 0 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 0 ) != e01_drift );
+        SIXTRL_ASSERT( ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) != e02_cavity );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 2 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 2 ) != e03_drift );
+        SIXTRL_ASSERT( ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) != e04_limit_rect );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 4 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 4 ) != e05_drift );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ) != e06_monitor );
 
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 6 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 6 ) != e07_drift );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_ellipse)( copy_of_eb, 7 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_limit_ellipse)( copy_of_eb, 7 ) != e08_limit_ell );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 6 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(Drift_from_buffer)( copy_of_eb, 6 ) != e07_drift );
+        SIXTRL_ASSERT( ::NS(LimitEllipse_from_buffer)( copy_of_eb, 7 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(LimitEllipse_from_buffer)( copy_of_eb, 7 ) != e08_limit_ell );
 
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) != nullptr );
-        SIXTRL_ASSERT( ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) != e09_monitor );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ) != nullptr );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ) != e09_monitor );
 
         /* The beam monitors on the host side should have output adddr == 0: */
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
 
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)(
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) ==
-                       ::NS(BeamMonitor_get_out_address)( e06_monitor ) );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_out_address)(
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ) ) ==
+                       ::NS(BeamMonitor_out_address)( e06_monitor ) );
 
-        SIXTRL_ASSERT( ::NS(BeamMonitor_get_out_address)(
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) ==
-                       ::NS(BeamMonitor_get_out_address)( e09_monitor ) );
+        SIXTRL_ASSERT( ::NS(BeamMonitor_out_address)(
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ) ) ==
+                       ::NS(BeamMonitor_out_address)( e09_monitor ) );
 
         buffer_t* copy_of_pb = ::NS(Buffer_new_from_copy)( pb );
         SIXTRL_ASSERT( ::NS(Buffer_get_num_of_objects)( copy_of_pb ) == ::NS(Buffer_get_num_of_objects)( pb ) );
@@ -250,26 +250,26 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
         SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) == 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 0 ) ) == 0 );
         ::NS(Drift_set_length)( e01_drift,
-            double{0.5} * ::NS(Drift_get_length)( e01_drift ) );
+            double{0.5} * ::NS(Drift_length)( e01_drift ) );
 
         SIXTRL_ASSERT( ::NS(Drift_compare_values)( e01_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) != 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 0 ) ) != 0 );
 
         SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) == 0 );
-        ::NS(Cavity_set_voltage)( e02_cavity, double{2.0} * ::NS(Cavity_get_voltage)( e02_cavity ) );
-        ::NS(Cavity_set_frequency)( e02_cavity, double{2.0} * ::NS(Cavity_get_frequency)( e02_cavity ) );
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) == 0 );
+        ::NS(Cavity_set_voltage)( e02_cavity, double{2.0} * ::NS(Cavity_voltage)( e02_cavity ) );
+        ::NS(Cavity_set_frequency)( e02_cavity, double{2.0} * ::NS(Cavity_frequency)( e02_cavity ) );
         ::NS(Cavity_set_lag)( e02_cavity, double{ 1.0 } );
         SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) != 0 );
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) != 0 );
 
         SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) == 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 2 ) ) == 0 );
         ::NS(Drift_set_length)( e03_drift, double{ 0.0 } );
         SIXTRL_ASSERT( ::NS(Drift_compare_values)( e03_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) != 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 2 ) ) != 0 );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output: */
@@ -313,42 +313,42 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         ::NS(TrackJob_collect_beam_elements)( job );
 
-        ASSERT_TRUE( e01_drift == ::NS(BeamElements_buffer_get_drift)(
+        ASSERT_TRUE( e01_drift == ::NS(Drift_from_buffer)(
             ::NS(TrackJob_get_beam_elements_buffer)( job ), 0 ) );
 
         ASSERT_TRUE( ::NS(Drift_compare_values)( e01_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 0 ) ) == 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 0 ) ) == 0 );
 
         ASSERT_TRUE( e02_cavity ==
-            ::NS(BeamElements_buffer_get_cavity)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 1 ) );
+            ::NS(Cavity_from_buffer)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 1 ) );
 
         ASSERT_TRUE( ::NS(Cavity_compare_values)( e02_cavity,
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) == 0 );
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) == 0 );
 
         ASSERT_TRUE( e03_drift ==
-            ::NS(BeamElements_buffer_get_drift)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 2 ) );
+            ::NS(Drift_from_buffer)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 2 ) );
 
         ASSERT_TRUE( ::NS(Drift_compare_values)( e03_drift,
-            ::NS(BeamElements_buffer_get_drift)( copy_of_eb, 2 ) ) == 0 );
+            ::NS(Drift_from_buffer)( copy_of_eb, 2 ) ) == 0 );
 
         /* Check that the collected output has output addresses */
 
         ASSERT_TRUE( e06_monitor ==
-            ::NS(BeamElements_buffer_get_beam_monitor)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 5 ) );
+            ::NS(BeamMonitor_from_buffer)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 5 ) );
 
         ASSERT_TRUE( e09_monitor ==
-            ::NS(BeamElements_buffer_get_beam_monitor)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 8 ) );
+            ::NS(BeamMonitor_from_buffer)( ::NS(TrackJob_get_beam_elements_buffer)( job ), 8 ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( e06_monitor ) != be_monitor_addr_t{ 0 } );
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( e09_monitor ) != be_monitor_addr_t{ 0 } );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
-                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) ==
-            ::NS(BeamMonitor_get_out_address)( e06_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)(
+                ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ) ) ==
+            ::NS(BeamMonitor_out_address)( e06_monitor ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)(
-                ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) ==
-            ::NS(BeamMonitor_get_out_address)( e09_monitor ) );
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)(
+                ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ) ) ==
+            ::NS(BeamMonitor_out_address)( e09_monitor ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */
@@ -379,15 +379,15 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         ::NS(Cavity_set_lag)( e02_cavity, double{ 2.0 } );
         SIXTRL_ASSERT( ::NS(Cavity_compare_values)( e02_cavity,
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) != 0 );
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) != 0 );
 
         SIXTRL_ASSERT( 0 == ::NS(LimitRect_compare_values)( e04_limit_rect,
-            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+            ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) ) );
 
         ::NS(LimitRect_set_min_y)( e04_limit_rect, double{ 0.0 } );
         ::NS(LimitRect_set_max_y)( e04_limit_rect, double{ 0.5 } );
         SIXTRL_ASSERT( 0 != ::NS(LimitRect_compare_values)( e04_limit_rect,
-            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+            ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) ) );
 
         ::NS(BeamMonitor_set_out_address)(
             e06_monitor, ::NS(be_monitor_addr_t){  42u } );
@@ -432,14 +432,14 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* beam elements: */
 
-        ::NS(Cavity_set_lag)( e02_cavity, ::NS(Cavity_get_lag)(
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) );
+        ::NS(Cavity_set_lag)( e02_cavity, ::NS(Cavity_lag)(
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) );
 
-        ::NS(LimitRect_set_min_y)( e04_limit_rect, ::NS(LimitRect_get_min_y)(
-            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+        ::NS(LimitRect_set_min_y)( e04_limit_rect, ::NS(LimitRect_min_y)(
+            ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) ) );
 
-        ::NS(LimitRect_set_max_y)( e04_limit_rect, ::NS(LimitRect_get_max_y)(
-            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+        ::NS(LimitRect_set_max_y)( e04_limit_rect, ::NS(LimitRect_max_y)(
+            ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) ) );
 
         ::NS(BeamMonitor_set_out_address)( e06_monitor, 0u );
         ::NS(BeamMonitor_set_out_address)( e09_monitor, 0u );
@@ -490,66 +490,66 @@ TEST( C99_TrackJobClCollectPushTests, TestCollectAndPush )
 
         ::NS(TrackJob_collect_beam_elements)( job );
 
-        ASSERT_TRUE( e02_cavity == ::NS(BeamElements_buffer_get_cavity)(
+        ASSERT_TRUE( e02_cavity == ::NS(Cavity_from_buffer)(
             ::NS(TrackJob_get_beam_elements_buffer)( job ), 1 ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            ::NS(Cavity_get_lag)( e02_cavity ) - double{ 2.0 } ) );
+            ::NS(Cavity_lag)( e02_cavity ) - double{ 2.0 } ) );
 
-        ::NS(Cavity_set_lag)( ::NS(BeamElements_buffer_get_cavity)(
+        ::NS(Cavity_set_lag)( ::NS(Cavity_from_buffer)(
             copy_of_eb, 1 ), double{ 2.0 } );
 
         ASSERT_TRUE( 0 == ::NS(Cavity_compare_values)( e02_cavity,
-            ::NS(BeamElements_buffer_get_cavity)( copy_of_eb, 1 ) ) );
+            ::NS(Cavity_from_buffer)( copy_of_eb, 1 ) ) );
 
 
-        ASSERT_TRUE( e04_limit_rect == ::NS(BeamElements_buffer_get_limit_rect)(
+        ASSERT_TRUE( e04_limit_rect == ::NS(LimitRect_from_buffer)(
             ::NS(TrackJob_get_beam_elements_buffer)( job ), 3 ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            ::NS(LimitRect_get_min_y)( e04_limit_rect ) - double{ 0.0 } ) );
+            ::NS(LimitRect_min_y)( e04_limit_rect ) - double{ 0.0 } ) );
 
         ASSERT_TRUE( EPS > std::fabs(
-            ::NS(LimitRect_get_max_y)( e04_limit_rect ) - double{ 0.5 } ) );
+            ::NS(LimitRect_max_y)( e04_limit_rect ) - double{ 0.5 } ) );
 
-        ::NS(LimitRect_set_min_y)( ::NS(BeamElements_buffer_get_limit_rect)(
+        ::NS(LimitRect_set_min_y)( ::NS(LimitRect_from_buffer)(
             copy_of_eb, 3 ), double{ 0.0 } );
 
-        ::NS(LimitRect_set_max_y)( ::NS(BeamElements_buffer_get_limit_rect)(
+        ::NS(LimitRect_set_max_y)( ::NS(LimitRect_from_buffer)(
             copy_of_eb, 3 ), double{ 0.5 } );
 
         ASSERT_TRUE( 0 == ::NS(LimitRect_compare_values)( e04_limit_rect,
-            ::NS(BeamElements_buffer_get_limit_rect)( copy_of_eb, 3 ) ) );
+            ::NS(LimitRect_from_buffer)( copy_of_eb, 3 ) ) );
 
         /* Check that the collected output has output addresses */
 
-        ASSERT_TRUE( e06_monitor == ::NS(BeamElements_buffer_get_beam_monitor)(
+        ASSERT_TRUE( e06_monitor == ::NS(BeamMonitor_from_buffer)(
             ::NS(TrackJob_get_beam_elements_buffer)( job ), 5 ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e06_monitor ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( e06_monitor ) ==
             ::NS(be_monitor_addr_t){ 42 } );
 
         ::NS(BeamMonitor_set_out_address)(
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ),
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ),
             ::NS(be_monitor_addr_t){ 42 } );
 
         ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
             e06_monitor,
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 5 ) ) );
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 5 ) ) );
 
-        ASSERT_TRUE( e09_monitor == ::NS(BeamElements_buffer_get_beam_monitor)(
+        ASSERT_TRUE( e09_monitor == ::NS(BeamMonitor_from_buffer)(
             ::NS(TrackJob_get_beam_elements_buffer)( job ), 8 ) );
 
-        ASSERT_TRUE( ::NS(BeamMonitor_get_out_address)( e09_monitor ) ==
+        ASSERT_TRUE( ::NS(BeamMonitor_out_address)( e09_monitor ) ==
             ::NS(be_monitor_addr_t){ 137 } );
 
         ::NS(BeamMonitor_set_out_address)(
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ),
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ),
             ::NS(be_monitor_addr_t){ 137 } );
 
         ASSERT_TRUE( 0 == ::NS(BeamMonitor_compare_values)(
             e09_monitor,
-            ::NS(BeamElements_buffer_get_beam_monitor)( copy_of_eb, 8 ) ) );
+            ::NS(BeamMonitor_from_buffer)( copy_of_eb, 8 ) ) );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
         /* output buffer: */

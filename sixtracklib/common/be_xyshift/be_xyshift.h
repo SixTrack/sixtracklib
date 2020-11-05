@@ -1,5 +1,5 @@
-#ifndef SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__
-#define SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__
+#ifndef SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_XY_SHIFT_H__
+#define SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_XY_SHIFT_H__
 
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stdbool.h>
@@ -9,90 +9,158 @@
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/internal/buffer_main_defines.h"
     #include "sixtracklib/common/internal/beam_elements_defines.h"
     #include "sixtracklib/common/internal/objects_type_id.h"
     #include "sixtracklib/common/buffer/buffer_type.h"
+    #include "sixtracklib/common/buffer/buffer_object.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-typedef SIXTRL_REAL_T NS(xyshift_real_t);
+/* ========================================================================= */
 
 typedef struct NS(XYShift)
 {
-    NS(xyshift_real_t) dx SIXTRL_ALIGN( 8 );
-    NS(xyshift_real_t) dy SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T dx SIXTRL_ALIGN( 8 );
+    SIXTRL_REAL_T dy SIXTRL_ALIGN( 8 );
 }
 NS(XYShift);
 
 /* ------------------------------------------------------------------------- */
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(XYShift_get_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC NS(buffer_size_t) NS(XYShift_get_num_slots)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(XYShift) *const SIXTRL_RESTRICT xy_shift,
-    NS(buffer_size_t) const slot_size );
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(XYShift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
-    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift );
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC NS(xyshift_real_t) NS(XYShift_get_dx)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift );
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(XYShift_num_dataptrs)(
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const
+        SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC NS(xyshift_real_t) NS(XYShift_get_dy)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift );
+SIXTRL_STATIC SIXTRL_FN NS(buffer_size_t) NS(XYShift_num_slots)(
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(XYShift_set_dx)(
+SIXTRL_STATIC SIXTRL_FN NS(object_type_id_t) NS(XYShift_type_id)(
+    void ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(XYShift_dx)(
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const
+        SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(XYShift_dy)(
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const
+        SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(XYShift_set_dx)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
-    NS(xyshift_real_t) const dx );
+    SIXTRL_REAL_T const dx ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(XYShift_set_dy)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(XYShift_set_dy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
-    NS(xyshift_real_t) const dy );
+    SIXTRL_REAL_T const dy ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC void NS(XYShift_clear)(
-    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift );
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC int NS(XYShift_copy)(
+SIXTRL_STATIC SIXTRL_FN NS(arch_status_t) NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source );
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const
+        SIXTRL_RESTRICT source ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC int  NS(XYShift_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT rhs );
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-SIXTRL_FN SIXTRL_STATIC int NS(XYShift_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold );
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift) const*
+NS(XYShift_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object)
+    *const SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)*
+NS(XYShift_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+    SIXTRL_RESTRICT index_obj ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift) const*
+NS(XYShift_const_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char const* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)*
+NS(XYShift_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
 
 #if !defined( _GPUCODE )
 
-SIXTRL_FN SIXTRL_STATIC bool NS(XYShift_can_be_added)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift) const*
+NS(XYShift_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_dataptrs );
+    NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_new)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
-
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_add)(
+SIXTRL_STATIC SIXTRL_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(xyshift_real_t)  const dx,
-    NS(xyshift_real_t)  const dy );
+    NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT;
 
-SIXTRL_FN SIXTRL_STATIC SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)*
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(XYShift_attributes_offsets)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT offsets_begin,
+    NS(buffer_size_t) const max_num_offsets,
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(XYShift_attributes_sizes)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT sizes_begin,
+    NS(buffer_size_t) const max_num_sizes,
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(XYShift_attributes_counts)(
+    SIXTRL_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT counts_begin,
+    NS(buffer_size_t) const max_num_counts,
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT data,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(object_type_id_t)
+NS(XYShift_type_id_ext)( void ) SIXTRL_NOEXCEPT;
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_EXTERN SIXTRL_HOST_FN bool NS(XYShift_can_be_added)(
+    SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_objs,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT ptr_requ_slots,
+    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)*
+        SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)*
+NS(XYShift_new)( SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_add)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    SIXTRL_REAL_T const dx, SIXTRL_REAL_T const dy );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BE_ARGPTR_DEC NS(XYShift)*
 NS(XYShift_add_copy)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xyshift );
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift );
 
-#endif /* !defined( _GPUCODE )*/
-
+#endif /* !defined( _GPUCODE ) */
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
@@ -102,8 +170,10 @@ NS(XYShift_add_copy)(
 /* ************************************************************************* */
 
 #if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/buffer/managed_buffer_minimal.h"
+    #include "sixtracklib/common/internal/compiler_attributes.h"
     #if !defined( _GPUCODE )
-        #include "sixtracklib/common/buffer.h"
+    #include "sixtracklib/common/buffer.h"
     #endif /* !defined( _GPUCODE ) */
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
@@ -111,279 +181,159 @@ NS(XYShift_add_copy)(
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_get_num_dataptrs)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
-{
-    ( void )xy_shift;
-    return ( NS(buffer_size_t) )0u;
-}
-
-SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_get_num_slots)(
-    SIXTRL_BE_ARGPTR_DEC  const NS(XYShift) *const SIXTRL_RESTRICT xyshift,
-    NS(buffer_size_t) const slot_size )
-{
-    typedef NS(buffer_size_t) buf_size_t;
-    typedef NS(XYShift)     beam_element_t;
-
-    SIXTRL_STATIC_VAR buf_size_t const ZERO = ( buf_size_t )0u;
-
-    ( void )xyshift;
-
-    buf_size_t extent = NS(ManagedBuffer_get_slot_based_length)(
-        sizeof( beam_element_t ), slot_size );
-
-    SIXTRL_ASSERT( ( slot_size == ZERO ) || ( ( extent % slot_size ) == ZERO ) );
-    return ( slot_size > ZERO ) ? ( extent / slot_size ) : ( ZERO );
-}
-
 SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_preset)(
-    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift )
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT
 {
-    NS(XYShift_clear)( xy_shift );
+    if( xy_shift != SIXTRL_NULLPTR ) NS(XYShift_clear)( xy_shift );
     return xy_shift;
 }
 
-SIXTRL_INLINE NS(xyshift_real_t) NS(XYShift_get_dx)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
+SIXTRL_INLINE NS(arch_status_t) NS(XYShift_clear)(
+    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT
+{
+    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
+    return NS(XYShift_set_dx)( xy_shift, ( SIXTRL_REAL_T )0 ) |
+           NS(XYShift_set_dy)( xy_shift, ( SIXTRL_REAL_T )0 );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_num_dataptrs)( SIXTRL_BE_ARGPTR_DEC
+    const NS(XYShift) *const SIXTRL_RESTRICT SIXTRL_UNUSED( xy_shift )
+) SIXTRL_NOEXCEPT
+{
+    return ( NS(buffer_size_t) )0u;
+}
+
+SIXTRL_INLINE NS(buffer_size_t) NS(XYShift_num_slots)( SIXTRL_BE_ARGPTR_DEC const
+        NS(XYShift) *const SIXTRL_RESTRICT SIXTRL_UNUSED( xy_shift ),
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    NS(buffer_size_t) num_slots = ( NS(buffer_size_t) )0u;
+    NS(buffer_size_t) const num_bytes = NS(ManagedBuffer_get_slot_based_length)(
+                sizeof( NS(XYShift) ), slot_size );
+
+    SIXTRL_ASSERT( slot_size > ( NS(buffer_size_t) )0 );
+    num_slots = num_bytes / slot_size;
+    if( num_slots * slot_size < num_bytes ) ++num_slots;
+    return num_slots;
+}
+
+SIXTRL_INLINE NS(object_type_id_t) NS(XYShift_type_id)(
+    void ) SIXTRL_NOEXCEPT
+{
+    return ( NS(object_type_id_t) )NS(OBJECT_TYPE_XYSHIFT);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(XYShift_dx)( SIXTRL_BE_ARGPTR_DEC const
+    NS(XYShift) *const SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
     return xy_shift->dx;
 }
 
-SIXTRL_INLINE NS(xyshift_real_t) NS(XYShift_get_dy)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xy_shift )
+SIXTRL_INLINE SIXTRL_REAL_T NS(XYShift_dy)( SIXTRL_BE_ARGPTR_DEC const
+    NS(XYShift) *const SIXTRL_RESTRICT xy_shift ) SIXTRL_NOEXCEPT
 {
     SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
     return xy_shift->dy;
 }
 
-SIXTRL_INLINE void NS(XYShift_set_dx)(
+SIXTRL_INLINE NS(arch_status_t) NS(XYShift_set_dx)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
-    NS(xyshift_real_t) const dx )
+    SIXTRL_REAL_T const dx ) SIXTRL_NOEXCEPT
 {
-    if( xy_shift != SIXTRL_NULLPTR ) xy_shift->dx = dx;
-    return;
+    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
+    xy_shift->dx = dx;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(XYShift_set_dy)(
+SIXTRL_INLINE NS(arch_status_t) NS(XYShift_set_dy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift,
-    NS(xyshift_real_t) const dy )
+    SIXTRL_REAL_T const dy ) SIXTRL_NOEXCEPT
 {
-    if( xy_shift != SIXTRL_NULLPTR ) xy_shift->dy = dy;
-    return;
+    SIXTRL_ASSERT( xy_shift != SIXTRL_NULLPTR );
+    xy_shift->dy = dy;
+    return ( NS(arch_status_t) )SIXTRL_ARCH_STATUS_SUCCESS;
 }
 
-SIXTRL_INLINE void NS(XYShift_clear)(
-    SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT xy_shift )
-{
-    NS(XYShift_set_dx)( xy_shift, ( NS(xyshift_real_t) )0 );
-    NS(XYShift_set_dy)( xy_shift, ( NS(xyshift_real_t) )0 );
-
-    return;
-}
-
-SIXTRL_INLINE int NS(XYShift_copy)(
+SIXTRL_INLINE NS(arch_status_t) NS(XYShift_copy)(
     SIXTRL_BE_ARGPTR_DEC NS(XYShift)* SIXTRL_RESTRICT destination,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source )
+    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT source
+) SIXTRL_NOEXCEPT
 {
-    int success = -1;
-
-    if( ( destination != SIXTRL_NULLPTR ) && ( source != SIXTRL_NULLPTR ) )
-    {
-        NS(XYShift_set_dx)( destination, NS(XYShift_get_dx)( source ) );
-        NS(XYShift_set_dx)( destination, NS(XYShift_get_dy)( source ) );
-        success = 0;
-    }
-
-    return success;
+    return NS(XYShift_set_dx)( destination, NS(XYShift_dx)( source ) ) |
+           NS(XYShift_set_dy)( destination, NS(XYShift_dy)( source ) );
 }
 
-SIXTRL_INLINE int NS(XYShift_compare_values)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT rhs )
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift) const*
+NS(XYShift_const_from_obj_index)( SIXTRL_BUFFER_OBJ_ARGPTR_DEC const NS(Object)
+    *const SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT
 {
-    int compare_value = -1;
+    typedef SIXTRL_BE_ARGPTR_DEC NS(XYShift) const* ptr_xy_shift_t;
+    ptr_xy_shift_t elem = SIXTRL_NULLPTR;
 
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) )
+    if( ( obj != SIXTRL_NULLPTR ) &&
+        ( NS(Object_get_type_id)( obj ) == NS(OBJECT_TYPE_XYSHIFT) ) &&
+        ( NS(Object_get_size)( obj ) >= sizeof( NS(XYShift) ) ) )
     {
-        compare_value = 0;
-
-        if( NS(XYShift_get_dx)( lhs ) > NS(XYShift_get_dx)( rhs ) )
-        {
-            compare_value = +1;
-        }
-        else if( NS(XYShift_get_dx)( lhs ) < NS(XYShift_get_dx)( rhs ) )
-        {
-            compare_value = -1;
-        }
-
-        if( compare_value == 0 )
-        {
-            if( NS(XYShift_get_dy)( lhs ) > NS(XYShift_get_dy)( rhs ) )
-            {
-                compare_value = +1;
-            }
-            else if( NS(XYShift_get_dy)( lhs ) < NS(XYShift_get_dy)( rhs ) )
-            {
-                compare_value = -1;
-            }
-        }
-    }
-    else if( lhs != SIXTRL_NULLPTR )
-    {
-        compare_value = +1;
+        elem = ( ptr_xy_shift_t )( uintptr_t )NS(Object_get_begin_addr)( obj );
     }
 
-    return compare_value;
+    return elem;
 }
 
-SIXTRL_INLINE int NS(XYShift_compare_values_with_treshold)(
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT lhs,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT rhs,
-    SIXTRL_REAL_T const treshold )
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_from_obj_index)(
+    SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object)*
+        SIXTRL_RESTRICT obj ) SIXTRL_NOEXCEPT
 {
-    typedef SIXTRL_REAL_T real_t;
+    return ( SIXTRL_BE_ARGPTR_DEC NS(XYShift)*
+        )NS(XYShift_const_from_obj_index)( obj );
+}
 
-    SIXTRL_STATIC_VAR real_t const ZERO = ( real_t )0.0;
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    int compare_value = -1;
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift) const*
+NS(XYShift_const_from_managed_buffer)( SIXTRL_BUFFER_DATAPTR_DEC unsigned char
+        const* SIXTRL_RESTRICT buffer_begin, NS(buffer_size_t) const index,
+    NS(buffer_size_t) const slot_size ) SIXTRL_NOEXCEPT
+{
+    return NS(XYShift_const_from_obj_index)( NS(ManagedBuffer_get_const_object)(
+        buffer_begin, index, slot_size ) );
+}
 
-    if( ( lhs != SIXTRL_NULLPTR ) && ( rhs != SIXTRL_NULLPTR ) &&
-        ( treshold >= ZERO ) )
-    {
-        compare_value = 0;
-
-        if( compare_value == 0 )
-        {
-            real_t const diff =
-                NS(XYShift_get_dx)( lhs ) - NS(XYShift_get_dx)( rhs );
-
-            real_t const abs_diff = ( diff >= ZERO ) ? diff : -diff;
-
-            if( abs_diff > treshold )
-            {
-                if( diff > ZERO )
-                {
-                    compare_value = +1;
-                }
-                else if( diff < ZERO )
-                {
-                    compare_value = -1;
-                }
-            }
-        }
-
-        if( compare_value == 0 )
-        {
-            real_t const diff =
-                NS(XYShift_get_dy)( lhs ) - NS(XYShift_get_dy)( rhs );
-
-            real_t const abs_diff = ( diff >= ZERO ) ? diff : -diff;
-
-            if( abs_diff > treshold )
-            {
-                if( diff > ZERO )
-                {
-                    compare_value = +1;
-                }
-                else if( diff < ZERO )
-                {
-                    compare_value = -1;
-                }
-            }
-        }
-    }
-    else if( ( lhs != SIXTRL_NULLPTR ) && ( treshold >= ZERO ) )
-    {
-        compare_value = +1;
-    }
-
-    return compare_value;
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_from_managed_buffer)(
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
+    NS(buffer_size_t) const index, NS(buffer_size_t) const slot_size
+) SIXTRL_NOEXCEPT
+{
+    return NS(XYShift_from_obj_index)( NS(ManagedBuffer_get_object)(
+        buffer_begin, index, slot_size ) );
 }
 
 #if !defined( _GPUCODE )
-
-SIXTRL_INLINE bool NS(XYShift_can_be_added)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift) const* NS(XYShift_const_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT buffer,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_objects,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_slots,
-    SIXTRL_BUFFER_ARGPTR_DEC NS(buffer_size_t)* SIXTRL_RESTRICT requ_dataptrs )
+    NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(XYShift)        elem_t;
-
-    buf_size_t const num_dataptrs =
-        NS(XYShift_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-
-    return NS(Buffer_can_add_object)( buffer, sizeof( elem_t ),
-        num_dataptrs, sizes, counts, requ_objects, requ_slots, requ_dataptrs );
+    return NS(XYShift_const_from_obj_index)( NS(Buffer_get_const_object)(
+        buffer, index ) );
 }
 
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_new)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
-{
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef SIXTRL_REAL_T      real_t;
-    typedef NS(XYShift)        elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*  ptr_to_elem_t;
-
-    buf_size_t const num_dataptrs =
-        NS(XYShift_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-
-    elem_t temp_obj;
-    temp_obj.dx = ( real_t )0.0;
-    temp_obj.dy = ( real_t )0.0;
-
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_XYSHIFT), num_dataptrs, offsets, sizes, counts ) );
-}
-
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_add)(
+SIXTRL_INLINE SIXTRL_BE_ARGPTR_DEC NS(XYShift)* NS(XYShift_from_buffer)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    NS(xyshift_real_t)  const dx, NS(xyshift_real_t)  const dy )
+    NS(buffer_size_t) const index ) SIXTRL_NOEXCEPT
 {
-    typedef NS(buffer_size_t)  buf_size_t;
-    typedef NS(XYShift)        elem_t;
-    typedef SIXTRL_BUFFER_DATAPTR_DEC   elem_t*  ptr_to_elem_t;
-
-    buf_size_t const num_dataptrs =
-        NS(XYShift_get_num_dataptrs)( SIXTRL_NULLPTR );
-
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* offsets = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* sizes   = SIXTRL_NULLPTR;
-    SIXTRL_BUFFER_ARGPTR_DEC buf_size_t const* counts  = SIXTRL_NULLPTR;
-
-    elem_t temp_obj;
-    temp_obj.dx = dx;
-    temp_obj.dy = dy;
-
-    return ( ptr_to_elem_t )( uintptr_t )NS(Object_get_begin_addr)(
-        NS(Buffer_add_object)( buffer, &temp_obj, sizeof( elem_t ),
-            NS(OBJECT_TYPE_XYSHIFT), num_dataptrs, offsets, sizes, counts ) );
+    return NS(XYShift_from_obj_index)( NS(Buffer_get_object)(
+        buffer, index ) );
 }
-
-SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(XYShift)* NS(XYShift_add_copy)(
-    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
-    SIXTRL_BE_ARGPTR_DEC const NS(XYShift) *const SIXTRL_RESTRICT xyshift )
-{
-    return NS(XYShift_add)( buffer,
-        NS(XYShift_get_dx)( xyshift ), NS(XYShift_get_dy)( xyshift ) );
-}
-
-#endif /* #if !defined( _GPUCODE ) */
+#endif /* !defined( _GPUCODE ) */
 
 #if !defined(  _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
-#endif /* SIXTRACKLIB_COMMON_BE_XYSHIFT_BEAM_ELEMENT_XYSHIFT_H__ */
-
-/*end: sixtracklib/common/be_xyshift/be_xyshift.h */
+#endif /* SIXTRACKLIB_COMMON_BE_DRIFT_BEAM_ELEMENT_XY_SHIFT_H__ */

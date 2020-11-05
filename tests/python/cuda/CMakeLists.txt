@@ -8,7 +8,7 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # ==========================================================================
     # test_cuda_controller.py:
 
-    add_test( NAME Python_Cuda_CudaControllerTests
+    add_test( NAME Python_Cuda_CudaController
               COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_cuda_controller.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
@@ -16,14 +16,14 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # ==========================================================================
     # test_cuda_argument.py:
 
-    add_test( NAME Python_Cuda_CudaArgumentTests
+    add_test( NAME Python_Cuda_CudaArgument
               COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_cuda_argument.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
     # ==========================================================================
     # test_track_job_track_line.py:
 
-    add_test( NAME Python_Cuda_CudaTrackJobTrackLineTests
+    add_test( NAME Python_Cuda_CudaTrackJob_TrackLine
               COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_track_job_track_line.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
@@ -31,18 +31,29 @@ if( SIXTRACKL_ENABLE_PROGRAMM_TESTS )
     # ==========================================================================
     # test_track_job_fetch_particle_addr.py:
 
-    add_test( NAME Python_Cuda_CudaTrackJobFetchParticleAddrTests
+    add_test( NAME Python_Cuda_CudaTrackJob_FetchParticleAddr
               COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_track_job_fetch_particle_addr.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
     # ==========================================================================
     # test_track_job_collect_and_push_cuda.py:
 
-    add_test( NAME Python_Cuda_CudaTrackJobCollectPushTests
+    add_test( NAME Python_Cuda_CudaTrackJob_CollectPush
               COMMAND ${PYTHON_EXECUTABLE}
                       ${PRG_DIR}/test_track_job_collect_and_push_cuda.py
               WORKING_DIRECTORY ${WORK_DIR} )
 
-endif()
+    # ==========================================================================
+    # test_track_job_collect_and_push_cuda.py:
 
-#end: tests/python/cuda/CMakeLists.txt
+    add_test( NAME Python_Cuda_CudaTrackJobThreadsPerBlockTests
+              COMMAND ${PYTHON_EXECUTABLE}
+                      ${PRG_DIR}/test_track_job_threads_per_block.py
+              WORKING_DIRECTORY ${WORK_DIR} )
+
+    # ==========================================================================
+    # test_cuda_assign_address_item.py:
+    add_test( NAME Python_Cuda_CudaTrackJob_AssignAddressItem
+              COMMAND ${PYTHON_EXECUTABLE} ${PRG_DIR}/test_cuda_assign_address_items.py
+              WORKING_DIRECTORY ${WORK_DIR} )
+endif()

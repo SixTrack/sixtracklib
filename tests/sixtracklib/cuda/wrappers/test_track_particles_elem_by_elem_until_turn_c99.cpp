@@ -51,6 +51,9 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
     c_buffer_t* cmp_output_buffer = ::NS(Buffer_new)( buf_size_t{ 0 } );
     c_buffer_t* cmp_track_pb      = ::NS(Buffer_new)( buf_size_t{ 0 } );
 
+    c_buffer_t* elem_by_elem_config_buffer =
+        ::NS(Buffer_new)( buf_size_t{ 0 } );
+
     particles_t* cmp_particles = ::NS(Particles_add_copy)(
         cmp_track_pb, ::NS(Particles_buffer_get_const_particles)(
             in_particles_buffer, buf_size_t{ 0 } ) );
@@ -92,12 +95,13 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
 
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
-    elem_by_elem_conf_t elem_by_elem_conf;
+    elem_by_elem_conf_t* elem_by_elem_conf =
+        ::NS(ElemByElemConfig_new)( elem_by_elem_config_buffer );
 
-    ::NS(ElemByElemConfig_preset)( &elem_by_elem_conf );
+    ::NS(ElemByElemConfig_preset)( elem_by_elem_conf );
 
     status = ::NS(ElemByElemConfig_init_detailed)(
-        &elem_by_elem_conf, ::NS(ELEM_BY_ELEM_ORDER_DEFAULT),
+        elem_by_elem_conf, ::NS(ELEM_BY_ELEM_ORDER_DEFAULT),
             min_particle_id, max_particle_id, min_at_element_id,
                 max_at_element_id, min_at_turn, max_elem_by_elem_turn_id,
                     true );
@@ -105,11 +109,11 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
 
     status = ::NS(ElemByElemConfig_assign_output_buffer)(
-        &elem_by_elem_conf, cmp_output_buffer, elem_by_elem_out_idx_offset );
+        elem_by_elem_conf, cmp_output_buffer, elem_by_elem_out_idx_offset );
 
     SIXTRL_ASSERT( status == ::NS(ARCH_STATUS_SUCCESS) );
     SIXTRL_ASSERT( ::NS(ElemByElemConfig_get_output_store_address)(
-        &elem_by_elem_conf ) != ::NS(elem_by_elem_out_addr_t){ 0 } );
+        elem_by_elem_conf ) != ::NS(elem_by_elem_out_addr_t){ 0 } );
 
     /* --------------------------------------------------------------------- */
     /* Perform comparison tracking over lattice: */
@@ -117,7 +121,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
     track_status_t track_status =
         ::NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
         cmp_track_pb, NUM_PSETS, &track_pset_index, eb,
-            &elem_by_elem_conf, UNTIL_TURN_ELEM_BY_ELEM );
+            elem_by_elem_conf, UNTIL_TURN_ELEM_BY_ELEM );
 
     SIXTRL_ASSERT( track_status == ::NS(TRACK_SUCCESS) );
     ( void )track_status;
@@ -188,7 +192,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
-                ptr_assign_kernel_config, ptr_node_info );
+                ptr_assign_kernel_config, ptr_node_info, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -208,7 +212,8 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
             status =
             ::NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
                 ptr_track_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -231,15 +236,15 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
 
             /* ************************************************************* */
 
-            ::NS(ElemByElemConfig_preset)( &elem_by_elem_conf );
+            ::NS(ElemByElemConfig_preset)( elem_by_elem_conf );
 
             size_t output_buffer_index_offset =
                 ::NS(Buffer_get_num_of_objects)( output_buffer ) + size_t{ 1 };
 
             status = ::NS(TestElemByElemConfigCtrlArg_prepare_assign_output_buffer)(
                 track_pb, NUM_PSETS, &track_pset_index, eb,
-                elem_by_elem_conf_arg, &elem_by_elem_conf, output_arg,
-                output_buffer, &output_buffer_index_offset,
+                elem_by_elem_conf_arg, elem_by_elem_config_buffer, size_t{ 0 },
+                output_arg, output_buffer, &output_buffer_index_offset,
                 UNTIL_TURN_ELEM_BY_ELEM, result_arg );
 
             SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
@@ -250,12 +255,12 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
             SIXTRL_ASSERT( status == NS(ARCH_STATUS_SUCCESS) );
 
             ::NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_wrapper)(
-                ptr_assign_kernel_config, elem_by_elem_conf_arg, output_arg,
-                    output_buffer_index_offset, result_arg );
+                ptr_assign_kernel_config, elem_by_elem_conf_arg, size_t{ 0 },
+                    output_arg, output_buffer_index_offset, result_arg );
 
             ::NS(Track_particles_elem_by_elem_until_turn_cuda_wrapper)(
                 ptr_track_kernel_config, particles_arg, track_pset_index,
-                    beam_elements_arg, elem_by_elem_conf_arg,
+                    beam_elements_arg, elem_by_elem_conf_arg, size_t{ 0 },
                         UNTIL_TURN_ELEM_BY_ELEM, result_arg );
 
             status = ::NS(TestTrackCtrlArg_evaulate_tracking)(
@@ -300,6 +305,7 @@ TEST( C99_CudaWrappersTrackParticlesElemByElemUntilTurnTests,
     ::NS(Buffer_delete)( in_particles_buffer );
     ::NS(Buffer_delete)( cmp_track_pb );
     ::NS(Buffer_delete)( cmp_output_buffer );
+    ::NS(Buffer_delete)( elem_by_elem_config_buffer );
     ::NS(Buffer_delete)( eb );
 }
 

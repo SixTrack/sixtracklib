@@ -26,7 +26,7 @@
     #include "sixtracklib/common/track_job_cpu.h"
 
     #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
-        ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
+               ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
     #include "sixtracklib/opencl/make_track_job.h"
 
@@ -37,9 +37,13 @@
 #if !defined( _GPUCODE )
 #if defined( __cplusplus )
 
-namespace st = SIXTRL_CXX_NAMESPACE;
 namespace SIXTRL_CXX_NAMESPACE
 {
+    namespace
+    {
+        namespace st = SIXTRL_CXX_NAMESPACE;
+    }
+
     TrackJobBase* TrackJob_create( const char *const SIXTRL_RESTRICT arch_str,
         const char *const SIXTRL_RESTRICT config_str )
     {
@@ -469,6 +473,14 @@ void NS(TrackJob_collect_output)( ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
     if( job != nullptr ) job->collectOutput();
 }
 
+void NS(TrackJob_collect_particles_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    if( job != nullptr ) job->collectParticlesAddresses();
+}
+
+/* ------------------------------------------------------------------------- */
+
 void NS(TrackJob_enable_collect_particles)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
@@ -543,6 +555,7 @@ bool NS(TrackJob_requires_collecting)(
     return ( job != nullptr ) ? job->requiresCollecting() : false;
 }
 
+/* ------------------------------------------------------------------------- */
 
 void NS(TrackJob_push)( ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
     ::NS(track_job_push_flag_t) const flags )
@@ -553,33 +566,570 @@ void NS(TrackJob_push)( ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
 void NS(TrackJob_push_particles)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
 {
-    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_PARTICLES );
+    if( track_job != nullptr ) track_job->push(
+            SIXTRL_CXX_NAMESPACE::TRACK_JOB_IO_PARTICLES );
 }
 
 void NS(TrackJob_push_beam_elements)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
 {
-    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_BEAM_ELEMENTS );
+    if( track_job != nullptr ) track_job->push(
+        SIXTRL_CXX_NAMESPACE::TRACK_JOB_IO_BEAM_ELEMENTS );
 }
 
 void NS(TrackJob_push_output)(
     ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
 {
-    if( track_job != nullptr ) track_job->push( st::TRACK_JOB_IO_OUTPUT );
+    if( track_job != nullptr ) track_job->push(
+            SIXTRL_CXX_NAMESPACE::TRACK_JOB_IO_OUTPUT );
 }
 
-bool NS(TrackJob_can_fetch_particle_addresses)(
-    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
+void NS(TrackJob_push_particles_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
 {
-    ( void )track_job; /* not supported by track jobs based on this API */
-    return false;
+    if( job != nullptr ) job->push(
+        SIXTRL_CXX_NAMESPACE::TRACK_JOB_IO_PARTICLES_ADDR );
 }
 
-bool NS(TrackJob_has_particle_addresses)(
+/* ------------------------------------------------------------------------- */
+
+bool NS(TrackJob_can_fetch_particles_addr)(
     const ::NS(TrackJobBase) *const SIXTRL_RESTRICT track_job )
 {
-    ( void )track_job; /* not supported by track jobs based on this API */
-    return false;
+    return ( ( track_job != nullptr ) &&
+             ( track_job->canFetchParticleAddresses() ) );
+}
+
+bool NS(TrackJob_has_particles_addr)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->has_particles_addr() ) );
+}
+
+::NS(arch_status_t) NS(TrackJob_fetch_particles_addr)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->fetch_particles_addr()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_particles_addr)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const particle_set_index )
+{
+    return ( job != nullptr ) ? job->clear_particles_addr( particle_set_index )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_all_particles_addr)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->clear_all_particles_addr()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(ParticlesAddr) const* NS(TrackJob_particles_addr)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const particle_set_index )
+{
+    return ( job != nullptr )
+        ? job->particles_addr( particle_set_index ) : nullptr;
+}
+
+::NS(Buffer) const* NS(TrackJob_particles_addr_buffer)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr ) ? job->ptr_particles_addr_cbuffer() : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(AssignAddressItem)* NS(TrackJob_add_assign_address_item)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF assign_item_to_add )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    st::AssignAddressItem const* ptr_cxx_item = reinterpret_cast<
+        st::AssignAddressItem const* >( assign_item_to_add );
+
+    return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) )
+        ? job->add_assign_address_item( *ptr_cxx_item ) : nullptr;
+}
+
+::NS(AssignAddressItem)* NS(TrackJob_add_assign_address_item_detailed)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(object_type_id_t) const dest_type_id,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const dest_elem_index,
+    ::NS(buffer_size_t) const dest_pointer_offset,
+    ::NS(object_type_id_t) const src_type_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const src_elem_index,
+    ::NS(buffer_size_t) const src_pointer_offset )
+{
+    return ( job != nullptr )
+        ? job->add_assign_address_item(
+            dest_type_id, dest_buffer_id, dest_elem_index, dest_pointer_offset,
+            src_type_id, src_buffer_id, src_elem_index, src_pointer_offset )
+        : nullptr;
+}
+
+::NS(arch_status_t) NS(TrackJob_remove_assign_address_item)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT_REF item_to_remove )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    st::AssignAddressItem const* ptr_cxx_item = reinterpret_cast<
+        st::AssignAddressItem const* >( item_to_remove );
+
+    return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) )
+        ? job->remove_assign_address_item( *ptr_cxx_item )
+        : st::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+
+::NS(arch_status_t) NS(TrackJob_remove_assign_address_item_by_key_and_index)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    const ::NS(TrackJobDestSrcBufferIds) *const SIXTRL_RESTRICT_REF key,
+    ::NS(buffer_size_t) const index_of_item_to_remove )
+{
+    return ( ( job != nullptr ) && ( key != nullptr ) )
+        ? job->remove_assign_address_item( *key, index_of_item_to_remove )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+bool NS(TrackJob_has_assign_address_item)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT item )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    st::AssignAddressItem  const* ptr_cxx_item = reinterpret_cast<
+        st::AssignAddressItem const* >( item );
+
+    return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) &&
+             ( job->has_assign_address_item( *ptr_cxx_item ) ) );
+}
+
+bool NS(TrackJob_has_assign_item_by_index)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const assign_item_index )
+{
+    return ( ( job != nullptr ) && ( job->num_assign_items(
+                dest_buffer_id, src_buffer_id ) > assign_item_index ) );
+}
+
+bool NS(TrackJob_has_assign_address_item_detailed)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(object_type_id_t) const dest_type_id,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const dest_elem_index,
+    ::NS(buffer_size_t) const dest_pointer_offset,
+    ::NS(object_type_id_t) const src_type_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const src_elem_index,
+    ::NS(buffer_size_t) const src_pointer_offset )
+{
+    return ( ( job != nullptr ) &&
+             ( job->has_assign_address_item(
+                dest_type_id, dest_buffer_id, dest_elem_index,
+                    dest_pointer_offset,
+                src_type_id, src_buffer_id, src_elem_index,
+                    src_pointer_offset ) ) );
+}
+
+::NS(buffer_size_t) NS(TrackJob_index_of_assign_address_item_detailed)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(object_type_id_t) const dest_type_id,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const dest_elem_index,
+    ::NS(buffer_size_t) const dest_pointer_offset,
+    ::NS(object_type_id_t) const src_type_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const src_elem_index,
+    ::NS(buffer_size_t) const src_pointer_offset )
+{
+    return ( job != nullptr )
+        ? job->index_of_assign_address_item(
+            dest_type_id, dest_buffer_id, dest_elem_index, dest_pointer_offset,
+            src_type_id, src_buffer_id, src_elem_index, src_pointer_offset )
+        : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(buffer_size_t) NS(TrackJob_index_of_assign_address_item)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT assign_item )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    st::AssignAddressItem const* ptr_cxx_item = reinterpret_cast<
+        st::AssignAddressItem const* >( assign_item );
+
+    return ( ( job != nullptr ) && ( ptr_cxx_item != nullptr ) )
+        ? job->index_of_assign_address_item( *ptr_cxx_item )
+        : ::NS(buffer_size_t){ 0 };
+}
+
+bool NS(TrackJob_has_assign_items)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( ( job != nullptr ) &&
+             ( job->has_assign_items( dest_buffer_id, src_buffer_id ) ) );
+}
+
+::NS(buffer_size_t) NS(TrackJob_num_assign_items)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( job != nullptr )
+        ? job->num_assign_items( dest_buffer_id, src_buffer_id )
+        : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(buffer_size_t) NS(TrackJob_total_num_assign_items)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->total_num_assign_items() : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    const ::NS(AssignAddressItem) *const SIXTRL_RESTRICT item )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( ( job != nullptr ) && ( item != nullptr ) )
+    {
+        st::AssignAddressItem const* _ptr = job->ptr_assign_address_item(
+            *( reinterpret_cast< st::AssignAddressItem const* >( item ) ) );
+        if( _ptr != nullptr ) ptr_item = _ptr->getCApiPtr();
+    }
+
+    return ptr_item;
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item_detailed)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(object_type_id_t) const dest_type_id,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const dest_elem_index,
+    ::NS(buffer_size_t) const dest_pointer_offset,
+    ::NS(object_type_id_t) const src_type_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const src_elem_index,
+    ::NS(buffer_size_t) const src_pointer_offset )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( job != nullptr )
+    {
+        st::TrackJobBase::size_type const assign_address_item_index =
+            job->index_of_assign_address_item( dest_type_id, dest_buffer_id,
+                dest_elem_index, dest_pointer_offset, src_type_id,
+                    src_buffer_id, src_elem_index, src_pointer_offset );
+
+        ptr_item = job->ptr_assign_address_item(
+            dest_buffer_id, src_buffer_id, assign_address_item_index );
+    }
+
+    return ptr_item;
+}
+
+::NS(AssignAddressItem) const* NS(TrackJob_ptr_assign_address_item_by_index)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id,
+    ::NS(buffer_size_t) const assign_address_item_index )
+{
+    namespace st = SIXTRL_CXX_NAMESPACE;
+    ::NS(AssignAddressItem) const* ptr_item = nullptr;
+
+    if( job != nullptr )
+    {
+        st::AssignAddressItem const* _ptr = job->ptr_assign_address_item(
+            dest_buffer_id, src_buffer_id, assign_address_item_index );
+
+        if( _ptr != nullptr ) ptr_item = _ptr->getCApiPtr();
+    }
+
+    return ptr_item;
+}
+
+::NS(buffer_size_t)
+NS(TrackJob_num_distinct_available_assign_address_items_dest_src_pairs)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->num_distinct_available_assign_address_items_dest_src_pairs()
+        : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(buffer_size_t) NS(TrackJob_available_assign_address_items_dest_src_pairs)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const max_num_pairs,
+    ::NS(TrackJobDestSrcBufferIds)* pairs_begin )
+{
+    return ( job != nullptr )
+        ? job->available_assign_address_items_dest_src_pairs(
+            max_num_pairs, pairs_begin )
+        : ::NS(buffer_size_t){ 0 };
+}
+
+::NS(Buffer)* NS(TrackJob_buffer_by_buffer_id)( ::NS(TrackJobBase)*
+    SIXTRL_RESTRICT job, ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->buffer_by_buffer_id( buffer_id ) : nullptr;
+
+}
+
+::NS(Buffer) const* NS(TrackJob_const_buffer_by_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->buffer_by_buffer_id( buffer_id ) : nullptr;
+}
+
+bool NS(TrackJob_is_buffer_by_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_id )
+{
+    return ( ( job != nullptr ) &&
+             ( job->is_buffer_by_buffer_id)( buffer_id ) );
+}
+
+bool NS(TrackJob_is_raw_memory_by_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_id )
+{
+    return ( ( job != nullptr ) &&
+             ( job->is_raw_memory_by_buffer_id( buffer_id ) ) );
+}
+
+SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const*
+NS(TrackJob_assign_items_begin)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( job != nullptr )
+        ? job->assign_items_begin( dest_buffer_id, src_buffer_id ) : nullptr;
+}
+
+SIXTRL_BUFFER_OBJ_ARGPTR_DEC ::NS(Object) const*
+NS(TrackJob_assign_items_end)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( job != nullptr )
+        ? job->assign_items_end( dest_buffer_id, src_buffer_id ) : nullptr;
+}
+
+::NS(TrackJobDestSrcBufferIds) const*
+NS(TrackJob_assign_item_dest_src_begin)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->assign_item_dest_src_begin() : nullptr;
+}
+
+::NS(TrackJobDestSrcBufferIds) const*
+NS(TrackJob_assign_item_dest_src_end)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->assign_item_dest_src_end() : nullptr;
+}
+
+::NS(arch_status_t) NS(TrackJob_commit_address_assignments)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->commit_address_assignments()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_assign_all_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->assign_all_addresses()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_assign_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const dest_buffer_id,
+    ::NS(buffer_size_t) const src_buffer_id )
+{
+    return ( job != nullptr )
+        ? job->assign_addresses( dest_buffer_id, src_buffer_id )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(arch_status_t) NS(TrackJob_fetch_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr )
+        ? track_job->fetchParticleAddresses()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job,
+    ::NS(arch_size_t) const index ) SIXTRL_NOEXCEPT
+{
+    return ( track_job != nullptr )
+        ? track_job->clearParticleAddresses( index )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_clear_all_particle_addresses)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT track_job ) SIXTRL_NOEXCEPT
+{
+    return ( track_job != nullptr )
+        ? track_job->clearAllParticleAddresses()
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(ParticlesAddr) const* NS(TrackJob_particle_addresses)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(arch_size_t) const index ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->particleAddresses( index ) : nullptr;
+}
+
+::NS(Buffer)* NS(TrackJob_get_particles_addr_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->ptrParticleAddressesBuffer() : nullptr;
+}
+
+::NS(Buffer) const* NS(TrackJob_get_const_particles_addr_buffer)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job ) SIXTRL_NOEXCEPT
+{
+    return ( job != nullptr ) ? job->ptrParticleAddressesBuffer() : nullptr;
+}
+
+/* ------------------------------------------------------------------------- */
+
+::NS(arch_size_t) NS(TrackJob_stored_buffers_capacity)(
+    const NS(TrackJobBase) *const SIXTRL_RESTRICT job ) {
+    return ( job != nullptr )
+        ? job->stored_buffers_capacity() : ::NS(arch_size_t){ 0 };
+}
+
+::NS(arch_status_t) NS(TrackJob_reserve_stored_buffers_capacity)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const capacity )
+{
+    return ( job != nullptr )
+        ? job->reserve_stored_buffers_capacity( capacity )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+bool NS(TrackJob_has_stored_buffers)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( ( job != nullptr ) && ( job->has_stored_buffers() ) );
+}
+
+::NS(arch_size_t) NS(TrackJob_num_stored_buffers)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->num_stored_buffers() : ::NS(arch_size_t){ 0 };
+}
+
+::NS(arch_size_t) NS(TrackJob_min_stored_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->min_stored_buffer_id()
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_BUFFER_ID;
+}
+
+::NS(arch_size_t) NS(TrackJob_max_stored_buffer_id)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job )
+{
+    return ( job != nullptr )
+        ? job->max_stored_buffer_id()
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_BUFFER_ID;
+}
+
+::NS(arch_size_t) NS(TrackJob_create_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(buffer_size_t) const buffer_capacity )
+{
+    return ( job != nullptr )
+        ? job->add_stored_buffer( buffer_capacity )
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_BUFFER_ID;
+}
+
+::NS(arch_size_t) NS(TrackJob_add_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(Buffer)* SIXTRL_RESTRICT buffer, bool const take_ownership,
+    bool const delete_ptr_after_move )
+{
+    return ( job != nullptr )
+        ? job->add_stored_buffer(
+                buffer, take_ownership, delete_ptr_after_move )
+        : SIXTRL_CXX_NAMESPACE::ARCH_ILLEGAL_BUFFER_ID;
+}
+
+bool NS(TrackJob_owns_stored_buffer)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(arch_size_t) const buffer_id )
+{
+    return ( ( job != nullptr ) &&
+             ( job->owns_stored_buffer( buffer_id ) ) );
+}
+
+::NS(arch_status_t) NS(TrackJob_remove_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job,
+    ::NS(arch_size_t) const buffer_index )
+{
+    return ( job != nullptr )
+        ? job->remove_stored_buffer( buffer_index )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(Buffer)* NS(TrackJob_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
+{
+    return ( job != nullptr ) ? job->ptr_stored_buffer( buffer_id ) : nullptr;
+}
+
+::NS(Buffer) const* NS(TrackJob_const_stored_buffer)(
+    const ::NS(TrackJobBase) *const SIXTRL_RESTRICT job,
+    ::NS(arch_size_t) const buffer_id )
+{
+    return ( job != nullptr ) ? job->ptr_stored_buffer( buffer_id ) : nullptr;
+}
+
+::NS(arch_status_t) NS(TrackJob_push_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->push_stored_buffer( buffer_id )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
+}
+
+::NS(arch_status_t) NS(TrackJob_collect_stored_buffer)(
+    ::NS(TrackJobBase)* SIXTRL_RESTRICT job, ::NS(arch_size_t) const buffer_id )
+{
+    return ( job != nullptr )
+        ? job->collect_stored_buffer( buffer_id )
+        : SIXTRL_CXX_NAMESPACE::ARCH_STATUS_GENERAL_FAILURE;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -977,5 +1527,3 @@ void NS(TrackJob_set_default_elem_by_elem_config_order)(
 
 #endif /* defined( __cplusplus ) */
 #endif /* !defined( _GPUCODE ) */
-
-/* end: sixtracklib/common/internal/track_job.cpp */

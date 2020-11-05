@@ -42,8 +42,8 @@ SIXTRL_INLINE int NS(Track_particle_srotation)(
 {
     typedef NS(particle_real_t) real_t;
 
-    real_t const sin_z = NS(SRotation_get_sin_angle)( srotation );
-    real_t const cos_z = NS(SRotation_get_cos_angle)( srotation );
+    real_t const sin_z = NS(SRotation_sin_angle)( srotation );
+    real_t const cos_z = NS(SRotation_cos_angle)( srotation );
 
     real_t const x  = NS(Particles_get_x_value)(  particles, index );
     real_t const y  = NS(Particles_get_y_value)(  particles, index );

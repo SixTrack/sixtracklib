@@ -19,6 +19,227 @@ namespace st = SIXTRL_CXX_NAMESPACE;
 
 namespace SIXTRL_CXX_NAMESPACE
 {
+    using _this_t = st::CudaController;
+
+    CudaController::size_type CudaController::NUM_ALL_NODES()
+    {
+        using _size_t = _this_t::size_type;
+        int num_count = int{ 0 };
+        ::cudaError_t err = ::cudaGetDeviceCount( &num_count );
+
+        return ( err == ::cudaSuccess )
+            ? static_cast< _size_t >( num_count ) : _size_t{ 0 };
+    }
+
+    CudaController::size_type CudaController::GET_ALL_NODES(
+        CudaController::node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+        CudaController::size_type const max_num_node_ids )
+    {
+        using _size_t = _this_t::size_type;
+        _size_t num_nodes_added = _size_t{ 0 };
+
+        if( ( out_node_ids_begin != nullptr ) &&
+            ( max_num_node_ids > _size_t{ 0 } ) )
+        {
+            _size_t num_avail_nodes = _this_t::NUM_ALL_NODES();
+
+            if( num_avail_nodes > max_num_node_ids )
+            {
+                num_avail_nodes = max_num_node_ids;
+            }
+
+            _this_t::node_id_t* it = out_node_ids_begin;
+            _this_t::node_id_t* end = it;
+            std::advance( end, num_avail_nodes );
+
+            for( _size_t ii = _size_t{ 0 } ; it != end ; ++ii, ++it )
+            {
+                it->setPlatformId( ii );
+                it->setDeviceId( 0 );
+                it->setIndex( ii );
+
+                ++num_nodes_added;
+            }
+
+            end = out_node_ids_begin;
+            std::advance( end, max_num_node_ids );
+
+            for( ; it != end ; ++it )
+            {
+                it->clear();
+            }
+        }
+
+        return num_nodes_added;
+    }
+
+    void CudaController::PRINT_ALL_NODES()
+    {
+        using _size_t = _this_t::size_type;
+        _size_t const num_avail_nodes = _this_t::NUM_ALL_NODES();
+
+        if( num_avail_nodes > _size_t{ 0 } )
+        {
+            ::cudaError_t err = ::cudaSuccess;
+
+            for( _size_t ii = _size_t{ 0 } ; ii < num_avail_nodes ; ++ii )
+            {
+                ::cudaDeviceProp cu_properties;
+                err = ::cudaGetDeviceProperties( &cu_properties, ii );
+
+                if( err != ::cudaSuccess ) continue;
+
+                std::unique_ptr< _this_t::node_info_t > ptr_node_info(
+                    new _this_t::node_info_t( ii, cu_properties ) );
+
+                if( ptr_node_info.get() == nullptr ) continue;
+
+                ptr_node_info->setNodeIndex( ii );
+                ptr_node_info->setPlatformId( ii );
+                ptr_node_info->setDeviceId( 0 );
+
+                std::cout << *ptr_node_info << "\r\n";
+            }
+        }
+        else
+        {
+            std::cout << "No CUDA nodes available for printing\r\n";
+        }
+
+
+        std::cout << std::endl;
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    CudaController::size_type CudaController::NUM_AVAILABLE_NODES(
+        char const* SIXTRL_RESTRICT filter_str,
+        char const* SIXTRL_RESTRICT env_variable_name )
+    {
+        ( void )filter_str;
+        ( void )env_variable_name;
+
+        return st::CudaController::NUM_ALL_NODES();
+    }
+
+    CudaController::size_type CudaController::GET_AVAILABLE_NODES(
+        CudaController::node_id_t* SIXTRL_RESTRICT out_node_ids_begin,
+        CudaController::size_type const max_num_node_ids,
+        CudaController::size_type const skip_first_num_nodes,
+        char const* SIXTRL_RESTRICT filter_str,
+        char const* SIXTRL_RESTRICT env_variable_name )
+    {
+        using _this_t = st::CudaController;
+        using _size_t = _this_t::size_type;
+
+        _size_t num_nodes_added = _size_t{ 0 };
+
+        ( void )filter_str;
+        ( void )env_variable_name;
+
+        if( ( out_node_ids_begin != nullptr ) &&
+            ( max_num_node_ids > _size_t{ 0 } ) )
+        {
+            _size_t num_avail_nodes = _this_t::NUM_ALL_NODES();
+
+            if( num_avail_nodes >= skip_first_num_nodes )
+            {
+                num_avail_nodes -= skip_first_num_nodes;
+            }
+            else
+            {
+                num_avail_nodes = _size_t{ 0 };
+            }
+
+            if( num_avail_nodes > max_num_node_ids )
+            {
+                num_avail_nodes = max_num_node_ids;
+            }
+
+            _this_t::node_id_t* it = out_node_ids_begin;
+            _this_t::node_id_t* end = it;
+            std::advance( end, num_avail_nodes );
+
+            for( _size_t ii = _size_t{ 0 } ; it != end ; ++ii, ++it )
+            {
+                it->setPlatformId( ii );
+                it->setDeviceId( 0 );
+                it->setIndex( ii );
+
+                ++num_nodes_added;
+            }
+
+            end = out_node_ids_begin;
+            std::advance( end, max_num_node_ids );
+
+            for( ; it != end ; ++it )
+            {
+                it->clear();
+            }
+        }
+
+        return num_nodes_added;
+    }
+
+    void CudaController::PRINT_AVAILABLE_NODES(
+        char const* SIXTRL_RESTRICT filter_str,
+        char const* SIXTRL_RESTRICT env_variable_name )
+    {
+        ( void )filter_str;
+        ( void )env_variable_name;
+
+        st::CudaController::PRINT_ALL_NODES();
+    }
+
+    CudaController::size_type CudaController::GET_AVAILABLE_NODE_ID_STR(
+        char** SIXTRL_RESTRICT out_node_id_strs,
+        CudaController::size_type const max_num_node_ids,
+        CudaController::size_type const node_id_str_capacity,
+        ::NS(node_id_str_fmt_t) const node_id_str_format,
+        CudaController::size_type const skip_first_num_nodes,
+        char const* SIXTRL_RESTRICT filter_str,
+        char const* SIXTRL_RESTRICT env_variable_name )
+    {
+        using _this_t = st::CudaController;
+        using _size_t = _this_t::size_type;
+
+        _size_t num_nodes_added = _size_t{ 0 };
+
+        if( ( out_node_id_strs != nullptr ) &&
+            ( max_num_node_ids > size_t{ 0 } ) &&
+            ( node_id_str_capacity > _size_t{ 0 } ) )
+        {
+            std::vector< _this_t::node_id_t > temp_node_ids( max_num_node_ids );
+
+            _size_t num_nodes_available = _this_t::GET_AVAILABLE_NODES(
+                temp_node_ids.data(), max_num_node_ids, skip_first_num_nodes,
+                    filter_str, env_variable_name );
+
+            if( num_nodes_available > 0 )
+            {
+                auto it = temp_node_ids.begin();
+                auto end = it;
+                std::advance( it, num_nodes_available );
+
+                for( _size_t ii = _size_t{ 0 } ; it != end ; ++it, ++ii )
+                {
+                    if( out_node_id_strs[ ii ] == nullptr ) continue;
+
+                    if( st::ARCH_STATUS_SUCCESS == it->to_string(
+                            &out_node_id_strs[ ii ][ 0 ], node_id_str_capacity,
+                                st::ARCHITECTURE_CUDA, node_id_str_format ) )
+                    {
+                        ++num_nodes_added;
+                    }
+                }
+            }
+        }
+
+        return num_nodes_added;
+    }
+
+    /* --------------------------------------------------------------------- */
+
     CudaController::CudaController( char const* config_str ) :
         st::NodeControllerBase( st::ARCHITECTURE_CUDA,
             SIXTRL_ARCHITECTURE_CUDA_STR, config_str ),

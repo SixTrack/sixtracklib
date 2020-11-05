@@ -22,11 +22,11 @@
 namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
-     * ====  TMultiPole< T >:
+     * ====  TMultipole< T >:
      * ===================================================================== */
 
     template< typename T >
-    struct TMultiPole
+    struct TMultipole
     {
         using value_type = T;
         using type_id_t  = NS(object_type_id_t);
@@ -34,17 +34,17 @@ namespace SIXTRL_CXX_NAMESPACE
         using size_type  = NS(buffer_size_t);
         using buffer_t   = ::NS(Buffer);
 
-        SIXTRL_FN TMultiPole() = default;
-        SIXTRL_FN TMultiPole( TMultiPole< T > const& other ) = default;
-        SIXTRL_FN TMultiPole( TMultiPole< T >&& other ) = default;
+        SIXTRL_FN TMultipole() = default;
+        SIXTRL_FN TMultipole( TMultipole< T > const& other ) = default;
+        SIXTRL_FN TMultipole( TMultipole< T >&& other ) = default;
 
-        SIXTRL_FN TMultiPole< T >& operator=(
-            TMultiPole< T > const& rhs ) = default;
+        SIXTRL_FN TMultipole< T >& operator=(
+            TMultipole< T > const& rhs ) = default;
 
-        SIXTRL_FN TMultiPole< T >& operator=(
-            TMultiPole< T >&& rhs ) = default;
+        SIXTRL_FN TMultipole< T >& operator=(
+            TMultipole< T >&& rhs ) = default;
 
-        SIXTRL_FN ~TMultiPole() = default;
+        SIXTRL_FN ~TMultipole() = default;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -56,17 +56,17 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT ptr_requ_dataptrs
             ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultiPole< T >*
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultipole< T >*
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
                            order_type const order );
 
-        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultiPole< T >*
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultipole< T >*
         AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
             order_type const order  = order_type{ 0 },
-            SIXTRL_DATAPTR_DEC value_type const* SIXTRL_RESTRICT bal = nullptr,
             value_type const length = value_type{ 0.0 },
             value_type const hxl    = value_type{ 0.0 },
-            value_type const hyl    = value_type{ 0.0 } );
+            value_type const hyl    = value_type{ 0.0 },
+            SIXTRL_DATAPTR_DEC value_type const* SIXTRL_RESTRICT bal = nullptr );
 
         SIXTRL_FN SIXTRL_STATIC value_type Factorial(
             size_type n ) SIXTRL_NOEXCEPT;
@@ -165,48 +165,48 @@ namespace SIXTRL_CXX_NAMESPACE
     };
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_new( Buffer& SIXTRL_RESTRICT_REF buffer,
-                    typename TMultiPole< T >::order_type const order );
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_new( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    typename TMultipole< T >::order_type const order );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_new( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-                    typename TMultiPole< T >::order_type const order );
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_new( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+                    typename TMultipole< T >::order_type const order );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_add( Buffer& SIXTRL_RESTRICT_REF buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_DATAPTR_DEC typename TMultiPole< T >::value_type const*
-            SIXTRL_RESTRICT bal = nullptr,
-        typename TMultiPole< T >::value_type const& length =
-            typename TMultiPole< T >::value_type{},
-        typename TMultiPole< T >::value_type const& hxl =
-            typename TMultiPole< T >::value_type{},
-        typename TMultiPole< T >::value_type const& hyl =
-            typename TMultiPole< T >::value_type{} );
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_add( Buffer& SIXTRL_RESTRICT_REF buffer,
+        typename TMultipole< T >::order_type const order,
+        typename TMultipole< T >::value_type const& length =
+            typename TMultipole< T >::value_type{},
+        typename TMultipole< T >::value_type const& hxl =
+            typename TMultipole< T >::value_type{},
+        typename TMultipole< T >::value_type const& hyl =
+            typename TMultipole< T >::value_type{},
+        SIXTRL_DATAPTR_DEC typename TMultipole< T >::value_type const*
+            SIXTRL_RESTRICT bal = nullptr );
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_add(
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_add(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_DATAPTR_DEC typename TMultiPole< T >::value_type const*
-            SIXTRL_RESTRICT bal = nullptr,
-        typename TMultiPole< T >::value_type const& length =
-            typename TMultiPole< T >::value_type{},
-        typename TMultiPole< T >::value_type const& hxl =
-            typename TMultiPole< T >::value_type{},
-        typename TMultiPole< T >::value_type const& hyl =
-            typename TMultiPole< T >::value_type{} );
+        typename TMultipole< T >::order_type const order,
+        typename TMultipole< T >::value_type const& length =
+            typename TMultipole< T >::value_type{},
+        typename TMultipole< T >::value_type const& hxl =
+            typename TMultipole< T >::value_type{},
+        typename TMultipole< T >::value_type const& hyl =
+            typename TMultipole< T >::value_type{},
+        SIXTRL_DATAPTR_DEC typename TMultipole< T >::value_type const*
+            SIXTRL_RESTRICT bal = nullptr );
 
     /* ===================================================================== *
-     * ====  TMultiPole< SIXTRL_REAL_T >:
+     * ====  TMultipole< SIXTRL_REAL_T >:
      * ===================================================================== */
 
     template<>
-    struct TMultiPole< SIXTRL_REAL_T > : public ::NS(MultiPole)
+    struct TMultipole< SIXTRL_REAL_T > : public ::NS(Multipole)
     {
         using value_type = SIXTRL_REAL_T;
         using type_id_t  = NS(object_type_id_t);
@@ -214,23 +214,23 @@ namespace SIXTRL_CXX_NAMESPACE
         using order_t    = order_type;
         using size_type  = NS(buffer_size_t);
         using buffer_t   = ::NS(Buffer);
-        using c_api_t    = ::NS(MultiPole);
+        using c_api_t    = ::NS(Multipole);
 
-        SIXTRL_FN TMultiPole() = default;
+        SIXTRL_FN TMultipole() = default;
 
-        SIXTRL_FN TMultiPole(
-            TMultiPole< SIXTRL_REAL_T > const& other ) = default;
+        SIXTRL_FN TMultipole(
+            TMultipole< SIXTRL_REAL_T > const& other ) = default;
 
-        SIXTRL_FN TMultiPole(
-            TMultiPole< SIXTRL_REAL_T >&& other ) = default;
+        SIXTRL_FN TMultipole(
+            TMultipole< SIXTRL_REAL_T >&& other ) = default;
 
-        SIXTRL_FN TMultiPole< SIXTRL_REAL_T >& operator=(
-            TMultiPole< SIXTRL_REAL_T > const& rhs ) = default;
+        SIXTRL_FN TMultipole< SIXTRL_REAL_T >& operator=(
+            TMultipole< SIXTRL_REAL_T > const& rhs ) = default;
 
-        SIXTRL_FN TMultiPole< SIXTRL_REAL_T >& operator=(
-            TMultiPole< SIXTRL_REAL_T >&& rhs ) = default;
+        SIXTRL_FN TMultipole< SIXTRL_REAL_T >& operator=(
+            TMultipole< SIXTRL_REAL_T >&& rhs ) = default;
 
-        SIXTRL_FN ~TMultiPole() = default;
+        SIXTRL_FN ~TMultipole() = default;
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -243,17 +243,17 @@ namespace SIXTRL_CXX_NAMESPACE
             SIXTRL_ARGPTR_DEC size_type* SIXTRL_RESTRICT
                 ptr_requ_dataptrs = nullptr ) SIXTRL_NOEXCEPT;
 
-        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >*
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >*
         CreateNewOnBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
                            order_type const order );
 
-        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >*
+        SIXTRL_FN SIXTRL_STATIC SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >*
         AddToBuffer( buffer_t& SIXTRL_RESTRICT_REF buffer,
             order_type const order,
-            SIXTRL_DATAPTR_DEC value_type const* SIXTRL_RESTRICT bal,
             value_type const length,
             value_type const hxl,
-            value_type const hyl );
+            value_type const hyl,
+            SIXTRL_DATAPTR_DEC value_type const* SIXTRL_RESTRICT bal );
 
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -337,17 +337,17 @@ namespace SIXTRL_CXX_NAMESPACE
             size_type n ) SIXTRL_NOEXCEPT;
     };
 
-    using MultiPole = TMultiPole< SIXTRL_REAL_T >;
+    using Multipole = TMultipole< SIXTRL_REAL_T >;
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_new(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_new(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         ::NS(multipole_order_t) const order );
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_new(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_new(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         ::NS(multipole_order_t) const order );
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_add(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_add(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         ::NS(multipole_order_t) const order,
         SIXTRL_DATAPTR_DEC ::NS(multipole_real_t) const*
@@ -356,7 +356,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(multipole_real_t) const hxl    = ::NS(multipole_real_t){ 0.0 },
         ::NS(multipole_real_t) const hyl    = ::NS(multipole_real_t){ 0.0 } );
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_add(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_add(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         ::NS(multipole_order_t) const order,
         SIXTRL_DATAPTR_DEC ::NS(multipole_real_t) const*
@@ -365,7 +365,7 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(multipole_real_t) const hxl    = ::NS(multipole_real_t){ 0.0 },
         ::NS(multipole_real_t) const hyl    = ::NS(multipole_real_t){ 0.0 } );
 
-    template<> struct ObjectTypeTraits< ::NS(MultiPole) >
+    template<> struct ObjectTypeTraits< ::NS(Multipole) >
     {
         SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
         {
@@ -373,7 +373,7 @@ namespace SIXTRL_CXX_NAMESPACE
         }
     };
 
-    template<> struct ObjectTypeTraits< MultiPole >
+    template<> struct ObjectTypeTraits< Multipole >
     {
         SIXTRL_STATIC SIXTRL_INLINE object_type_id_t Type() SIXTRL_NOEXCEPT
         {
@@ -389,21 +389,21 @@ namespace SIXTRL_CXX_NAMESPACE
 namespace SIXTRL_CXX_NAMESPACE
 {
     /* ===================================================================== *
-     * ====  TMultiPole< T >:
+     * ====  TMultipole< T >:
      * ===================================================================== */
 
     template< typename T >
-    SIXTRL_INLINE bool TMultiPole< T >::CanAddToBuffer(
-        typename TMultiPole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_ARGPTR_DEC typename TMultiPole< T >::size_type*
+    SIXTRL_INLINE bool TMultipole< T >::CanAddToBuffer(
+        typename TMultipole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TMultipole< T >::order_type const order,
+        SIXTRL_ARGPTR_DEC typename TMultipole< T >::size_type*
             SIXTRL_RESTRICT ptr_requ_objects,
-        SIXTRL_ARGPTR_DEC typename TMultiPole< T >::size_type*
+        SIXTRL_ARGPTR_DEC typename TMultipole< T >::size_type*
             SIXTRL_RESTRICT ptr_requ_slots,
-        SIXTRL_ARGPTR_DEC typename TMultiPole< T >::size_type*
+        SIXTRL_ARGPTR_DEC typename TMultipole< T >::size_type*
             SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using  size_t = typename _this_t::size_type;
 
         static_assert( std::is_trivial< _this_t >::value, "" );
@@ -418,12 +418,12 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole< T >::CreateNewOnBuffer(
-        typename TMultiPole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TMultiPole< T >::order_type const order )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole< T >::CreateNewOnBuffer(
+        typename TMultipole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TMultipole< T >::order_type const order )
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using size_t  = typename _this_t::size_type;
         using value_t = typename _this_t::value_type;
 
@@ -441,24 +441,24 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t const sizes[]      = { sizeof( value_t ) };
         size_t const counts[]     = { static_cast< size_t >( 2 * order + 2 ) };
 
-        return static_cast< SIXTRL_ARGPTR_DEC TMultiPole< T >* >(
+        return static_cast< SIXTRL_ARGPTR_DEC TMultipole< T >* >(
             static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                 ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                     type_id, num_dataptrs, offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole< T >::AddToBuffer(
-        typename TMultiPole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_DATAPTR_DEC typename TMultiPole< T >::value_type const*
-            SIXTRL_RESTRICT bal,
-        typename TMultiPole< T >::value_type const length,
-        typename TMultiPole< T >::value_type const hxl,
-        typename TMultiPole< T >::value_type const hyl )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole< T >::AddToBuffer(
+        typename TMultipole< T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        typename TMultipole< T >::order_type const order,
+        typename TMultipole< T >::value_type const length,
+        typename TMultipole< T >::value_type const hxl,
+        typename TMultipole< T >::value_type const hyl,
+        SIXTRL_DATAPTR_DEC typename TMultipole< T >::value_type const*
+            SIXTRL_RESTRICT bal )
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using size_t  = typename _this_t::size_type;
         using value_t = typename _this_t::value_type;
 
@@ -479,39 +479,39 @@ namespace SIXTRL_CXX_NAMESPACE
         size_t const sizes[]      = { sizeof( value_t ) };
         size_t const counts[]     = { static_cast< size_t >( 2 * order + 2 ) };
 
-        return static_cast< SIXTRL_ARGPTR_DEC TMultiPole< T >* >(
+        return static_cast< SIXTRL_ARGPTR_DEC TMultipole< T >* >(
             static_cast< uintptr_t >( ::NS(Object_get_begin_addr)(
                 ::NS(Buffer_add_object)( &buffer, &temp, sizeof( _this_t ),
                     type_id, num_dataptrs, offsets, sizes, counts ) ) ) );
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::Factorial(
-        typename TMultiPole< T >::size_type n ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::Factorial(
+        typename TMultipole< T >::size_type n ) SIXTRL_NOEXCEPT
     {
-        using size_t  = typename TMultiPole< T >::size_type;
-        using value_t = typename TMultiPole< T >::value_type;
+        using size_t  = typename TMultipole< T >::size_type;
+        using value_t = typename TMultipole< T >::value_type;
 
         return ( n > size_t{ 1 } )
                 ? ( static_cast< value_t >( n ) *
-                    TMultiPole< T >::Factorial( n - size_t{ 1 } ) )
+                    TMultipole< T >::Factorial( n - size_t{ 1 } ) )
                 : ( value_t{ 1.0 } );
     }
 
     /* ----------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::type_id_t
-    TMultiPole< T >::getTypeId() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::type_id_t
+    TMultipole< T >::getTypeId() const SIXTRL_NOEXCEPT
     {
         return NS(OBJECT_TYPE_MULTIPOLE);
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::preset() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::preset() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using order_t = typename _this_t::order_type;
         using value_t = typename _this_t::value_type;
 
@@ -525,38 +525,38 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getLength() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getLength() const SIXTRL_NOEXCEPT
     {
         return this->length;
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getHxl() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getHxl() const SIXTRL_NOEXCEPT
     {
         return this->hxl;
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getHyl() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getHyl() const SIXTRL_NOEXCEPT
     {
         return this->hyl;
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::order_type
-    TMultiPole< T >::getOrder() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::order_type
+    TMultipole< T >::getOrder() const SIXTRL_NOEXCEPT
     {
         return this->order;
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::size_type
-    TMultiPole< T >::getBalSize() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::size_type
+    TMultipole< T >::getBalSize() const SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using  size_t = typename _this_t::size_type;
 
         return ( this->order >= 0 )
@@ -567,29 +567,29 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getKnlValue(
-        typename TMultiPole< T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getKnlValue(
+        typename TMultipole< T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
         return this->getBalValue( 2 * index ) *
-                TMultiPole< T >::Factorial( index );
+                TMultipole< T >::Factorial( index );
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getKslValue(
-        typename TMultiPole< T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getKslValue(
+        typename TMultipole< T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
         return this->getBalValue( 2u * index + 1u ) *
-                TMultiPole< T >::Factorial( index );
+                TMultipole< T >::Factorial( index );
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type
-    TMultiPole< T >::getBalValue(
-        typename TMultiPole< T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type
+    TMultipole< T >::getBalValue(
+        typename TMultipole< T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
-        using _this_t        = TMultiPole< T >;
+        using _this_t        = TMultipole< T >;
         using value_t        = typename _this_t::value_type;
         using ptr_to_value_t = SIXTRL_DATAPTR_DEC value_t*;
 
@@ -603,9 +603,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< T >::setKnl( Iter knl_begin ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setKnl( Iter knl_begin ) SIXTRL_NOEXCEPT
     {
-        using _this_t        = TMultiPole< T >;
+        using _this_t        = TMultipole< T >;
         using size_t         = typename _this_t::size_type;
         using order_t        = typename _this_t::order_type;
 
@@ -634,9 +634,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< T >::setKsl( Iter ksl_begin ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setKsl( Iter ksl_begin ) SIXTRL_NOEXCEPT
     {
-        using _this_t        = TMultiPole< T >;
+        using _this_t        = TMultipole< T >;
         using size_t         = typename _this_t::size_type;
         using order_t        = typename _this_t::order_type;
 
@@ -665,9 +665,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< T >::setBal( Iter bal_begin ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setBal( Iter bal_begin ) SIXTRL_NOEXCEPT
     {
-        using size_t = typename TMultiPole< T >::size_type;
+        using size_t = typename TMultipole< T >::size_type;
 
         size_t const bal_length = this->getBalSize();
         size_t ii = size_t{ 0 };
@@ -691,11 +691,11 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setKnlValue(
-        typename TMultiPole< T >::value_type knl_value,
-        typename TMultiPole< T >::size_type const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setKnlValue(
+        typename TMultipole< T >::value_type knl_value,
+        typename TMultipole< T >::size_type const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using size_t  = typename _this_t::size_type;
 
         this->setBalValue( knl_value / _this_t::Factorial( index ),
@@ -705,11 +705,11 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setKslValue(
-        typename TMultiPole< T >::value_type ksl_value,
-        typename TMultiPole< T >::size_type const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setKslValue(
+        typename TMultipole< T >::value_type ksl_value,
+        typename TMultipole< T >::size_type const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using size_t  = typename _this_t::size_type;
 
         this->setBalValue( ksl_value / _this_t::Factorial( index ),
@@ -719,11 +719,11 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setBalValue(
-        typename TMultiPole< T >::value_type bal_value,
-        typename TMultiPole< T >::size_type const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setBalValue(
+        typename TMultipole< T >::value_type bal_value,
+        typename TMultipole< T >::size_type const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t        = TMultiPole< T >;
+        using _this_t        = TMultipole< T >;
         using value_t        = typename _this_t::value_type;
         using ptr_to_value_t = SIXTRL_DATAPTR_DEC value_t*;
 
@@ -740,24 +740,24 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type const*
-    TMultiPole< T >::begin() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type const*
+    TMultipole< T >::begin() const SIXTRL_NOEXCEPT
     {
         return this->getBalBegin<>();
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type const*
-    TMultiPole< T >::end() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type const*
+    TMultipole< T >::end() const SIXTRL_NOEXCEPT
     {
         return this->getBalEnd<>();
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type*
-    TMultiPole< T >::begin() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type*
+    TMultipole< T >::begin() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using   ptr_t = typename _this_t::value_type*;
 
         return const_cast< ptr_t >( static_cast< _this_t const& >(
@@ -765,10 +765,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T >
-    SIXTRL_INLINE typename TMultiPole< T >::value_type*
-    TMultiPole< T >::end() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE typename TMultipole< T >::value_type*
+    TMultipole< T >::end() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< T >;
+        using _this_t = TMultipole< T >;
         using   ptr_t = typename _this_t::value_type*;
 
         return const_cast< ptr_t >( static_cast< _this_t const& >(
@@ -778,10 +778,10 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T > template< typename CPtr >
-    SIXTRL_INLINE CPtr TMultiPole< T >::getBalBegin() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE CPtr TMultipole< T >::getBalBegin() const SIXTRL_NOEXCEPT
     {
-        using size_t  = typename TMultiPole< T >::size_type;
-        using value_t = typename TMultiPole< T >::value_type;
+        using size_t  = typename TMultipole< T >::size_type;
+        using value_t = typename TMultipole< T >::value_type;
 
         static_assert( sizeof( typename std::iterator_traits<
             CPtr >::value_type ) == sizeof( value_type ), "" );
@@ -795,12 +795,13 @@ namespace SIXTRL_CXX_NAMESPACE
         SIXTRL_ASSERT(
             ( ( bal_size == 0u ) && ( this->bal == nullptr ) ) ||
             ( ( bal_size >  0u ) && ( this->bal != nullptr ) ) );
+        ( void )bal_size;
 
         return reinterpret_cast< CPtr >( this->bal );
     }
 
     template< typename T > template< typename CPtr >
-    SIXTRL_INLINE CPtr TMultiPole< T >::getBalEnd() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE CPtr TMultipole< T >::getBalEnd() const SIXTRL_NOEXCEPT
     {
         CPtr end_ptr = this->getBalBegin< CPtr >();
 
@@ -813,20 +814,20 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename T > template< typename Ptr >
-    SIXTRL_INLINE Ptr TMultiPole< T >::getBalBegin() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Ptr TMultipole< T >::getBalBegin() SIXTRL_NOEXCEPT
     {
         using out_const_ptr_t = typename std::add_const< Ptr >::type;
-        using _this_t         = TMultiPole< T >;
+        using _this_t         = TMultipole< T >;
 
         return const_cast< Ptr >( static_cast<
             _this_t const& >( *this ).getBalBegin< out_const_ptr_t >() );
     }
 
     template< typename T > template< typename Ptr >
-    SIXTRL_INLINE Ptr TMultiPole< T >::getBalEnd() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Ptr TMultipole< T >::getBalEnd() SIXTRL_NOEXCEPT
     {
         using out_const_ptr_t = typename std::add_const< Ptr >::type;
-        using _this_t         = TMultiPole< T >;
+        using _this_t         = TMultipole< T >;
 
         return const_cast< Ptr >( static_cast<
             _this_t const& >( *this ).getBalEnd< out_const_ptr_t >() );
@@ -835,32 +836,32 @@ namespace SIXTRL_CXX_NAMESPACE
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setOrder(
-        typename TMultiPole< T >::order_type const order ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setOrder(
+        typename TMultipole< T >::order_type const order ) SIXTRL_NOEXCEPT
     {
         this->order = order;
         return;
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setLength(
-        typename TMultiPole< T >::value_type const length ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setLength(
+        typename TMultipole< T >::value_type const length ) SIXTRL_NOEXCEPT
     {
         this->length = length;
         return;
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setHxl(
-        typename TMultiPole< T >::value_type const hxl ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setHxl(
+        typename TMultipole< T >::value_type const hxl ) SIXTRL_NOEXCEPT
     {
         this->hxl = hxl;
         return;
     }
 
     template< typename T >
-    SIXTRL_INLINE void TMultiPole< T >::setHyl(
-        typename TMultiPole< T >::value_type const hyl ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::setHyl(
+        typename TMultipole< T >::value_type const hyl ) SIXTRL_NOEXCEPT
     {
         this->hyl = hyl;
         return;
@@ -870,9 +871,9 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     template< typename Ptr >
-    SIXTRL_INLINE void TMultiPole< T >::assignBal( Ptr ptr_to_bal ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< T >::assignBal( Ptr ptr_to_bal ) SIXTRL_NOEXCEPT
     {
-        using value_t   = typename TMultiPole< T >::value_type;
+        using value_t   = typename TMultipole< T >::value_type;
         using pointer_t = SIXTRL_DATAPTR_DEC value_t*;
 
         this->bal = reinterpret_cast< pointer_t >( ptr_to_bal );
@@ -882,132 +883,135 @@ namespace SIXTRL_CXX_NAMESPACE
     /* --------------------------------------------------------------------- */
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_new( Buffer& SIXTRL_RESTRICT_REF buffer,
-                    typename TMultiPole< T >::order_type const order )
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_new( Buffer& SIXTRL_RESTRICT_REF buffer,
+                    typename TMultipole< T >::order_type const order )
     {
-        return TMultiPole< T >::CreateNewOnBuffer(
+        return TMultipole< T >::CreateNewOnBuffer(
             *buffer.getCApiPtr(), order );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_new( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-                    typename TMultiPole< T >::order_type const order )
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_new( SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+                    typename TMultipole< T >::order_type const order )
     {
         return ( ptr_buffer != nullptr )
-            ? ( TMultiPole< T >::CreateNewOnBuffer( *ptr_buffer, order ) )
+            ? ( TMultipole< T >::CreateNewOnBuffer( *ptr_buffer, order ) )
             : nullptr;
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_add( Buffer& SIXTRL_RESTRICT_REF buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_DATAPTR_DEC typename TMultiPole< T >::value_type
-            const* SIXTRL_RESTRICT bal,
-        typename TMultiPole< T >::value_type const& length,
-        typename TMultiPole< T >::value_type const& hxl,
-        typename TMultiPole< T >::value_type const& hyl )
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_add( Buffer& SIXTRL_RESTRICT_REF buffer,
+        typename TMultipole< T >::order_type const order,
+        typename TMultipole< T >::value_type const& length,
+        typename TMultipole< T >::value_type const& hxl,
+        typename TMultipole< T >::value_type const& hyl,
+        SIXTRL_DATAPTR_DEC typename TMultipole< T >::value_type
+            const* SIXTRL_RESTRICT bal )
     {
-        return TMultiPole< T >::AddToBuffer(
-            *buffer.getCApiPtr(), order, bal, length, hxl, hyl );
+        return TMultipole< T >::AddToBuffer(
+            *buffer.getCApiPtr(), order, length, hxl, hyl,
+            reinterpret_cast< uintptr_t >( bal ) );
     }
 
     template< typename T >
-    SIXTRL_ARGPTR_DEC TMultiPole< T >*
-    TMultiPole_add( ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
-        typename TMultiPole< T >::order_type const order,
-        SIXTRL_DATAPTR_DEC typename TMultiPole< T >::value_type
-            const* SIXTRL_RESTRICT bal,
-        typename TMultiPole< T >::value_type const& length,
-        typename TMultiPole< T >::value_type const& hxl,
-        typename TMultiPole< T >::value_type const& hyl )
+    SIXTRL_ARGPTR_DEC TMultipole< T >*
+    TMultipole_add( ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
+        typename TMultipole< T >::order_type const order,
+        typename TMultipole< T >::value_type const& length,
+        typename TMultipole< T >::value_type const& hxl,
+        typename TMultipole< T >::value_type const& hyl,
+        SIXTRL_DATAPTR_DEC typename TMultipole< T >::value_type
+            const* SIXTRL_RESTRICT bal )
     {
         return ( ptr_buffer != nullptr )
-            ? ( TMultiPole< T >::AddToBuffer(
-                    *ptr_buffer, order, bal, length, hxl, hyl ) )
+            ? ( TMultipole< T >::AddToBuffer(
+                    *ptr_buffer, order, length, hxl, hyl,
+                    reinterpret_cast< uintptr_t >( bal ) ) )
             : ( nullptr );
     }
 
     /* ===================================================================== *
-     * ====  TMultiPole< SIXTRL_REAL_T >:
+     * ====  TMultipole< SIXTRL_REAL_T >:
      * ===================================================================== */
 
 
-    SIXTRL_INLINE bool TMultiPole< SIXTRL_REAL_T >::CanAddToBuffer(
-        TMultiPole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TMultiPole< SIXTRL_REAL_T >::order_type const order,
-        SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >::size_type*
+    SIXTRL_INLINE bool TMultipole< SIXTRL_REAL_T >::CanAddToBuffer(
+        TMultipole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TMultipole< SIXTRL_REAL_T >::order_type const order,
+        SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >::size_type*
             SIXTRL_RESTRICT ptr_requ_objects,
-        SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >::size_type*
+        SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >::size_type*
             SIXTRL_RESTRICT ptr_requ_slots,
-        SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >::size_type*
+        SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >::size_type*
             SIXTRL_RESTRICT ptr_requ_dataptrs ) SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_can_be_added)( &buffer, order,
+        return ::NS(Multipole_can_be_added)( &buffer, order,
                     ptr_requ_objects, ptr_requ_slots, ptr_requ_dataptrs );
     }
 
-    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >*
-    TMultiPole< SIXTRL_REAL_T >::CreateNewOnBuffer(
-        TMultiPole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TMultiPole< SIXTRL_REAL_T >::order_type const order )
+    SIXTRL_INLINE SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >*
+    TMultipole< SIXTRL_REAL_T >::CreateNewOnBuffer(
+        TMultipole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TMultipole< SIXTRL_REAL_T >::order_type const order )
     {
-        return static_cast< SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >* >(
-            ::NS(MultiPole_new)( &buffer, order ) );
+        return static_cast< SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >* >(
+            ::NS(Multipole_new)( &buffer, order ) );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >*
-    TMultiPole< SIXTRL_REAL_T >::AddToBuffer(
-        TMultiPole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
-        TMultiPole< SIXTRL_REAL_T >::order_type const order,
-        SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::value_type
-            const* SIXTRL_RESTRICT bal,
-        TMultiPole< SIXTRL_REAL_T >::value_type const length,
-        TMultiPole< SIXTRL_REAL_T >::value_type const hxl,
-        TMultiPole< SIXTRL_REAL_T >::value_type const hyl )
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >*
+    TMultipole< SIXTRL_REAL_T >::AddToBuffer(
+        TMultipole< SIXTRL_REAL_T >::buffer_t& SIXTRL_RESTRICT_REF buffer,
+        TMultipole< SIXTRL_REAL_T >::order_type const order,
+        TMultipole< SIXTRL_REAL_T >::value_type const length,
+        TMultipole< SIXTRL_REAL_T >::value_type const hxl,
+        TMultipole< SIXTRL_REAL_T >::value_type const hyl,
+        SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::value_type
+            const* SIXTRL_RESTRICT bal )
     {
-        return static_cast< SIXTRL_ARGPTR_DEC TMultiPole< SIXTRL_REAL_T >* >(
-            ::NS(MultiPole_add)( &buffer, order, bal, length, hxl, hyl ) );
+        return static_cast< SIXTRL_ARGPTR_DEC TMultipole< SIXTRL_REAL_T >* >(
+            ::NS(Multipole_add)( &buffer, order, length, hxl, hyl,
+                 reinterpret_cast< uintptr_t >( bal ) ) );
     }
 
     /* ----------------------------------------------------------------- */
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::preset() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::preset() SIXTRL_NOEXCEPT
     {
-        ::NS(MultiPole_preset)( this->getCApiPtr() );
+        ::NS(Multipole_preset)( this->getCApiPtr() );
         return;
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getLength() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getLength() const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_length)( this->getCApiPtr() );
+        return ::NS(Multipole_length)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getHxl() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getHxl() const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_hxl)( this->getCApiPtr() );
+        return ::NS(Multipole_hxl)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getHyl() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getHyl() const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_hyl)( this->getCApiPtr() );
+        return ::NS(Multipole_hyl)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::order_type
-    TMultiPole< SIXTRL_REAL_T >::getOrder() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::order_type
+    TMultipole< SIXTRL_REAL_T >::getOrder() const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_order)( this->getCApiPtr() );
+        return ::NS(Multipole_order)( this->getCApiPtr() );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::size_type
-    TMultiPole< SIXTRL_REAL_T >::getBalSize() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::size_type
+    TMultipole< SIXTRL_REAL_T >::getBalSize() const SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using  size_t = typename _this_t::size_type;
         using order_t = typename _this_t::order_type;
 
@@ -1019,17 +1023,17 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ----------------------------------------------------------------- */
 
-    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::c_api_t const*
-    TMultiPole< SIXTRL_REAL_T >::getCApiPtr() const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::c_api_t const*
+    TMultipole< SIXTRL_REAL_T >::getCApiPtr() const SIXTRL_NOEXCEPT
     {
-        using c_api_t = TMultiPole< SIXTRL_REAL_T >::c_api_t;
+        using c_api_t = TMultipole< SIXTRL_REAL_T >::c_api_t;
         return reinterpret_cast< SIXTRL_DATAPTR_DEC c_api_t const* >( this );
     }
 
-    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::c_api_t*
-    TMultiPole< SIXTRL_REAL_T >::getCApiPtr() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::c_api_t*
+    TMultipole< SIXTRL_REAL_T >::getCApiPtr() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using   ptr_t = SIXTRL_DATAPTR_DEC _this_t::c_api_t*;
 
         return const_cast< ptr_t >( static_cast< _this_t const& >(
@@ -1038,33 +1042,33 @@ namespace SIXTRL_CXX_NAMESPACE
 
     /* ----------------------------------------------------------------- */
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getKnlValue(
-        TMultiPole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getKnlValue(
+        TMultipole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_knl_value)( this->getCApiPtr(), index );
+        return ::NS(Multipole_knl)( this->getCApiPtr(), index );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getKslValue(
-        TMultiPole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getKslValue(
+        TMultipole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_ksl_value)( this->getCApiPtr(), index );
+        return ::NS(Multipole_ksl)( this->getCApiPtr(), index );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::getBalValue(
-        TMultiPole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::getBalValue(
+        TMultipole< SIXTRL_REAL_T >::size_type const index ) const SIXTRL_NOEXCEPT
     {
-        return ::NS(MultiPole_get_bal_value)( this->getCApiPtr(), index );
+        return ::NS(Multipole_bal)( this->getCApiPtr(), index );
     }
 
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setKnl(
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setKnl(
         Iter knl_begin ) SIXTRL_NOEXCEPT
     {
-        using size_t         = TMultiPole< SIXTRL_REAL_T >::size_type;
-        using order_t        = TMultiPole< SIXTRL_REAL_T >::order_type;
+        using size_t         = TMultipole< SIXTRL_REAL_T >::size_type;
+        using order_t        = TMultipole< SIXTRL_REAL_T >::order_type;
 
         order_t const order = this->getOrder();
         size_t  const    nn = ( order >= order_t{ 0 } )
@@ -1090,11 +1094,11 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setKsl(
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setKsl(
         Iter ksl_begin ) SIXTRL_NOEXCEPT
     {
-        using size_t         = TMultiPole< SIXTRL_REAL_T >::size_type;
-        using order_t        = TMultiPole< SIXTRL_REAL_T >::order_type;
+        using size_t         = TMultipole< SIXTRL_REAL_T >::size_type;
+        using order_t        = TMultipole< SIXTRL_REAL_T >::order_type;
 
         order_t const order = this->getOrder();
         size_t  const    nn = ( order >= order_t{ 0 } )
@@ -1120,10 +1124,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename Iter >
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setBal(
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setBal(
         Iter bal_begin ) SIXTRL_NOEXCEPT
     {
-        using size_t = TMultiPole< SIXTRL_REAL_T >::size_type;
+        using size_t = TMultipole< SIXTRL_REAL_T >::size_type;
 
         size_t const bal_length = this->getBalSize();
         size_t ii = size_t{ 0 };
@@ -1144,11 +1148,11 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setKnlValue(
-        TMultiPole< SIXTRL_REAL_T >::value_type const knl_value,
-        TMultiPole< SIXTRL_REAL_T >::size_type  const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setKnlValue(
+        TMultipole< SIXTRL_REAL_T >::value_type const knl_value,
+        TMultipole< SIXTRL_REAL_T >::size_type  const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using size_t  = _this_t::size_type;
 
         this->setBalValue( knl_value / _this_t::Factorial( index ),
@@ -1157,11 +1161,11 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setKslValue(
-        TMultiPole< SIXTRL_REAL_T >::value_type const ksl_value,
-        TMultiPole< SIXTRL_REAL_T >::size_type  const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setKslValue(
+        TMultipole< SIXTRL_REAL_T >::value_type const ksl_value,
+        TMultipole< SIXTRL_REAL_T >::size_type  const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using size_t  = _this_t::size_type;
 
         this->setBalValue( ksl_value / _this_t::Factorial( index ),
@@ -1170,11 +1174,11 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setBalValue(
-        TMultiPole< SIXTRL_REAL_T >::value_type const bal_value,
-        TMultiPole< SIXTRL_REAL_T >::size_type const index ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setBalValue(
+        TMultipole< SIXTRL_REAL_T >::value_type const bal_value,
+        TMultipole< SIXTRL_REAL_T >::size_type const index ) SIXTRL_NOEXCEPT
     {
-        using _this_t        = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t        = TMultipole< SIXTRL_REAL_T >;
         using value_t        = _this_t::value_type;
         using ptr_to_value_t = SIXTRL_DATAPTR_DEC value_t*;
 
@@ -1191,23 +1195,23 @@ namespace SIXTRL_CXX_NAMESPACE
     /* ----------------------------------------------------------------- */
 
     SIXTRL_INLINE
-    SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::value_type const*
-    TMultiPole< SIXTRL_REAL_T >::begin() const SIXTRL_NOEXCEPT
+    SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::value_type const*
+    TMultipole< SIXTRL_REAL_T >::begin() const SIXTRL_NOEXCEPT
     {
         return this->getBalBegin<>();
     }
 
     SIXTRL_INLINE
-    SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::value_type const*
-    TMultiPole< SIXTRL_REAL_T >::end() const SIXTRL_NOEXCEPT
+    SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::value_type const*
+    TMultipole< SIXTRL_REAL_T >::end() const SIXTRL_NOEXCEPT
     {
         return this->getBalEnd<>();
     }
 
-    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::value_type*
-    TMultiPole< SIXTRL_REAL_T >::begin() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::value_type*
+    TMultipole< SIXTRL_REAL_T >::begin() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using   ptr_t = SIXTRL_DATAPTR_DEC _this_t::value_type*;
 
         return const_cast< ptr_t >( static_cast< _this_t const& >(
@@ -1215,10 +1219,10 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     SIXTRL_INLINE
-    SIXTRL_DATAPTR_DEC TMultiPole< SIXTRL_REAL_T >::value_type*
-    TMultiPole< SIXTRL_REAL_T >::end() SIXTRL_NOEXCEPT
+    SIXTRL_DATAPTR_DEC TMultipole< SIXTRL_REAL_T >::value_type*
+    TMultipole< SIXTRL_REAL_T >::end() SIXTRL_NOEXCEPT
     {
-        using _this_t = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t = TMultipole< SIXTRL_REAL_T >;
         using   ptr_t = _this_t::value_type*;
 
         return const_cast< ptr_t >( static_cast< _this_t const& >(
@@ -1226,20 +1230,21 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename CPtr > SIXTRL_INLINE CPtr
-    TMultiPole< SIXTRL_REAL_T >::getBalBegin() const SIXTRL_NOEXCEPT
+    TMultipole< SIXTRL_REAL_T >::getBalBegin() const SIXTRL_NOEXCEPT
     {
         static_assert( sizeof( typename std::iterator_traits<
             CPtr >::value_type ) == sizeof( value_type ), "" );
 
         SIXTRL_ASSERT(
-            ( ( this->getBalSize() == 0u ) && ( this->bal == nullptr ) ) ||
-            ( ( this->getBalSize() >  0u ) && ( this->bal != nullptr ) ) );
+            ( ( this->getBalSize() == 0u ) && ( this->bal_addr == 0u ) ) ||
+            ( ( this->getBalSize() >  0u ) && ( this->bal_addr != 0u ) ) );
 
-        return reinterpret_cast< CPtr >( this->bal );
+        return reinterpret_cast< CPtr >(
+            static_cast< uintptr_t >( this->bal_addr ) );
     }
 
     template< typename CPtr > SIXTRL_INLINE CPtr
-    TMultiPole< SIXTRL_REAL_T >::getBalEnd() const SIXTRL_NOEXCEPT
+    TMultipole< SIXTRL_REAL_T >::getBalEnd() const SIXTRL_NOEXCEPT
     {
         CPtr end_ptr = this->getBalBegin< CPtr >();
 
@@ -1252,100 +1257,91 @@ namespace SIXTRL_CXX_NAMESPACE
     }
 
     template< typename Ptr >
-    SIXTRL_INLINE Ptr TMultiPole< SIXTRL_REAL_T >::getBalBegin() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Ptr TMultipole< SIXTRL_REAL_T >::getBalBegin() SIXTRL_NOEXCEPT
     {
         using out_const_ptr_t = typename std::add_const< Ptr >::type;
-        using _this_t         = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t         = TMultipole< SIXTRL_REAL_T >;
 
         return const_cast< Ptr >( static_cast<
             _this_t const& >( *this ).getBalBegin< out_const_ptr_t >() );
     }
 
     template< typename Ptr >
-    SIXTRL_INLINE Ptr TMultiPole< SIXTRL_REAL_T >::getBalEnd() SIXTRL_NOEXCEPT
+    SIXTRL_INLINE Ptr TMultipole< SIXTRL_REAL_T >::getBalEnd() SIXTRL_NOEXCEPT
     {
         using out_const_ptr_t = typename std::add_const< Ptr >::type;
-        using _this_t         = TMultiPole< SIXTRL_REAL_T >;
+        using _this_t         = TMultipole< SIXTRL_REAL_T >;
 
         return const_cast< Ptr >( static_cast<
             _this_t const& >( *this ).getBalEnd< out_const_ptr_t >() );
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setOrder(
-        TMultiPole< SIXTRL_REAL_T >::order_type const order ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setOrder(
+        TMultipole< SIXTRL_REAL_T >::order_type const order ) SIXTRL_NOEXCEPT
     {
         this->order = order;
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setLength(
-        TMultiPole< SIXTRL_REAL_T >::value_type const length ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setLength(
+        TMultipole< SIXTRL_REAL_T >::value_type const length ) SIXTRL_NOEXCEPT
     {
         this->length = length;
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setHxl(
-        TMultiPole< SIXTRL_REAL_T >::value_type const hxl ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setHxl(
+        TMultipole< SIXTRL_REAL_T >::value_type const hxl ) SIXTRL_NOEXCEPT
     {
         this->hxl = hxl;
         return;
     }
 
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::setHyl(
-        TMultiPole< SIXTRL_REAL_T >::value_type const hyl ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::setHyl(
+        TMultipole< SIXTRL_REAL_T >::value_type const hyl ) SIXTRL_NOEXCEPT
     {
         this->hyl = hyl;
         return;
     }
 
     template< typename Ptr >
-    SIXTRL_INLINE void TMultiPole< SIXTRL_REAL_T >::assignBal(
+    SIXTRL_INLINE void TMultipole< SIXTRL_REAL_T >::assignBal(
         Ptr ptr_to_bal ) SIXTRL_NOEXCEPT
     {
-        using value_t   = TMultiPole< SIXTRL_REAL_T >::value_type;
-        using pointer_t = SIXTRL_DATAPTR_DEC value_t*;
-
-        this->bal = reinterpret_cast< pointer_t >( ptr_to_bal );
-        return;
+        this->bal_addr = reinterpret_cast< uintptr_t >( ptr_to_bal );
     }
 
-    SIXTRL_INLINE TMultiPole< SIXTRL_REAL_T >::value_type
-    TMultiPole< SIXTRL_REAL_T >::Factorial(
-        TMultiPole< SIXTRL_REAL_T >::size_type n ) SIXTRL_NOEXCEPT
+    SIXTRL_INLINE TMultipole< SIXTRL_REAL_T >::value_type
+    TMultipole< SIXTRL_REAL_T >::Factorial(
+        TMultipole< SIXTRL_REAL_T >::size_type n ) SIXTRL_NOEXCEPT
     {
-        using size_t  = TMultiPole< SIXTRL_REAL_T >::size_type;
-        using value_t = TMultiPole< SIXTRL_REAL_T >::value_type;
-
-        return ( n > size_t{ 1 } )
-                ? ( static_cast< value_t >( n ) *
-                    TMultiPole< SIXTRL_REAL_T >::Factorial( n - size_t{ 1 } ) )
-                : ( value_t{ 1.0 } );
+        return SIXTRL_CXX_NAMESPACE::Math_factorial<
+            size_type, SIXTRL_REAL_T >( n );
     }
 
     /* --------------------------------------------------------------------- */
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_new(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_new(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         ::NS(multipole_order_t) const order )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC MultiPole*;
+        using ptr_t = SIXTRL_ARGPTR_DEC Multipole*;
 
         return static_cast< ptr_t >(
-                ::NS(MultiPole_new)( buffer.getCApiPtr(), order ) );
+                ::NS(Multipole_new)( buffer.getCApiPtr(), order ) );
     }
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_new(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_new(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         ::NS(multipole_order_t) const order )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC MultiPole*;
+        using ptr_t = SIXTRL_ARGPTR_DEC Multipole*;
 
         return static_cast< ptr_t >(
-            ::NS(MultiPole_new)( ptr_buffer, order ) );
+            ::NS(Multipole_new)( ptr_buffer, order ) );
     }
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_add(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_add(
         Buffer& SIXTRL_RESTRICT_REF buffer,
         ::NS(multipole_order_t) const order,
         SIXTRL_DATAPTR_DEC ::NS(multipole_real_t) const* SIXTRL_RESTRICT bal,
@@ -1353,29 +1349,27 @@ namespace SIXTRL_CXX_NAMESPACE
         ::NS(multipole_real_t) const hxl,
         ::NS(multipole_real_t) const hyl )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC MultiPole*;
+        using ptr_t = SIXTRL_ARGPTR_DEC Multipole*;
 
-        return static_cast< ptr_t >( ::NS(MultiPole_add)(
-            buffer.getCApiPtr(), order, bal, length, hxl, hyl ) );
+        return static_cast< ptr_t >( ::NS(Multipole_add)( buffer.getCApiPtr(),
+            order, length, hxl, hyl, reinterpret_cast< uintptr_t >( bal ) ) );
     }
 
-    SIXTRL_ARGPTR_DEC MultiPole* MultiPole_add(
+    SIXTRL_ARGPTR_DEC Multipole* Multipole_add(
         SIXTRL_ARGPTR_DEC ::NS(Buffer)* SIXTRL_RESTRICT ptr_buffer,
         ::NS(multipole_order_t) const order,
-        SIXTRL_DATAPTR_DEC ::NS(multipole_real_t) const* SIXTRL_RESTRICT bal,
         ::NS(multipole_real_t) const length,
         ::NS(multipole_real_t) const hxl,
-        ::NS(multipole_real_t) const hyl )
+        ::NS(multipole_real_t) const hyl,
+        SIXTRL_DATAPTR_DEC ::NS(multipole_real_t) const* SIXTRL_RESTRICT bal )
     {
-        using ptr_t = SIXTRL_ARGPTR_DEC MultiPole*;
+        using ptr_t = SIXTRL_ARGPTR_DEC Multipole*;
 
-        return static_cast< ptr_t >( ::NS(MultiPole_add)(
-            ptr_buffer, order, bal, length, hxl, hyl ) );
+        return static_cast< ptr_t >( ::NS(Multipole_add)(
+            ptr_buffer, order, length, hxl, hyl, reinterpret_cast< uintptr_t >(
+                bal ) ) );
     }
 }
 
 #endif /* define( __cplusplus ) */
-
 #endif /* CXX_SIXTRACKLIB_COMMON_BE_MULTIPOLE_BEAM_ELEM_BE_MULTIPOLE_HPP__ */
-
-/* end: sixtracklib/common/be_multipole/be_multipole.hpp */

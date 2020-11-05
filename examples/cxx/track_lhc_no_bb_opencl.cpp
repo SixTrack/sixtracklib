@@ -142,6 +142,7 @@ int main( int argc, char* argv[] )
     ctx.assign_particles_arg( particles_arg );
     ctx.assign_particle_set_arg( 0u, NUM_PARTICLES );
     ctx.assign_beam_elements_arg( beam_elements_arg );
+    ctx.assign_slot_size_arg( pb.getSlotSize() );
 
     ctx.track_until( NUM_TURNS );
 

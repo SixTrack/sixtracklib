@@ -19,19 +19,22 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_track_until_turn_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track );
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_track_elem_by_elem_until_turn_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track );
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_track_line_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const total_num_particles_to_track );
+    NS(buffer_size_t) const total_num_particles_to_track,
+    NS(buffer_size_t) const threads_per_block );
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -39,20 +42,26 @@ SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const num_particle_sets );
+    NS(buffer_size_t) const num_particle_sets,
+    NS(buffer_size_t) const threads_per_block );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
-    NS(buffer_size_t) const num_beam_monitors );
+    NS(buffer_size_t) const num_beam_monitors,
+    NS(buffer_size_t) const threads_per_block );
 
 SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
 NS(CudaKernelConfig_configure_assign_output_to_elem_by_elem_config_kernel)(
     NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
+    const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info,
+    NS(buffer_size_t) const threads_per_block );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN NS(arch_status_t)
+NS(CudaKernelConfig_configure_assign_address_kernel)(
+    NS(CudaKernelConfig)* SIXTRL_RESTRICT kernel_config,
     const NS(CudaNodeInfo) *const SIXTRL_RESTRICT node_info );
-
-
 
 #endif /* !defined( _GPUCODE ) */
 

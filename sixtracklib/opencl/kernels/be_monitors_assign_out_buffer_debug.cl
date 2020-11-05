@@ -34,20 +34,14 @@ __kernel void NS(BeamMonitor_assign_out_buffer_from_offset_debug_opencl)(
 }
 
 __kernel void NS(BeamMonitor_clear_all_line_obj_debug_opencl)(
-    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT beam_elements_buf,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT buffer_begin,
     SIXTRL_UINT64_T const slot_size,
     SIXTRL_DATAPTR_DEC NS(arch_debugging_t)* SIXTRL_RESTRICT ptr_status_flag )
 {
     if( ( size_t )get_global_id( 0 ) == ( size_t )0u )
     {
         NS(arch_debugging_t) flags = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
-        NS(BeamMonitor_clear_all_on_managed_buffer_debug)(
-            beam_elements_buf, slot_size, &flags );
-
-        if( ptr_status_flag != SIXTRL_NULLPTR )
-        {
-            *ptr_status_flag = flags;
-        }
+        NS(BeamMonitor_reset_all_in_managed_buffer)( buffer_begin, slot_size );
     }
 }
 

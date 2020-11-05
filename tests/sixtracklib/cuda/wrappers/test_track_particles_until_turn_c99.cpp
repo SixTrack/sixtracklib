@@ -134,7 +134,8 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
             status_t status =
             ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
                 ptr_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -247,7 +248,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
     buf_size_t const num_beam_monitors = buf_size_t{ 2 };
 
-    SIXTRL_ASSERT( ::NS(BeamMonitor_get_num_of_beam_monitor_objects)( eb ) ==
+    SIXTRL_ASSERT( ::NS(BeamMonitor_num_monitors_in_buffer)( eb ) ==
                    num_beam_monitors );
 
     /* -------------------------------------------------------------------- */
@@ -347,7 +348,8 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             status =
             ::NS(CudaKernelConfig_configure_assign_output_to_beam_monitors_kernel)(
-                ptr_assign_kernel_config, ptr_node_info, num_beam_monitors );
+                ptr_assign_kernel_config, ptr_node_info, num_beam_monitors,
+                    size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -366,7 +368,8 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             status = ::NS(CudaKernelConfig_configure_track_until_turn_kernel)(
                 ptr_kernel_config, ptr_node_info,
-                    ::NS(Particles_get_num_of_particles)( particles ) );
+                    ::NS(Particles_get_num_of_particles)( particles ),
+                        size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -389,7 +392,7 @@ TEST( C99_CudaWrappersTrackParticlesUntilTurnTests,
 
             /* reset the output addresses of the eb beam monitors to prepare a
              * clean slate for the gpu tracking */
-            NS(BeamMonitor_clear_all)( eb );
+            ::NS(BeamMonitor_reset_all_in_buffer)( eb );
 
             status = ::NS(TestTrackCtrlArg_prepare_tracking)(
                 particles_arg, track_pb, beam_elements_arg, eb, result_arg );

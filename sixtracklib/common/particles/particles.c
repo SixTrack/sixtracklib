@@ -47,7 +47,7 @@ NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
 {
-    return NS(BufferIndex_get_total_num_of_particles_in_range_ext)(
+    return NS(BufferIndex_get_total_num_of_particles_in_range)(
         begin, end );
 }
 
@@ -56,7 +56,7 @@ NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT begin,
     SIXTRL_BUFFER_OBJ_ARGPTR_DEC NS(Object) const* SIXTRL_RESTRICT end )
 {
-    return NS(BufferIndex_get_total_num_of_particle_blocks_in_range_ext)(
+    return NS(BufferIndex_get_total_num_of_particle_blocks_in_range)(
         begin, end );
 }
 
@@ -147,14 +147,14 @@ void NS(Particles_buffers_calculate_difference_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC const NS(Buffer) *const SIXTRL_RESTRICT rhs,
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT diff )
 {
-    NS(Particles_buffers_calculate_difference_ext)( lhs, rhs, diff );
+    NS(Particles_buffers_calculate_difference)( lhs, rhs, diff );
     return;
 }
 
 void NS(Particles_buffer_clear_particles_ext)(
     SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer )
 {
-    NS(Particles_buffer_clear_particles_ext)( buffer );
+    NS(Particles_buffer_clear_particles)( buffer );
 }
 
 /* ------------------------------------------------------------------------- */

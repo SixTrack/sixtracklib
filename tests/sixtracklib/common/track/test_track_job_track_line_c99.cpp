@@ -26,7 +26,7 @@
 #include "sixtracklib/common/be_monitor/be_monitor.h"
 #include "sixtracklib/common/track/track.h"
 
-TEST( C99CpuCpuTrackJobTrackLineTests, CmpWithTrackUntilTest )
+TEST( C99CpuCpuTrackJobTrackLine, CmpWithTrackUntilTest )
 {
     namespace st = SIXTRL_CXX_NAMESPACE;
 
@@ -234,21 +234,21 @@ TEST( C99CpuCpuTrackJobTrackLineTests, CmpWithTrackUntilTest )
 }
 
 
-TEST( C99CpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
+TEST( C99CpuCpuTrackJobTrackLine, LostParticleBehaviour )
 {
     using npart_t = ::NS(particle_num_elements_t);
 
     ::NS(Buffer)* elements = ::NS(Buffer_new)( ::NS(buffer_size_t){ 0 } );
 
     ::NS(DriftExact)* drift0 = ::NS(DriftExact_new)( elements );
-    ::NS(MultiPole)*  quad   = ::NS(MultiPole_new)( elements, 2 );
+    ::NS(Multipole)*  quad   = ::NS(Multipole_new)( elements, 2 );
     ::NS(LimitRect)*  limit  = ::NS(LimitRect_new)( elements );
     ::NS(DriftExact)* drift1 = ::NS(DriftExact_new)( elements );
 
-    drift0 = ::NS(BeamElements_buffer_get_drift_exact)( elements, 0 );
-    quad   = ::NS(BeamElements_buffer_get_multipole)( elements, 1 );
-    limit  = ::NS(BeamElements_buffer_get_limit_rect)( elements, 2 );
-    drift1 = ::NS(BeamElements_buffer_get_drift_exact)( elements, 3 );
+    drift0 = ::NS(DriftExact_from_buffer)( elements, 0 );
+    quad   = ::NS(Multipole_from_buffer)(  elements, 1 );
+    limit  = ::NS(LimitRect_from_buffer)(  elements, 2 );
+    drift1 = ::NS(DriftExact_from_buffer)( elements, 3 );
 
     SIXTRL_ASSERT( drift0 != nullptr );
     SIXTRL_ASSERT( quad   != nullptr );
@@ -257,9 +257,9 @@ TEST( C99CpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
 
     ::NS(DriftExact_set_length)( drift0, double{ 5 } );
 
-    ::NS(MultiPole_set_knl_value)( quad, 0, double{ 0 } );
-    ::NS(MultiPole_set_knl_value)( quad, 1, double{ 1e-2 } );
-    ::NS(MultiPole_set_length)( quad, double{ 1 } );
+    ::NS(Multipole_set_knl_value)( quad, 0, double{ 0 } );
+    ::NS(Multipole_set_knl_value)( quad, 1, double{ 1e-2 } );
+    ::NS(Multipole_set_length)( quad, double{ 1 } );
 
     ::NS(LimitRect_set_min_x)( limit, double{ -0.1 } );
     ::NS(LimitRect_set_max_x)( limit, double{  0.1 } );

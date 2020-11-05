@@ -137,18 +137,20 @@ namespace SIXTRL_CXX_NAMESPACE
 
         protected:
 
-        virtual track_status_t doTrackUntilTurn(
+        SIXTRL_HOST_FN status_t doFetchParticleAddresses() override;
+
+        SIXTRL_HOST_FN track_status_t doTrackUntilTurn(
             size_type const until_turn ) override;
 
-        virtual track_status_t doTrackElemByElem(
+        SIXTRL_HOST_FN track_status_t doTrackElemByElem(
             size_type const until_turn_elem_by_elem ) override;
 
-        virtual track_status_t doTrackLine(
+        SIXTRL_HOST_FN track_status_t doTrackLine(
             size_type const beam_elements_begin_index,
             size_type const beam_elements_end_index,
             bool const finish_turn ) override;
 
-        virtual void doCollect( collect_flag_t const flags ) override;
+        SIXTRL_HOST_FN void doCollect( collect_flag_t const flags ) override;
     };
 
     SIXTRL_HOST_FN void collect( TrackJobCpu& job ) SIXTRL_NOEXCEPT;

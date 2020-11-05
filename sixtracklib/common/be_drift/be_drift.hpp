@@ -1016,7 +1016,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE TDrift< NS(drift_real_t) >::value_type
     TDrift< NS(drift_real_t) >::getLength() const SIXTRL_NOEXCEPT
     {
-        return ::NS(Drift_get_length)( this->getCApiPtr() );
+        return ::NS(Drift_length)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE void TDrift< NS(drift_real_t) >::setLength(
@@ -1239,7 +1239,7 @@ namespace SIXTRL_CXX_NAMESPACE
     SIXTRL_INLINE TDriftExact< NS(drift_real_t) >::value_type
     TDriftExact< NS(drift_real_t) >::getLength() const SIXTRL_NOEXCEPT
     {
-        return ::NS(DriftExact_get_length)( this->getCApiPtr() );
+        return ::NS(DriftExact_length)( this->getCApiPtr() );
     }
 
     SIXTRL_INLINE void TDriftExact< NS(drift_real_t) >::setLength(

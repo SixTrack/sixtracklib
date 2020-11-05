@@ -20,22 +20,26 @@
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(buffer_size_t) const slot_size )
 {
     if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( size_t )0u )
     {
+        SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
+            elem_by_elem_config = NS(ElemByElemConfig_from_managed_buffer)(
+                config_buffer, elem_by_elem_config_index, slot_size );
+
         NS(ElemByElemConfig_assign_managed_output_buffer)( elem_by_elem_config,
             output_buffer, out_buffer_offset_index, slot_size );
     }
 }
 
 __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)(
-    SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
-        SIXTRL_RESTRICT elem_by_elem_config,
+    SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT config_buffer,
+    NS(buffer_size_t) const elem_by_elem_config_index,
     SIXTRL_BUFFER_DATAPTR_DEC unsigned char* SIXTRL_RESTRICT output_buffer,
     NS(buffer_size_t) const out_buffer_offset_index,
     NS(buffer_size_t) const slot_size,
@@ -44,6 +48,10 @@ __global__ void NS(ElemByElemConfig_assign_out_buffer_from_offset_cuda_debug)(
     if( NS(Cuda_get_1d_thread_id_in_kernel)() == ( size_t )0u )
     {
         NS(arch_debugging_t) dbg = SIXTRL_ARCH_DEBUGGING_GENERAL_FAILURE;
+
+        SIXTRL_ELEM_BY_ELEM_CONFIG_ARGPTR_DEC NS(ElemByElemConfig)*
+            elem_by_elem_config = NS(ElemByElemConfig_from_managed_buffer)(
+                config_buffer, elem_by_elem_config_index, slot_size );
 
         NS(ElemByElemConfig_assign_managed_output_buffer_debug)(
             elem_by_elem_config, output_buffer, out_buffer_offset_index,

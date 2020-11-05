@@ -116,7 +116,7 @@ NS(BeamMonitor_assign_output_kernel_impl)(
                 ( be_mon_addr != ( uintptr_t )0u ) )
             {
                 ptr_be_monitor_t be_mon = ( ptr_be_monitor_t )be_mon_addr;
-                nturn_t const nn = NS(BeamMonitor_get_num_stores)( be_mon );
+                nturn_t const nn = NS(BeamMonitor_num_stores)( be_mon );
 
                 SIXTRL_ASSERT( be_mon != SIXTRL_NULLPTR );
                 SIXTRL_ASSERT( out_it != out_end );
@@ -132,10 +132,10 @@ NS(BeamMonitor_assign_output_kernel_impl)(
                         NS(Particles_get_num_of_particles)( particles );
 
                     mon_index_t const min_part_id =
-                        NS(BeamMonitor_get_min_particle_id)( be_mon );
+                        NS(BeamMonitor_min_particle_id)( be_mon );
 
                     mon_index_t const max_part_id =
-                        NS(BeamMonitor_get_max_particle_id)( be_mon );
+                        NS(BeamMonitor_max_particle_id)( be_mon );
 
                     buf_size_t const stored_particles_per_turn =
                         ( max_part_id >= min_part_id )
@@ -257,8 +257,7 @@ NS(BeamMonitor_assign_output_debug_kernel_impl)(
                         ptr_be_monitor_t be_mon =
                             ( ptr_be_monitor_t )be_mon_addr;
 
-                        nturn_t const nn =
-                            NS(BeamMonitor_get_num_stores)( be_mon );
+                        nturn_t const nn = NS(BeamMonitor_num_stores)( be_mon );
 
                         if( nn > ( nturn_t )0u )
                         {
@@ -271,10 +270,10 @@ NS(BeamMonitor_assign_output_debug_kernel_impl)(
                                 NS(Particles_get_num_of_particles)( particles );
 
                             mon_index_t const min_part_id =
-                                NS(BeamMonitor_get_min_particle_id)( be_mon );
+                                NS(BeamMonitor_min_particle_id)( be_mon );
 
                             mon_index_t const max_part_id =
-                                NS(BeamMonitor_get_max_particle_id)( be_mon );
+                                NS(BeamMonitor_max_particle_id)( be_mon );
 
                             buf_size_t const stored_particles_per_turn =
                                 ( max_part_id >= min_part_id )

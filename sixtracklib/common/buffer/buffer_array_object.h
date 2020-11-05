@@ -413,6 +413,10 @@ NS(BufferArrayObj_add_copy_ext)(
 /* *********         Implementation of Inline Functions          *********** */
 /* ************************************************************************* */
 
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/internal/objects_type_id.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 SIXTRL_INLINE SIXTRL_BUFFER_DATAPTR_DEC NS(BufferArrayObj)*
 NS(BufferArrayObj_preset)( SIXTRL_BUFFER_DATAPTR_DEC
     NS(BufferArrayObj)* SIXTRL_RESTRICT array )
@@ -1157,14 +1161,14 @@ NS(BufferArrayObj_new)(
     array.offset_addr      = ( NS(buffer_addr_t) )0u;
     array.num_elements     = ( buf_size_t )0u;
     array.capacity         = capacity;
-    array.base_type_id     = NS(OBJECT_TYPE_ARRAY);
+    array.base_type_id     = NS(OBJECT_TYPE_BINARY_ARRAY);
     array.max_num_elements = max_nelements;
     array.slot_size        = NS(BUFFER_DEFAULT_SLOT_SIZE);
     array.base_type_id     = base_type_id;
 
     return ( ptr_array_t )( uintptr_t )NS(Object_get_begin_addr)(
         NS(Buffer_add_object)( buffer, &array, sizeof( array_t ),
-            NS(OBJECT_TYPE_ARRAY), nptrs,
+            NS(OBJECT_TYPE_BINARY_ARRAY), nptrs,
                 &offsets[ 0 ], &sizes[ 0 ], &counts[ 0 ] ) );
 }
 

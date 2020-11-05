@@ -95,13 +95,13 @@ bool NS(CudaTrackJob_has_controller)(
              ( track_job->hasCudaController() ) );
 }
 
-NS(CudaController)* NS(CudaTrackJob_get_ptr_controller)(
+::NS(CudaController)* NS(CudaTrackJob_get_ptr_controller)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrCudaController() : nullptr;
 }
 
-NS(CudaController) const* NS(CudaTrackJob_get_ptr_const_controller)(
+::NS(CudaController) const* NS(CudaTrackJob_get_ptr_const_controller)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr ) ? track_job->ptrCudaController() : nullptr;
@@ -115,14 +115,14 @@ bool NS(CudaTrackJob_has_particles_arg)(
     return ( ( track_job != nullptr ) && ( track_job->hasCudaParticlesArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_particles_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_particles_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaParticlesArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_particles_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_particles_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
@@ -137,14 +137,14 @@ bool NS(CudaTrackJob_has_beam_elements_arg)(
     return ( ( track_job != nullptr ) && ( track_job->hasCudaParticlesArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_beam_elements_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_beam_elements_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaBeamElementsArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_beam_elements_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_beam_elements_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
@@ -160,14 +160,14 @@ bool NS(CudaTrackJob_has_output_arg)(
              ( track_job->hasCudaOutputArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_output_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_output_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaOutputArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_output_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_output_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
@@ -183,14 +183,14 @@ bool NS(CudaTrackJob_has_elem_by_elem_config_arg)(
              ( track_job->hasCudaElemByElemConfigArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_elem_by_elem_config_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_elem_by_elem_config_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaElemByElemConfigArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_elem_by_elem_config_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_elem_by_elem_config_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
@@ -206,14 +206,14 @@ bool NS(CudaTrackJob_has_debug_register_arg)(
              ( track_job->hasCudaDebugRegisterArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_debug_register_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_debug_register_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaDebugRegisterArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_debug_register_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_debug_register_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
@@ -229,18 +229,32 @@ bool NS(CudaTrackJob_has_particles_addr_arg)(
              ( track_job->hasCudaParticlesAddrArg() ) );
 }
 
-NS(CudaArgument)* NS(CudaTrackJob_get_ptr_particles_addr_arg)(
+::NS(CudaArgument)* NS(CudaTrackJob_get_ptr_particles_addr_arg)(
     ::NS(CudaTrackJob)* SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaParticlesAddrArg() : nullptr;
 }
 
-NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_particles_addr_arg)(
+::NS(CudaArgument) const* NS(CudaTrackJob_get_ptr_const_particles_addr_arg)(
     const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
 {
     return ( track_job != nullptr )
         ? track_job->ptrCudaParticlesAddrArg() : nullptr;
+}
+
+::NS(arch_size_t) NS(CudaTrackJob_default_threads_per_block)(
+    const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr )
+        ? track_job->default_threads_per_block() : ::NS(arch_size_t){ 0 };
+}
+
+::NS(arch_size_t) NS(CudaTrackJob_default_track_threads_per_block)(
+    const ::NS(CudaTrackJob) *const SIXTRL_RESTRICT track_job )
+{
+    return ( track_job != nullptr )
+        ? track_job->default_track_threads_per_block() : ::NS(arch_size_t){ 0 };
 }
 
 /* end: sixtracklib/cuda/track/track_job_c99.cpp */

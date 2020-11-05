@@ -1,7 +1,7 @@
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include "sixtracklib/testlib/common/beam_elements/be_dipedge.h"
 #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
-    
+
 #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
     #include <stddef.h>
     #include <stdlib.h>
@@ -29,10 +29,10 @@ void NS(DipoleEdge_print)( SIXTRL_ARGPTR_DEC FILE* SIXTRL_RESTRICT fp,
         fprintf( fp,
                 "|dipole_edge      | r21      = %+16.12f m^-1;\r\n"
                 "                  | r43      = %+16.12f m^-1;\r\n",
-                NS(DipoleEdge_get_r21)( dipedge ),
-                NS(DipoleEdge_get_r43)( dipedge ) );
+                NS(DipoleEdge_r21)( dipedge ),
+                NS(DipoleEdge_r43)( dipedge ) );
     }
-    
+
     return;
 }
 

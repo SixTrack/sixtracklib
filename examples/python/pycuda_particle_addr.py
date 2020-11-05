@@ -6,7 +6,6 @@ from importlib import util
 import ctypes as ct
 import sixtracklib as pyst
 from sixtracklib import stcommon as st
-import pdb
 
 pycuda_spec = util.find_spec('pycuda')
 numpy_spec = util.find_spec('numpy')

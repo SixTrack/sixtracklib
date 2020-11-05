@@ -44,6 +44,7 @@ TEST( CXX_Cpu_CpuTrackJobTrackElemByElemTests,
 
     buffer_t cmp_track_pb;
     buffer_t cmp_output_buffer;
+    buffer_t elem_by_elem_config_buffer;
 
     SIXTRL_ASSERT( in_particles.get< particles_t >(
         buf_size_t{ 0 } ) != nullptr );
@@ -52,6 +53,10 @@ TEST( CXX_Cpu_CpuTrackJobTrackElemByElemTests,
         *in_particles.get< particles_t >( buf_size_t{ 0 } ) );
 
     SIXTRL_ASSERT( cmp_particles != nullptr );
+
+    elem_by_elem_config_t* elem_by_elem_config =
+        ::NS(ElemByElemConfig_new)( elem_by_elem_config_buffer.getCApiPtr() );
+    SIXTRL_ASSERT( elem_by_elem_config != nullptr );
 
     /* --------------------------------------------------------------------- */
     /* Perform comparison tracking over lattice: */
@@ -89,10 +94,9 @@ TEST( CXX_Cpu_CpuTrackJobTrackElemByElemTests,
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
     SIXTRL_ASSERT( max_elem_by_elem_turn_id >= pindex_t{ 0 } );
 
-    elem_by_elem_config_t elem_by_elem_config;
-    ::NS(ElemByElemConfig_preset)( &elem_by_elem_config );
+    ::NS(ElemByElemConfig_preset)( elem_by_elem_config );
 
-    status = ::NS(ElemByElemConfig_init_detailed)( &elem_by_elem_config,
+    status = ::NS(ElemByElemConfig_init_detailed)( elem_by_elem_config,
         ::NS(ELEM_BY_ELEM_ORDER_DEFAULT), min_particle_id, max_particle_id,
         min_at_element_id, max_at_element_id, min_at_turn,
         max_elem_by_elem_turn_id, true );
@@ -100,7 +104,7 @@ TEST( CXX_Cpu_CpuTrackJobTrackElemByElemTests,
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
 
     status = ::NS(ElemByElemConfig_assign_output_buffer)(
-        &elem_by_elem_config, cmp_output_buffer.getCApiPtr(),
+        elem_by_elem_config, cmp_output_buffer.getCApiPtr(),
             elem_by_elem_out_offset_index );
 
     SIXTRL_ASSERT( status == st::ARCH_STATUS_SUCCESS );
@@ -108,7 +112,7 @@ TEST( CXX_Cpu_CpuTrackJobTrackElemByElemTests,
     track_status_t track_status =
     ::NS(TestTrackCpu_track_particles_elem_by_elem_until_turn_cpu)(
         cmp_track_pb.getCApiPtr(), NUM_PSETS, &track_pset_index,
-            beam_elem_buffer.getCApiPtr(), &elem_by_elem_config,
+            beam_elem_buffer.getCApiPtr(), elem_by_elem_config,
                 UNTIL_TURN_ELEM_BY_ELEM );
 
     SIXTRL_ASSERT( track_status == st::TRACK_SUCCESS );

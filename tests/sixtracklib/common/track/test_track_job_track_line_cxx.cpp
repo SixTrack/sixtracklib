@@ -223,12 +223,12 @@ TEST( CXXCpuCpuTrackJobTrackLineTests, LostParticleBehaviour )
     st::Buffer elements;
 
     elements.createNew< st::DriftExact >();
-    elements.createNew< st::MultiPole >( 2 );
+    elements.createNew< st::Multipole >( 2 );
     elements.createNew< st::LimitRect >();
     elements.createNew< st::DriftExact >();
 
     st::DriftExact*  dr0 = elements.get< st::DriftExact >( 0 );
-    st::MultiPole*  quad = elements.get< st::MultiPole >( 1 );
+    st::Multipole*  quad = elements.get< st::Multipole >( 1 );
     st::LimitRect* limit = elements.get< st::LimitRect >( 2 );
     st::DriftExact*  dr1 = elements.get< st::DriftExact >( 3 );
 

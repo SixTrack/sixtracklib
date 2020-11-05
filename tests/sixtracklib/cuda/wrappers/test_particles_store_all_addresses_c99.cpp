@@ -127,7 +127,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestSingleParticleSetPerBuffer )
 
             status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
-                ptr_kernel_config, ptr_node_info, num_psets );
+                ptr_kernel_config, ptr_node_info, num_psets, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -290,7 +290,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests, TestMultiParticleSetsPerBuffer )
 
             status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
-                ptr_kernel_config, ptr_node_info, num_psets );
+                ptr_kernel_config, ptr_node_info, num_psets, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
@@ -454,7 +454,7 @@ TEST( C99_CudaWrappersParticlesStoreAddrTests,
 
             status =
             ::NS(CudaKernelConfig_configure_fetch_particles_addresses_kernel)(
-                ptr_kernel_config, ptr_node_info, num_psets );
+                ptr_kernel_config, ptr_node_info, num_psets, size_t{ 128 } );
 
             ASSERT_TRUE( status == ::NS(ARCH_STATUS_SUCCESS) );
 
