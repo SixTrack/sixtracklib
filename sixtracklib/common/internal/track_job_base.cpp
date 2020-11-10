@@ -50,7 +50,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         namespace st            = SIXTRL_CXX_NAMESPACE;
         using tjob_t            = st::TrackJobBase;
-        using st_size_t         = st_size_t;
+        using st_size_t         = tjob_t::size_type;
         using st_status_t       = tjob_t::status_t;
         using st_track_status_t = tjob_t::track_status_t;
         using paddr_t           = tjob_t::particles_addr_t;
