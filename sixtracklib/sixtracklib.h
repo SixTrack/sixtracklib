@@ -74,7 +74,7 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
     #include "sixtracklib/opencl/argument.h"
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/track_job_cl.h"
