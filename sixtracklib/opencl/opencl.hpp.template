@@ -24,6 +24,10 @@
     #define SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION @SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION@
 #endif /* !defined( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION ) */
 
+#if !defined( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED )
+    #define SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED @SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED@
+#endif /* !defined( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED ) */
+
 #if !defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG )
     #define SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG @SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG@
 #endif /* !defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) */
@@ -39,6 +43,7 @@
     #if defined( __GNUC__ ) && __GNUC__ >= 6
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wignored-attributes"
+        #pragma GCC diagnostic ignored "-Wpedantic"
     #endif
 
     #include <@SIXTRL_OPENCL_CXX_HEADER_FILE@>
