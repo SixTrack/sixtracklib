@@ -87,7 +87,7 @@ endif()
 
 if( TARGET sixtrack_opencl )
     target_include_directories( sixtrack
-        PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
+        PUBLIC $<BUILD_INTERFACE:${SIXTRL_OPENCL_INCLUDE_DIRS}> )
 endif()
 
 set_target_properties( sixtrack PROPERTIES
