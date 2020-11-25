@@ -284,7 +284,8 @@ if( GTEST_FOUND )
         set_property( TARGET ${C99_UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD 11 )
         set_property( TARGET ${C99_UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON )
         set_property( TARGET ${C99_UNIT_TEST_TARGETS} PROPERTY COMPILE_OPTIONS
-                      ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+                      ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_C99_FLAGS}
+                      ${SIXTRACKL_C99_AUTOVEC_FLAGS} )
     endif()
 
     if( CXX_UNIT_TEST_TARGETS )
@@ -303,6 +304,7 @@ if( GTEST_FOUND )
         set_property( TARGET ${CXX_UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD 11 )
         set_property( TARGET ${CXX_UNIT_TEST_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON )
         set_property( TARGET ${CXX_UNIT_TEST_TARGETS} PROPERTY COMPILE_OPTIONS
-                      ${SIXTRACKLIB_CPU_FLAGS} -Wall -Werror -pedantic )
+                      ${SIXTRACKLIB_CPU_FLAGS} ${SIXTRACKLIB_CXX_FLAGS}
+                      ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
     endif()
 endif()
