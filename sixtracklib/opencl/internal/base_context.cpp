@@ -25,8 +25,11 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/context/compute_arch.h"
 
-#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/opencl.h"
 #include "sixtracklib/opencl/argument.h"
+
+#if defined( __cplusplus )
+#include "sixtracklib/opencl/opencl.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -3188,6 +3191,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return success;
     }
 }
+#endif /* C++ */
 
 /* ------------------------------------------------------------------------- */
 /* -----             Implementation of C Wrapper functions              ---- */

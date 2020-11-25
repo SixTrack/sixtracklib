@@ -44,10 +44,14 @@ struct NS(Buffer);
 #endif /* defined( __cplusplus ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/opencl.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     class ClContextBase;

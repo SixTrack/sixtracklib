@@ -16,7 +16,7 @@
     #include "sixtracklib/common/generated/path.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/context/compute_arch.h"
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -33,6 +33,10 @@
         #include <vector>
         #include <regex>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+    #if !defined( SIXTRL_NO_INCLUDES )
+        #include "sixtracklib/opencl/opencl.hpp"
+    #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 using NS(arch_size_t) = std::size_t;
 
@@ -1232,10 +1236,6 @@ typedef SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t
         NS(kernel_arg_type_t);
 
 #else /* defined( __cplusplus ) */
-
-    #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-        #include <CL/cl.h>
-    #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 typedef void NS(ClContextBase);
 typedef uint32_t NS(kernel_arg_type_t);

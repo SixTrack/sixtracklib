@@ -9,6 +9,7 @@
     #if defined( __cplusplus )
         #include "sixtracklib/common/buffer.hpp"
         #include "sixtracklib/common/output/output_buffer.hpp"
+        #include "sixtracklib/opencl/opencl.hpp"
     #endif /* defined( __cplusplus ) */
 
     #include "sixtracklib/common/definitions.h"
@@ -18,6 +19,7 @@
 
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/argument.h"
+    #include "sixtracklib/opencl/opencl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
