@@ -15,16 +15,13 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         set( SIXTRL_OPENCL_LIBRARIES )
 
         if( NOT OpenCL_FOUND )
-            message( STATUS "---- Checking for OpenCL installation ... " )
             find_package( OpenCL QUIET )
         endif()
 
         if( OpenCL_FOUND )
             set( SIXTRL_TEMP_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS} )
             set( SIXTRL_OPENCL_LIBRARIES ${OpenCL_LIBRARIES} )
-            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION})" )
-            message( STATUS "---- OpenCL library ${OpenCL_LIBRARIES}" )
-            message( STATUS "---- OpenCL include directories ${OpenCL_INCLUDE_DIRS}" )
+            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION_STRING})" )
         elseif( SIXTRACKL_REQUIRE_OFFLINE_BUILD )
             message( STATUS "---- OpenCL not found, use fallback headers due to offline build" )
             set( SIXTRL_TEMP_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/external" )
@@ -195,7 +192,6 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         if( OpenCL_FOUND )
-            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION} )" )
             set( SIXTRACKLIB_MODULE_VALUE_OPENCL 1 )
         elseif( NOT OpenCL_FOUND AND NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD )
             FetchContent_Declare( opencl_icd_loader
@@ -258,12 +254,10 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
             endif()
 
             set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
-            string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                    "#if !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} )\r\n" )
-            string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                    "    #define ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} \r\n" )
-            string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                    "#endif /* !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} ) */\r\n" )
+            set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
+                "#if !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} )
+                    #define ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO}
+                 #endif /* !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} ) */" )
         endif()
     endif()
 
