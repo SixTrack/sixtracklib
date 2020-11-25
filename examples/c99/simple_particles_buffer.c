@@ -91,7 +91,8 @@ int main( int argc, char* argv[] )
                     )st_Object_get_const_begin_ptr( cmp_obj_it );
 
                 printf( "particle blocks: %3lu / %3lu\r\n",
-                        ii, num_particles_blocks );
+                        ( unsigned int )ii,
+                        ( unsigned int )num_particles_blocks );
 
                 printf( " -> original particles object : \r\n" );
                 printParticles( cmp_particles );
@@ -148,7 +149,8 @@ int main( int argc, char* argv[] )
                     )st_Object_get_const_begin_ptr( obj_it );
 
                 printf( "managed buffer particle blocks: %3lu / %3lu\r\n",
-                        ii, num_particles_blocks );
+                        ( unsigned int )ii,
+                        ( unsigned int )num_particles_blocks );
 
                 printf( " -> copy particles object : \r\n" );
                 printParticles( particles );
