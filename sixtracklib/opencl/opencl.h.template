@@ -1,0 +1,27 @@
+#ifndef SIXTRACKLIB_OPENCL_OPENCL_H__
+#define SIXTRACKLIB_OPENCL_OPENCL_H__
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if !defined( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS )
+    #define SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS "@SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS@"
+#endif /* !defined( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS ) */
+
+#if !defined( __cplusplus ) && !defined( _GPUCODE )
+
+    #if !defined( SIXTRL_OPENCL_C99_HEADER_FILE )
+        #define SIXTRL_OPENCL_C99_HEADER_FILE "@SIXTRL_OPENCL_C99_HEADER_FILE@"
+    #endif /* !defined( SIXTRL_OPENCL_C99_HEADER_FILE ) */
+
+    #if !defined( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION )
+        #define SIXTRL_OPENCL_C99_HEADER_FILE_VERSION @SIXTRL_OPENCL_C99_HEADER_FILE_VERSION@
+    #endif /* !defined( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION ) */
+
+    #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+        #include <@SIXTRL_OPENCL_C99_HEADER_FILE@>
+    #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+
+#endif /* C99, Host */
+#endif /* SIXTRACKLIB_OPENCL_OPENCL_H__ */
