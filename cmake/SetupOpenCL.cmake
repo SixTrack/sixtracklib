@@ -15,14 +15,19 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         set( SIXTRL_OPENCL_LIBRARIES )
 
         if( NOT OpenCL_FOUND )
+            message( STATUS "---- Checking for OpenCL installation ... " )
             find_package( OpenCL QUIET )
         endif()
 
         if( OpenCL_FOUND )
             set( SIXTRL_TEMP_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS} )
             set( SIXTRL_OPENCL_LIBRARIES ${OpenCL_LIBRARIES} )
+            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION})" )
+            message( STATUS "---- OpenCL library ${OpenCL_LIBRARIES}" )
+            message( STATUS "---- OpenCL include directories ${OpenCL_INCLUDE_DIRS}" )
         elseif( SIXTRACKL_REQUIRE_OFFLINE_BUILD )
-            set( SIXTRL_TEMP_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/external/CL" )
+            message( STATUS "---- OpenCL not found, use fallback headers due to offline build" )
+            set( SIXTRL_TEMP_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/external" )
         else()
             message( FATAL_ERROR
                 "---- Unable to find OpenCL setup, unable to download since offline build required" )
@@ -64,7 +69,7 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
             NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE_VERSION OR
             NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION )
 
-            set( SIXTRL_OPENCL_EXT_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include/CL )
+            set( SIXTRL_OPENCL_EXT_INCLUDE_DIR "${CMAKE_BINARY_DIR}/include" )
             include( FetchContent )
         endif()
 
@@ -76,8 +81,8 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
             NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE OR
             NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE_VERSION ) )
 
-            if( NOT EXISTS ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
-                file( MAKE_DIRECTORY ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+            if( NOT EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
+                file( MAKE_DIRECTORY "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
             endif()
 
             FetchContent_Declare( opencl_c99_headers
@@ -105,18 +110,17 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
                 foreach( in_file ${SIXTRL_OPENCL_C99_IN_FILES} )
                     get_filename_component( in_file_name ${in_file} NAME )
-                    get_filename_component( in_dir ${in_file} DIRECTORY )
                     file( COPY ${in_file}
-                          DESTINATION ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                          DESTINATION "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
 
                     if( NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE )
                         if( ${in_file_name} STREQUAL "opencl.h" )
-                            set( SIXTRL_OPENCL_C99_HEADER_FILE "opencl.h" )
-                            set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${in_dir} )
+                            set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/opencl.h" )
+                            set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
                             set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 3 )
                         elseif( ${in_file_name} STREQUAL "cl.h" )
-                            set( SIXTRL_OPENCL_C99_HEADER_FILE "cl.h" )
-                            set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${in_dir} )
+                            set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/cl.h" )
+                            set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
                             set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 1 )
                         endif()
                     endif()
@@ -156,22 +160,21 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
                 foreach( in_file ${SIXTRL_OPENCL_CXX_IN_FILES} )
                     get_filename_component( in_file_name ${in_file} NAME )
-                    get_filename_component( in_dir ${in_file} DIRECTORY )
                     file( COPY ${in_file}
-                          DESTINATION ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                          DESTINATION "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
 
                     if( NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE )
                         if( ${in_file_name} STREQUAL "opencl.hpp" )
-                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "opencl.hpp" )
-                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${in_dir} )
+                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/opencl.hpp" )
+                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
                             set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 3 )
                         elseif( ${in_file_name} STREQUAL "cl2.hpp" )
-                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "cl2.hpp" )
-                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${in_dir} )
+                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl2.hpp" )
+                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
                             set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 2 )
                         elseif( ${in_file_name} STREQUAL "cl.hpp" )
-                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "cl.hpp" )
-                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${in_dir} )
+                            set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl.hpp" )
+                            set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
                             set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 1 )
                         endif()
                     endif()
@@ -192,6 +195,7 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         if( OpenCL_FOUND )
+            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION} )" )
             set( SIXTRACKLIB_MODULE_VALUE_OPENCL 1 )
         elseif( NOT OpenCL_FOUND AND NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD )
             FetchContent_Declare( opencl_icd_loader
@@ -205,10 +209,10 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
                 message( STATUS "------ Downloading external OpenCL ICD Loader [DONE]" )
             endif()
 
-            get_filename_component( SIXTRL_OPENCL_C99_HEADER_DIR
+            get_filename_component( SIXTRL_TEMP_INCLUDE_DIRS
                 ${SIXTRL_OPENCL_C99_HEADER_FILE} DIRECTORY )
 
-            file( COPY ${SIXTRL_OPENCL_C99_HEADER_DIR} DESTINATION
+            file( COPY ${SIXTRL_TEMP_INCLUDE_DIRS} DESTINATION
                   ${opencl_icd_loader_SOURCE_DIR}/inc PATTERN "*.h" )
 
             FetchContent_MakeAvailable( opencl_icd_loader )
@@ -222,10 +226,11 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        set( SIXTRL_OPENCL_INCLUDE_DIRS ${SIXTRL_OPENCL_C99_INCLUDE_DIR} )
+        set( SIXTRL_OPENCL_INCLUDE_DIRS ${SIXTRL_OPENCL_INCLUDE_DIRS}
+             ${SIXTRL_OPENCL_C99_INCLUDE_DIR} )
 
-        if( NOT ( ${SIXTRL_OPENCL_CXX_INCLUDE_DIR} STREQUAL
-                  ${SIXTRL_OPENCL_C99_INCLUDE_DIR} ) )
+        if( NOT ( "${SIXTRL_OPENCL_CXX_INCLUDE_DIR}" STREQUAL
+                  "${SIXTRL_OPENCL_C99_INCLUDE_DIR}" ) )
             set(   SIXTRL_OPENCL_INCLUDE_DIRS ${SIXTRL_OPENCL_INCLUDE_DIRS}
                  ${SIXTRL_OPENCL_CXX_INCLUDE_DIR} )
         endif()
