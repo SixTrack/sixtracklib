@@ -38,8 +38,6 @@
         #include "sixtracklib/opencl/opencl.hpp"
     #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
-using NS(arch_size_t) = std::size_t;
-
 namespace SIXTRL_CXX_NAMESPACE
 {
     class ClArgument;
