@@ -61,7 +61,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using context_base_t     = ClContextBase;
-        using size_type          = std::size_t;
+        using size_type          = ::NS(arch_size_t);
         using cobj_buffer_t      = struct NS(Buffer);
         using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
         using status_t           = SIXTRL_CXX_NAMESPACE::arch_status_t;
