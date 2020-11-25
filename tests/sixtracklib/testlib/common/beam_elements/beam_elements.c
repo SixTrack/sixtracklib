@@ -162,7 +162,8 @@ void NS(BeamElement_print)(
                 printf( "|unknown          | type_id  = %3d\r\n"
                         "                  | size     = %8lu bytes\r\n"
                         "                  | addr     = %16p\r\n",
-                        ( int )type_id, NS(Object_get_size)( be_info ),
+                        ( int )type_id,
+                        ( long unsigned )NS(Object_get_size)( be_info ),
                         ( void* )( uintptr_t )addr );
             }
         };
