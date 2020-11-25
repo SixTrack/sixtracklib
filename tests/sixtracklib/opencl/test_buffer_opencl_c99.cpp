@@ -17,7 +17,7 @@
 #include "sixtracklib/common/generated/path.h"
 #include "sixtracklib/common/buffer.h"
 #include "sixtracklib/opencl/context.h"
-#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/opencl.h"
 
 TEST( C99_OpenCL_Buffer,
       InitWithGenericObjDataCopyToDeviceCopyBackCmpSingleThread )
