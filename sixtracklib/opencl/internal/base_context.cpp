@@ -37,7 +37,7 @@ namespace SIXTRL_CXX_NAMESPACE
     {
         namespace st = SIXTRL_CXX_NAMESPACE;
         using  ctx_t = st::ClContextBase;
-        using  st_size_t = st_size_t;
+        using  st_size_t = ctx_t::size_type;
         using  st_kernel_id_t = ctx_t::kernel_id_t;
         using  st_kernel_arg_type_t = ctx_t::kernel_arg_type_t;
         using  st_status_t = ctx_t::status_t;
