@@ -54,15 +54,15 @@ int main( int argc, char* argv[] )
                 "  buf size     = %16lu\r\n"
                 "  buf capacity = %16lu\r\n"
                 "  begin addr   = %16p\r\n\r\n",
-                ( uint64_t )num_objects,  ( uint64_t )num_slots,
-                ( uint64_t )num_dataptrs, ( uint64_t )num_garbage,
-                ( uint64_t )buffer_size,  ( uint64_t )buffer_capacity,
+                ( unsigned long )num_objects,  ( unsigned long )num_slots,
+                ( unsigned long )num_dataptrs, ( unsigned long )num_garbage,
+                ( unsigned long )buffer_size,  ( unsigned long )buffer_capacity,
                 ( void* )( uintptr_t )addr );
 
         for( ; it != end ; ++it, ++ii )
         {
             printf( "Object %9lu / %9lu:\r\n",
-                    ( uint64_t )ii, ( uint64_t )num_objects );
+                    ( unsigned long )ii, ( unsigned long )num_objects );
 
             NS(Buffer_object_print_out_typeid)( NS(Object_get_type_id)( it ) );
             printf( "\r\n" );
