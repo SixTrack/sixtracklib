@@ -9,7 +9,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-cmake_minimum_required( VERSION 3.8 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.11 FATAL_ERROR )
 project( sixtracklib LANGUAGES C CXX )
 
 message( STATUS "---- Project sixtracklib" )
