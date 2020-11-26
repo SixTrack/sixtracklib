@@ -52,6 +52,13 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
 endif()
 
+if( SIXTRACKL_ENABLE_CUDA )
+    # -------------------------------------------------------------------------
+    # track_fodo_opencl_cxx:
+    add_executable( track_fodo_cuda_cxx track_fodo_cuda.cpp )
+    list( APPEND EXAMPLE_CUDA_TARGETS track_fodo_cuda_cxx )
+endif()
+
 # ==============================================================================
 # Common settings for all programs:
 
