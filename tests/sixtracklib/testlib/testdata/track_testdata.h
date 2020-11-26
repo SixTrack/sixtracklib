@@ -17,19 +17,27 @@
 extern "C" {
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
 
-SIXTRL_HOST_FN NS(Buffer)* NS(TrackTestdata_extract_initial_particles_buffer)(
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+NS(TrackTestdata_extract_initial_particles_buffer)( const char path_to_file[] );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+NS(TrackTestdata_extract_result_particles_buffer)(
     const char path_to_file[] );
 
-SIXTRL_HOST_FN NS(Buffer)* NS(TrackTestdata_extract_result_particles_buffer)(
-    const char path_to_file[] );
+SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)*
+NS(TrackTestdata_extract_beam_elements_buffer)( const char path_to_file[] );
 
-SIXTRL_HOST_FN NS(Buffer)* NS(TrackTestdata_extract_beam_elements_buffer)(
-    const char path_to_file[] );
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackTestdata_generate_fodo_lattice)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    unsigned int const num_turns );
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(TrackTestdata_generate_particle_distr_x)(
+    SIXTRL_BUFFER_ARGPTR_DEC NS(Buffer)* SIXTRL_RESTRICT buffer,
+    unsigned int const NUM_PARTICLES, double const p0c,
+    double const min_x, double const max_x, double const mass0,
+    double const q0, double const chi, double const charge_ratio );
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
 }
 #endif /* !defined(  _GPUCODE ) && defined( __cplusplus ) */
-
 #endif /* SIXTRACKLIB_TESTS_SIXTRACKLIB_TESTLIB_TRACK_TESTDATA_HEADER_H__ */
-
-/* end: tests/sixtracklib/testlib/testdata/track_testdata.h */
