@@ -45,6 +45,10 @@ if( SIXTRACKL_ENABLE_OPENCL )
     add_executable( track_lhc_no_bb_opencl_cxx track_lhc_no_bb_opencl.cpp )
     list( APPEND EXAMPLE_OPENCL_TARGETS track_lhc_no_bb_opencl_cxx )
 
+    # -------------------------------------------------------------------------
+    # track_fodo_opencl_cxx:
+    add_executable( track_fodo_opencl_cxx track_fodo_opencl.cpp )
+    list( APPEND EXAMPLE_OPENCL_TARGETS track_fodo_opencl_cxx )
 
 endif()
 
