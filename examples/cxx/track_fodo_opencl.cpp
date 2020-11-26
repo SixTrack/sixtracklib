@@ -71,7 +71,7 @@ int main( int const argc, char* argv[] )
 
     st::collect( job );
 
-    auto wtime = stop_time - start_time;
+    std::chrono::duration< double > const wtime = stop_time - start_time;
 
     std::cout << "elapsed wall time: " << wtime.count() << " sec\r\n"
               << "                 = " << wtime.count() / ( NUM_PARTICLES * NUM_TURNS )
