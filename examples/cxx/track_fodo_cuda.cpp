@@ -15,7 +15,7 @@ int main( int const argc, char* argv[] )
 
     unsigned int NUM_PARTICLES = 50000; // Default
     unsigned int NUM_TURNS = 10000; // Default
-    std::string const device_id = "0:0";
+    std::string const device_id = "0.0";
 
     double const Q0 = 1.0;
     double const MASS0 = ( double )SIXTRL_PHYS_CONST_MASS_PROTON_EV;
@@ -34,14 +34,11 @@ int main( int const argc, char* argv[] )
 
     if( argc >= 2 )
     {
+        NUM_PARTICLES = std::stoi( argv[ 1 ] );
+
         if( argc >= 3 )
         {
-            NUM_PARTICLES = std::stoi( argv[ 2 ] );
-
-            if( argc >= 4 )
-            {
-                NUM_TURNS = std::stoi( argv[ 3 ] );
-            }
+            NUM_TURNS = std::stoi( argv[ 2 ] );
         }
     }
 
