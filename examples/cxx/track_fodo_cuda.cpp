@@ -61,9 +61,8 @@ int main( int const argc, char* argv[] )
     track_job_type job( device_id, pbuffer, lattice );
     auto start_time = std::chrono::steady_clock::now();
     job.trackUntil( NUM_TURNS );
-    auto stop_time = std::chrono::steady_clock::now();
-
     st::collect( job );
+    auto stop_time = std::chrono::steady_clock::now();
 
     std::chrono::duration< double > const wtime = stop_time - start_time;
 
