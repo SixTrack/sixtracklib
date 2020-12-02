@@ -255,6 +255,24 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
         endif()
     endif()
 
+    set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+
+    if( SIXTRACKL_OPENCL_PRINT_BUILD_REPORT )
+        if( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "always" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 2 )
+            message( STATUS "------- setting opencl build program report policy to \"always\"" )
+        elseif( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "error" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 1 )
+            message( STATUS "------- setting opencl build program report policy to \"error\"" )
+        elseif( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "never" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+            message( STATUS "------- setting opencl build program report policy to \"never\"" )
+        else()
+            message( STATUS "------- illegal value for SIXTRACKL_OPENCL_PRINT_BUILD_REPORT, choosing \"never\"" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+        endif()
+    endif()
+
     # ---------------------------------------------------------------------------
 
     list( APPEND SIXTRACKLIB_SUPPORTED_MODULES "OPENCL" )
