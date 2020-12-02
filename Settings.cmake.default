@@ -139,6 +139,10 @@ if( SIXTRACKL_ENABLE_OPENCL )
 
     option( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS
             "Enable OpenCL 1.x Host-side C++ Exceptions" ON )
+
+    set( SIXTRACKL_OPENCL_PRINT_BUILD_REPORT "error" CACHE STRING
+         "print OpenCL build report [values: always, error, never]" )
+
 endif()
 
 # ------------------------------------------------------------------------------
