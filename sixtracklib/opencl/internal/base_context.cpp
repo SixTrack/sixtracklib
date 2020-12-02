@@ -2513,16 +2513,16 @@ namespace SIXTRL_CXX_NAMESPACE
             std::string const platform_name =
                 platform.getInfo< CL_PLATFORM_NAME >();
 
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) && \
+                         SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG == 1
             try
             {
             #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
             platform.getDevices( CL_DEVICE_TYPE_ALL, &temp_devices );
 
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) && \
+                         SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG == 1
             }
             catch( cl::Error const& e )
             {
