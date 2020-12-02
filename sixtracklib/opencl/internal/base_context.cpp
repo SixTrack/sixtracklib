@@ -3088,13 +3088,6 @@ namespace SIXTRL_CXX_NAMESPACE
 
             cl_build_status build_status = CL_BUILD_NONE;
 
-            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG )
-            int const exception_flag = ( int )SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG;
-            #else
-            int const exception_flag = int{ 0 };
-            #endif /* defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) */
-            ( void )exception_flag;
-
             #if defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT )
             int const print_report = ( int )SIXTRL_OPENCL_PRINT_BUILD_REPORT;
             #else
@@ -3146,7 +3139,7 @@ namespace SIXTRL_CXX_NAMESPACE
                     std::string name = build_device.getInfo< CL_DEVICE_NAME >();
                     std::cerr << "\r\n"
                               << "Build log for device "
-                              << this->selectedNodeIdStr() << " ["
+                              << this->selectedNodeIdStr() << " [ "
                               << name << " ]\r\n";
 
                     if( !program_data.m_file_path.empty() )
@@ -3155,7 +3148,9 @@ namespace SIXTRL_CXX_NAMESPACE
                                   << program_data.m_file_path << "\r\n";
                     }
 
-                    std::cerr << "Build Log: " << build_log
+                    std::cerr << "Program Options : "
+                              << program_data.m_compile_options << "\r\n"
+                              << "Build Log: " << build_log
                               << std::endl;
                     std::cerr.flush();
                 }
