@@ -3086,75 +3086,162 @@ namespace SIXTRL_CXX_NAMESPACE
             auto& build_device =
                 this->m_available_devices.at( this->m_selected_node_index );
 
-            cl_int ret = CL_SUCCESS;
             cl_build_status build_status = CL_BUILD_NONE;
 
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG )
+            int const exception_flag = ( int )SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG;
+            #else
+            int const exception_flag = int{ 0 };
+            #endif /* defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) */
+            ( void )exception_flag;
+
+            #if defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT )
+            int const print_report = ( int )SIXTRL_OPENCL_PRINT_BUILD_REPORT;
+            #else
+            int const print_report = int{ 0 };
+            #endif /* defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT ) */
+
+            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) && \
+                         SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG == 1
             try
             {
             #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
-                ret = cl_program.build( program_data.m_compile_options.c_str() );
+                cl_int ret = cl_program.build( program_data.m_compile_options.c_str() );
+                SIXTRL_ASSERT( ret == CL_SUCCESS );
+                ( void )ret;
+
                 build_status = cl_program.getBuildInfo<
                         CL_PROGRAM_BUILD_STATUS >( build_device );
 
-            #if defined( SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS ) && \
-                         SIXTRL_OPENCL_CXX_ENABLES_HOST_EXCEPTIONS == 1
+            #if defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) && \
+                         SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG == 1
             }
             catch( cl::Error& e )
             {
-                if( ( this->debugMode() ) &&
-                    ( e.err() == CL_BUILD_PROGRAM_FAILURE ) )
+                std::string build_log = "";
+                build_log.clear();
+
+                if( print_report == 2 )
+                {
+                    build_log = this->get_program_build_log(
+                        build_device, cl_program );
+
+                    if( build_log.empty() )
+                    {
+                        build_log = "no build log available";
+                    }
+                }
+                else if( print_report == 1 )
+                {
+                    if( e.err() == CL_BUILD_PROGRAM_FAILURE )
+                    {
+                        build_log = this->get_program_build_log(
+                            build_device, cl_program );
+                    }
+                }
+
+                if( !build_log.empty() )
                 {
                     std::string name = build_device.getInfo< CL_DEVICE_NAME >();
-                    std::string buildlog = cl_program.getBuildInfo<
-                        CL_PROGRAM_BUILD_LOG >( build_device );
+                    std::cerr << "\r\n"
+                              << "Build log for device "
+                              << this->selectedNodeIdStr() << " ["
+                              << name << " ]\r\n";
 
-                    std::cerr << "Build log for " << name << ":" << std::endl
-                              << buildlog << std::endl;
+                    if( !program_data.m_file_path.empty() )
+                    {
+                        std::cerr << "Program : "
+                                  << program_data.m_file_path << "\r\n";
+                    }
+
+                    std::cerr << "Build Log: " << build_log
+                              << std::endl;
+                    std::cerr.flush();
                 }
 
                 throw e;
             }
             #endif /* OpenCL 1.x C++ Host Exceptions enabled */
 
-            if( ( build_status != CL_BUILD_NONE ) || ( ret == CL_SUCCESS ) )
+            this->update_program_data_with_build_error(
+                build_status, build_device, cl_program, program_data );
+
+            success = program_data.m_compiled;
+
+            if( ( ( print_report == 1 ) && ( !success ) ) ||
+                  ( print_report == 2 ) )
             {
-                program_data.m_compile_report =
-                    cl_program.getBuildInfo< CL_PROGRAM_BUILD_LOG >( build_device );
-
-                if( !program_data.m_compile_report.empty() )
-                {
-                    program_data.m_compile_report.erase(
-                        std::find_if(
-                            program_data.m_compile_report.rbegin(),
-                            program_data.m_compile_report.rend(),
-                            []( int ch ){ return !std::isspace( ch ); } ).base(),
-                            program_data.m_compile_report.end() );
-                }
-
-                if( !program_data.m_compile_report.empty() )
-                {
-                    program_data.m_compile_report.erase(
-                        program_data.m_compile_report.begin(),
-                        std::find_if(
-                            program_data.m_compile_report.begin(),
-                            program_data.m_compile_report.end(),
-                            []( int ch ){ return !std::isspace( ch ); } ) );
-                }
-
-                if( ( !program_data.m_compile_report.empty() ) &&
-                    (  program_data.m_compile_report.size() == size_type{ 1 } ) &&
-                    (  program_data.m_compile_report[ 0 ] == '\0' ) )
-                {
-                    program_data.m_compile_report.clear();
-                }
+                std::cerr << "program_name    : "
+                    << program_data.m_file_path << "\r\n"
+                    << "compiled        : " << std::boolalpha
+                    << program_data.m_compiled << std::noboolalpha << "\r\n"
+                    << "compile options : "
+                    << program_data.m_compile_options << "\r\n"
+                    << "compile report  : " << "\r\n"
+                    << program_data.m_compile_report << std::endl;
             }
+        }
+
+        return success;
+    }
+
+    std::string ctx_t::get_program_build_log(
+        cl::Device& SIXTRL_RESTRICT_REF build_device,
+        cl::Program& SIXTRL_RESTRICT_REF program ) const
+    {
+        std::string build_log = program.getBuildInfo<
+            CL_PROGRAM_BUILD_LOG >( build_device );
+
+        if( !build_log.empty() )
+        {
+            build_log.erase( std::find_if(
+                build_log.rbegin(), build_log.rend(),
+                []( int ch ){ return !std::isspace( ch ); } ).base(),
+                build_log.end() );
+        }
+
+        if( !build_log.empty() )
+        {
+            build_log.erase( build_log.begin(),
+                std::find_if( build_log.begin(), build_log.end(),
+                []( int ch ){ return !std::isspace( ch ); } ) );
+        }
+
+        if( ( !build_log.empty() ) &&
+            (  build_log.size() == size_type{ 1 } ) &&
+            (  build_log[ 0 ] == '\0' ) )
+        {
+            build_log.clear();
+        }
+
+        return build_log;
+    }
+
+    void ctx_t::update_program_data_with_build_error(
+            cl_build_status build_status,
+            cl::Device& SIXTRL_RESTRICT_REF build_device,
+            cl::Program& SIXTRL_RESTRICT_REF cl_program,
+            ctx_t::program_data_t& SIXTRL_RESTRICT_REF program_data ) {
+
+        if( build_status != CL_BUILD_NONE )
+        {
+            program_data.m_compile_report = this->get_program_build_log(
+                build_device, cl_program );
+
+            #if defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT ) && \
+                ( SIXTRL_OPENCL_PRINT_BUILD_REPORT == 2 ) /* "always" */
+
+            if( program_data.m_compile_report.empty() )
+            {
+                program_data.m_compile_report = "no build log available";
+            }
+
+            #endif
 
             if( build_status == CL_BUILD_SUCCESS )
             {
-                success = program_data.m_compiled = true;
+                program_data.m_compiled = true;
             }
             else if( build_status == CL_BUILD_ERROR )
             {
@@ -3170,25 +3257,7 @@ namespace SIXTRL_CXX_NAMESPACE
                 program_data.m_compiled = false;
                 program_data.m_compile_report.clear();
             }
-
-            if( ( this->debugMode() ) &&
-                ( ( !program_data.m_compile_report.empty() ) ||
-                  ( !program_data.m_compiled ) ) )
-            {
-                std::cerr << "program_name    : "
-                          << program_data.m_file_path << "\r\n"
-                          << "compiled        : "
-                          << std::boolalpha   << program_data.m_compiled
-                          << std::noboolalpha << "\r\n"
-                          << "compile options : "
-                          << program_data.m_compile_options << "\r\n"
-                          << "compile report  : " << "\r\n"
-                          << program_data.m_compile_report
-                          << std::endl;
-            }
         }
-
-        return success;
     }
 }
 #endif /* C++ */

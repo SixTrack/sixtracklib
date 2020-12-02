@@ -1177,6 +1177,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
+        std::string get_program_build_log(
+            cl::Device& SIXTRL_RESTRICT_REF build_device,
+            cl::Program& SIXTRL_RESTRICT_REF program ) const;
+
+        void update_program_data_with_build_error(
+            cl_build_status build_status,
+            cl::Device& SIXTRL_RESTRICT_REF build_device,
+            cl::Program& SIXTRL_RESTRICT_REF cl_program,
+            program_data_t& SIXTRL_RESTRICT_REF program_data );
+
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );
 
