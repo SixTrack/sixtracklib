@@ -103,9 +103,9 @@ class Multipole(CObject):
             kwargs["bal"] = bal
             kwargs["order"] = order
 
-        elif bal is not None and bal and len(bal) > 2 and ((len(bal) % 2) == 0):
+        elif bal is not None and len(bal) > 0:
             kwargs["bal"] = bal
-            kwargs["order"] = (len(bal) - 2) / 2
+            kwargs["order"] = (len(bal) - 2) // 2
 
         super().__init__(**kwargs)
 
@@ -286,9 +286,9 @@ class SRotation(CObject):
 
     def __init__(self, angle=0, **nargs):
         anglerad = angle / 180 * np.pi
-        cos_z = np.cos(anglerad)
-        sin_z = np.sin(anglerad)
-        super().__init__(cos_z=cos_z, sin_z=sin_z, **nargs)
+        nargs['cos_z']=np.cos(anglerad)
+        nargs['sin_z']=np.sin(anglerad)
+        super().__init__(**nargs)
 
     @property
     def angle(self):
