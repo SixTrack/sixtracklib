@@ -144,6 +144,41 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    void sincos( typename TypeMethodParamTraits< T >::const_argument_type arg,
+        SIXTRL_RESULT_PTR_DEC typename TypeMethodParamTraits< T >::pointer sin_res,
+        SIXTRL_RESULT_PTR_DEC typename TypeMethodParamTraits< T >::pointer cos_res
+    ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( sin_res != nullptr );
+        SIXTRL_ASSERT( cos_res != nullptr );
+        #if ( !defined( SIXTRL_NO_SINCOS ) ) && \
+            ( defined( __OPENCL_C_VERSION__ ) )
+
+        *sin_res = ::sincos( arg, cos_res );
+
+        #elif ( !defined( XSUITE_NO_SINCOS ) ) && \
+              ( ( defined( __CUDA_ARCH__ ) ) || \
+                ( defined( __GNUC__ ) && !defined( __clang__ ) && \
+              !defined( __STRICT_ANSI__ ) && !defined( __INTEL_COMPILER ) && \
+               defined( __NO_MATH_ERRNO__ ) ) )
+
+        ::sincos( arg, sin_res, cos_res );
+
+        #else
+
+        using std::sin;
+        using std::cos;
+
+        *sin_res = sin( arg );
+        *cos_res = cos( arg );
+
+        #endif
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
     typename TypeMethodParamTraits< T >::value_type tan( typename
         TypeMethodParamTraits< T >::const_argument_type arg ) SIXTRL_NOEXCEPT
     {
@@ -477,6 +512,20 @@ NS(acos)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN void NS(sincos)(
+    typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::const_argument_type arg,
+    SIXTRL_RESULT_PTR_DEC typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::pointer SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::pointer SIXTRL_RESTRICT cos_res ) SIXTRL_NOEXCEPT
+{
+    SIXTRL_CXX_NAMESPACE::sincos( arg, sin_res, cos_res );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+template< typename T >
 SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
 typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
 NS(tan)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
@@ -685,6 +734,11 @@ NS(asin)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(cos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
+SIXTRL_STATIC SIXTRL_FN void NS(sincos)( SIXTRL_REAL_T const arg,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT cos_res
+) SIXTRL_NOEXCEPT;
+
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(acos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
@@ -769,6 +823,32 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(cos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
     #endif /* Host, ADL */
 
     return cos( arg );
+}
+
+SIXTRL_INLINE void NS(sincos)( SIXTRL_REAL_T const arg,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT cos_res
+) SIXTRL_NOEXCEPT
+{
+    SIXTRL_ASSERT( sin_res != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( cos_res != SIXTRL_NULLPTR );
+
+    #if ( !defined( SIXTRL_NO_SINCOS ) ) && \
+        ( defined( __OPENCL_C_VERSION__ ) )
+    *sin_res = sincos( arg, cos_res );
+
+    #elif ( !defined( XSUITE_NO_SINCOS ) ) && \
+            ( ( defined( __CUDA_ARCH__ ) ) || \
+            ( defined( __GNUC__ ) && !defined( __clang__ ) && \
+            !defined( __STRICT_ANSI__ ) && !defined( __INTEL_COMPILER ) && \
+             defined( __NO_MATH_ERRNO__ ) ) )
+    sincos( arg, sin_res, cos_res );
+
+    #else
+    *sin_res = sin( arg );
+    *cos_res = cos( arg );
+
+    #endif
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(acos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
