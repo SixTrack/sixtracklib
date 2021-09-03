@@ -46,7 +46,7 @@ SIXTRL_FN SIXTRL_STATIC void NS(get_Ex_Ey_Gx_Gy_gauss)(
 
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/constants.h"
-    #include "sixtracklib/common/be_beamfields/faddeeva_cern.h"
+    #include "sixtracklib/common/be_beamfields/faddeeva.h"
 #endif
 
 #if !defined( _GPUCODE ) && defined( __cplusplus )
@@ -89,7 +89,10 @@ SIXTRL_INLINE void NS(get_transv_field_gauss_ellip)(
 
   SIXTRL_REAL_T S, factBE, Ex, Ey;
   SIXTRL_REAL_T etaBE_re, etaBE_im, zetaBE_re, zetaBE_im;
-  SIXTRL_REAL_T w_etaBE_re, w_etaBE_im, w_zetaBE_re, w_zetaBE_im;
+  SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T w_etaBE_re;
+  SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T w_etaBE_im;
+  SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T w_zetaBE_re;
+  SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T w_zetaBE_im;
   SIXTRL_REAL_T expBE;
 
   if (sigmax>sigmay){
@@ -103,9 +106,9 @@ SIXTRL_INLINE void NS(get_transv_field_gauss_ellip)(
     zetaBE_im = aby;
 
     //w_zetaBE_re, w_zetaBE_im = wfun(zetaBE_re/S, zetaBE_im/S)
-    cerrf(zetaBE_re/S, zetaBE_im/S , &(w_zetaBE_re), &(w_zetaBE_im));
+    NS(cerrf)(zetaBE_re/S, zetaBE_im/S , &(w_zetaBE_re), &(w_zetaBE_im));
     //w_etaBE_re, w_etaBE_im = wfun(etaBE_re/S, etaBE_im/S)
-    cerrf(etaBE_re/S, etaBE_im/S , &(w_etaBE_re), &(w_etaBE_im));
+    NS(cerrf)(etaBE_re/S, etaBE_im/S , &(w_etaBE_re), &(w_etaBE_im));
 
     expBE = exp(-abx*abx/(2*sigmax*sigmax)-aby*aby/(2*sigmay*sigmay));
 
@@ -123,9 +126,9 @@ SIXTRL_INLINE void NS(get_transv_field_gauss_ellip)(
     zetaBE_im = abx;
 
     //w_zetaBE_re, w_zetaBE_im = wfun(zetaBE_re/S, zetaBE_im/S)
-    cerrf(zetaBE_re/S, zetaBE_im/S , &(w_zetaBE_re), &(w_zetaBE_im));
+    NS(cerrf)(zetaBE_re/S, zetaBE_im/S , &(w_zetaBE_re), &(w_zetaBE_im));
     //w_etaBE_re, w_etaBE_im = wfun(etaBE_re/S, etaBE_im/S)
-    cerrf(etaBE_re/S, etaBE_im/S , &(w_etaBE_re), &(w_etaBE_im));
+    NS(cerrf)(etaBE_re/S, etaBE_im/S , &(w_etaBE_re), &(w_etaBE_im));
 
     expBE = exp(-aby*aby/(2*sigmay*sigmay)-abx*abx/(2*sigmax*sigmax));
 
