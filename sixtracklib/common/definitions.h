@@ -189,6 +189,12 @@
             #define   SIXTRL_FN
         #endif /* SIXTRL_FN */
 
+        /* ---------------------------------------------------------------- */
+
+        #if !defined( SIXTRL_RESULT_PTR_DEC )
+            #define SIXTRL_RESULT_PTR_DEC
+        #endif /* !defined( SIXTRL_RESULT_PTR_DEC ) */
+
     #elif defined( __CUDACC__ )
         /* ---------------------------------------------------------------- */
         /* assert: */
@@ -315,6 +321,12 @@
         #if !defined( SIXTRL_FN )
             #define   SIXTRL_FN __host__ __device__
         #endif /* SIXTRL_FN */
+
+        /* ---------------------------------------------------------------- */
+
+        #if !defined( SIXTRL_RESULT_PTR_DEC )
+            #define SIXTRL_RESULT_PTR_DEC
+        #endif /* !defined( SIXTRL_RESULT_PTR_DEC ) */
 
     #endif /* defined( __OPENCL_C_VERSION__ ) || defined( __CUDACC__ ) */
 
@@ -542,6 +554,10 @@
         #endif /* SIXTRL_FN */
 
     #endif /* defined( __CUDACC__ ) */
+
+    #if !defined( SIXTRL_RESULT_PTR_DEC )
+        #define SIXTRL_RESULT_PTR_DEC
+    #endif /* !defined( SIXTRL_RESULT_PTR_DEC ) */
 
 #endif /* defined( _GPUCODE ) */
 
