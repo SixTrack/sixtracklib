@@ -417,6 +417,69 @@ namespace SIXTRL_CXX_NAMESPACE
         #endif /* ADL / Host */
         return min( lhs, rhs );
     }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    round( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        typedef typename TypeMethodParamTraits< T >::value_type value_type;
+        typedef SIXTRL_INT64_T int_type;
+        #endif /* !defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::round;
+        #endif /* ADL / Host */
+
+        #if defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return round( arg );
+        #else
+        return static_cast< value_type >( static_cast< int_type >(
+                            value_type{ 0.5 } + arg ) );
+        #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+    }
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    floor( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        typedef typename TypeMethodParamTraits< T >::value_type value_type;
+        typedef SIXTRL_INT64_T int_type;
+        #endif /* !defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::floor;
+        #endif /* ADL / Host */
+
+        #if defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return round( arg );
+        #else
+        return static_cast< value_type >( static_cast< int_type >( arg ) );
+        #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+    }
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    ceil( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::ceil;
+        #endif /* ADL / Host */
+
+        return ceil( arg );
+    }
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -691,6 +754,35 @@ typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type NS(min)(
     return SIXTRL_CXX_NAMESPACE::min( lhs, rhs );
 }
 
+/* ------------------------------------------------------------------------ */
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(round)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::round< T >( arg );
+}
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(floor)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::floor< T >( arg );
+}
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(ceil)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::ceil< T >( arg );
+}
+
 #endif /* defined( __cplusplus ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -754,6 +846,15 @@ NS(min)( SIXTRL_REAL_T const lhs, SIXTRL_REAL_T const rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(max)( SIXTRL_REAL_T const lhs, SIXTRL_REAL_T const rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(floor)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(round)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(ceil)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -1038,6 +1139,43 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(max)(
     #else
     return ( lhs >= rhs ) ? lhs : rhs;
     #endif /* _GPUCODE */
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(floor)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return ( SIXTRL_REAL_T )( SIXTRL_INT64_T )( arg );
+    #else /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+        #if defined( __cplusplus ) && !defined( _GPUCODE )
+        using std::floor;
+        #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+        return floor( arg );
+    #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(round)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+    return ( SIXTRL_REAL_T )( SIXTRL_INT64_T )(
+        ( SIXTRL_REAL_T )0.5 + arg );
+
+    #else /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+        #if defined( __cplusplus ) && !defined( _GPUCODE )
+        using std::round;
+        #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+        return round( arg );
+    #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(ceil)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if defined( __cplusplus ) && !defined( _GPUCODE )
+    using std::ceil;
+    #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+    return ceil( arg );
 }
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
