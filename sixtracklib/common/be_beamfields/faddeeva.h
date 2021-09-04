@@ -802,8 +802,8 @@ SIXTRL_INLINE void NS(cerrf_alg680_q1)(
         real_type nn_plus_1;
 
         int n;
-        int N = 0;
-        int nu = 0;
+        int N  = -1;
+        int nu =  0;
 
         if( !use_cont_fraction )
         {
@@ -825,12 +825,12 @@ SIXTRL_INLINE void NS(cerrf_alg680_q1)(
 
             two_h_n = NS(pow_int_exp)( two_h_n, N );
 
-            if( two_h_n > ( real_type )SIXTRL_CERRF_ALG680_MIN_POW_2H_N )
+            if( two_h_n <= ( real_type )SIXTRL_CERRF_ALG680_MIN_POW_2H_N )
             {
-                use_cont_fraction = false;
+                use_cont_fraction = true;
                 two_h_n   = ( real_type )0.0;
                 inv_two_h = ( real_type )1.0;
-                N = 0;
+                N = -1;
             }
         }
         else
@@ -875,7 +875,7 @@ SIXTRL_INLINE void NS(cerrf_alg680_q1)(
             sy                 = ( ry * tx ) + ( rx * sy );
         }
 
-        if( !use_cont_fraction )
+        if( use_cont_fraction )
         {
             wz_re = NS(MathConst_two_over_sqrt_pi)() * rx;
             wz_im = NS(MathConst_two_over_sqrt_pi)() * ry;
