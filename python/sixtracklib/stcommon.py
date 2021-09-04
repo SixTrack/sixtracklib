@@ -6693,6 +6693,79 @@ st_XYShift_type_id.restype = st_object_type_id_t
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SC related methods:
 
+# Faddeeva / Dawson related methods
+
+st_cerrf_cernlib_c_baseline_q1 = sixtracklib.st_cerrf_cernlib_c_baseline_q1_ext
+st_cerrf_cernlib_c_baseline_q1.restype = None
+st_cerrf_cernlib_c_baseline_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_cernlib_c_upstream_q1 = sixtracklib.st_cerrf_cernlib_c_upstream_q1_ext
+st_cerrf_cernlib_c_upstream_q1.restype = None
+st_cerrf_cernlib_c_upstream_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_cernlib_c_optimised_q1 = sixtracklib.st_cerrf_cernlib_c_optimised_q1_ext
+st_cerrf_cernlib_c_optimised_q1.restype = None
+st_cerrf_cernlib_c_optimised_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_alg680_q1 = sixtracklib.st_cerrf_alg680_q1_ext
+st_cerrf_alg680_q1.restype = None
+st_cerrf_alg680_q1.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_abq2011_a_m_coeff = sixtracklib.st_cerrf_abq2011_a_m_coeff_ext
+st_cerrf_abq2011_a_m_coeff.restype = ct.c_double
+st_cerrf_abq2011_a_m_coeff.argtypes = [ ct.c_int ]
+
+st_cerrf_abq2011_q1 = sixtracklib.st_cerrf_abq2011_q1_ext
+st_cerrf_abq2011_q1.restype = None
+st_cerrf_abq2011_q1.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_abq2011_q1_coeff = sixtracklib.st_cerrf_abq2011_q1_coeff_ext
+st_cerrf_abq2011_q1_coeff.restype = None
+st_cerrf_abq2011_q1_coeff.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, st_double_p, st_double_p, ]
+
+st_cerrf_q1 = sixtracklib.st_cerrf_q1_ext
+st_cerrf_q1.restype = None
+st_cerrf_q1.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf = sixtracklib.st_cerrf_ext
+st_cerrf.restype = None
+st_cerrf.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+
+st_dawson_n_interval = sixtracklib.st_dawson_n_interval_ext
+st_dawson_n_interval.restype = ct.c_int
+st_dawson_n_interval.argtypes = [ ct.c_double ]
+
+st_dawson_xi = sixtracklib.st_dawson_xi_ext
+st_dawson_xi.restype = ct.c_double
+st_dawson_xi.argtypes = [ ct.c_int ]
+
+st_dawson_fz_xi = sixtracklib.st_dawson_fz_xi_ext
+st_dawson_fz_xi.restype = ct.c_double
+st_dawson_fz_xi.argtypes = [ ct.c_int ]
+
+st_dawson_nt_xi_abs_d10 = sixtracklib.st_dawson_nt_xi_abs_d10_ext
+st_dawson_nt_xi_abs_d10.restype = ct.c_double
+st_dawson_nt_xi_abs_d10.argtypes = [ ct.c_int ]
+
+st_dawson_nt_xi_rel_d14 = sixtracklib.st_dawson_nt_xi_rel_d14_ext
+st_dawson_nt_xi_rel_d14.restype = ct.c_double
+st_dawson_nt_xi_rel_d14.argtypes = [ ct.c_int ]
+
+st_dawson_cerrf = sixtracklib.st_dawson_cerrf_nocoeff_ext
+st_dawson_cerrf.restype = None
+st_dawson_cerrf.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_dawson_cerrf_coeff = sixtracklib.st_dawson_cerrf_ext
+st_dawson_cerrf_coeff.restype = None
+st_dawson_cerrf_coeff.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+# Beam Elements
+
 st_BeamBeam4D_p = ct.c_void_p
 st_NullBeamBeam4D = ct.cast(0, st_BeamBeam4D_p)
 

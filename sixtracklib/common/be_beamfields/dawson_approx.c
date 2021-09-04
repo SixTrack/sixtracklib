@@ -22,6 +22,9 @@ SIXTRL_REAL_T NS(dawson_fz_xi_ext)( int n_interval ) SIXTRL_NOEXCEPT {
 int NS(dawson_nt_xi_abs_d10_ext)( int n_interval ) SIXTRL_NOEXCEPT {
     return NS(dawson_nt_xi_abs_d10)( n_interval ); }
 
+int NS(dawson_nt_xi_rel_d14_ext)( int n_interval ) SIXTRL_NOEXCEPT {
+    return NS(dawson_nt_xi_rel_d14)( n_interval ); }
+
 void NS(dawson_cerrf_nocoeff_ext)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,

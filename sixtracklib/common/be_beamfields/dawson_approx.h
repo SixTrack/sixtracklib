@@ -63,6 +63,9 @@ SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_REAL_T NS(dawson_fz_xi_ext)(
 SIXTRL_EXTERN SIXTRL_HOST_FN int NS(dawson_nt_xi_abs_d10_ext)(
     int n_interval ) SIXTRL_NOEXCEPT;
 
+SIXTRL_EXTERN SIXTRL_HOST_FN int NS(dawson_nt_xi_rel_d14_ext)(
+    int n_interval ) SIXTRL_NOEXCEPT;
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(dawson_cerrf_nocoeff_ext)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
