@@ -37,7 +37,7 @@ void NS(cerrf_cernlib_c_upstream_q1_ext)(
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
 ) SIXTRL_NOEXCEPT
 {
-    NS(cerrf_cernlib_c_upstream_q1_ext)( x, y, out_real, out_imag );
+    NS(cerrf_cernlib_c_upstream_q1)( x, y, out_real, out_imag );
 }
 
 void NS(cerrf_cernlib_c_optimised_q1_ext)(

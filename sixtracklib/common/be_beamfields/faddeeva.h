@@ -343,6 +343,7 @@ SIXTRL_INLINE void NS(cerrf_cernlib_c_upstream_q1)(
     else
     {
         Rx[ 0 ] = Ry[ 0 ] = ( real_type )0.0;
+        n = ( int )SIXTRL_CERRF_CERNLIB_UPSTREAM_K;
 
         for( ; n > 0 ; --n )
         {
@@ -423,8 +424,8 @@ SIXTRL_INLINE void NS(cerrf_cernlib_c_optimised_q1)(
     int n  = 0;
 
     bool use_taylor_sum = (
-        ( y < ( real_type )SIXTRL_CERRF_CERNLIB_X0 ) &&
-        ( x < ( real_type )SIXTRL_CERRF_CERNLIB_Y0 ) );
+        ( y < ( real_type )SIXTRL_CERRF_CERNLIB_Y0 ) &&
+        ( x < ( real_type )SIXTRL_CERRF_CERNLIB_X0 ) );
 
     #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
                ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
