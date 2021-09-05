@@ -54,6 +54,23 @@ SIXTRL_STATIC SIXTRL_FN void NS(cerrf_cernlib_c_optimised_q1)(
     #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX &&  SIXTRL_CERRF_USE_DAWSON_COEFF */
 ) SIXTRL_NOEXCEPT;
 
+SIXTRL_STATIC SIXTRL_FN void NS(cerrf_cernlib_c_optimised_fixed_q1)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
+        defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 )
+    , SIXTRL_CERRF_DAWSON_COEFF_XI_DEC SIXTRL_REAL_T  const* SIXTRL_RESTRICT xi,
+    SIXTRL_CERRF_DAWSON_COEFF_FZ_DEC SIXTRL_REAL_T  const* SIXTRL_RESTRICT Fz_xi,
+    SIXTRL_CERRF_DAWSON_COEFF_NT_DEC SIXTRL_INT32_TYPE const* SIXTRL_RESTRICT Fz_nt
+    #if ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
+    , SIXTRL_CERRF_DAWSON_COEFF_TAYLOR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT Fz_kk_xi
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 ) */
+    #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX &&  SIXTRL_CERRF_USE_DAWSON_COEFF */
+) SIXTRL_NOEXCEPT;
+
 SIXTRL_STATIC SIXTRL_FN void NS(cerrf_alg680_q1)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
@@ -164,6 +181,12 @@ SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_cernlib_c_optimised_q1_ext)(
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
 ) SIXTRL_NOEXCEPT;
 
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_cernlib_c_optimised_fixed_q1_ext)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+) SIXTRL_NOEXCEPT;
+
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_alg680_q1_ext)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
@@ -174,6 +197,24 @@ SIXTRL_EXTERN SIXTRL_HOST_FN SIXTRL_REAL_T
 NS(cerrf_abq2011_a_m_coeff_ext)( int const m ) SIXTRL_NOEXCEPT;
 
 SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_abq2011_q1_ext)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_abq2011_cf_q1_ext)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_abq2011_cf_daw_q1_ext)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+) SIXTRL_NOEXCEPT;
+
+SIXTRL_EXTERN SIXTRL_HOST_FN void NS(cerrf_abq2011_root_q1_ext)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
@@ -638,45 +679,199 @@ SIXTRL_INLINE void NS(cerrf_cernlib_c_optimised_q1)(
             Sy     = Ry * Wx + Rx * Sy;
         }
 
-        if( use_taylor_sum )
-        {
-            Wx = NS(MathConst_two_over_sqrt_pi)() * Sx;
-            Wy = NS(MathConst_two_over_sqrt_pi)() * Sy;
-        }
-        else
-        {
-            Wx = NS(MathConst_two_over_sqrt_pi)() * Rx;
-            Wy = NS(MathConst_two_over_sqrt_pi)() * Ry;
-        }
+        *out_x = NS(MathConst_two_over_sqrt_pi)() * (
+            ( use_taylor_sum ) ? Sx : Rx );
+
+        *out_y = NS(MathConst_two_over_sqrt_pi)() * (
+            ( use_taylor_sum ) ? Sy : Ry );
 
     #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
                ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
     }
     else
     {
-        SIXTRL_CERRF_RESULT_DEC temp_wz_re;
-        SIXTRL_CERRF_RESULT_DEC temp_wz_im;
-
         #if defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt );
         #elif defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                      ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt, Fz_kk_xi );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt, Fz_kk_xi );
         #else
-        NS(dawson_cerrf)( x, y, &temp_wz_re, &temp_wz_im );
+        NS(dawson_cerrf)( x, y, out_x, out_y );
         #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF ) */
-
-        Wx = temp_wz_re;
-        Wy = temp_wz_im;
     }
     #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
-
-    *out_x = Wx;
-    *out_y = Wy;
 }
+
+
+/** \fn void cerrf_cernlib_c_optimised_fixed_q1( double const, double const, double*, double* )
+ *  \brief calculates the Faddeeva function w(z) for z = x + i * y in Q1
+ *
+ *  \param[in] x real component of argument z
+ *  \param[in] y imaginary component of argument z
+ *  \param[out] out_x pointer to real component of result
+ *  \param[out] out_y pointer to imanginary component of result
+ *
+ *  \warning This function assumes that x and y are > 0 i.e., that z is
+ *           from the first quadrant Q1 of the complex plane. Use cerrf if
+ *           you need a more general function
+ *
+ *  \note    Based upon the algorithm developed by W. Gautschi 1970,
+ *           "Efficient Computation of the Complex Error Function",
+ *           SIAM Journal on Numerical Analysis, Vol. 7, Issue 1. 1970,
+ *           pages 187-198, https://epubs.siam.org/doi/10.1137/0707012
+ */
+
+SIXTRL_INLINE void NS(cerrf_cernlib_c_optimised_fixed_q1)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_x,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_y
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
+        defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 )
+    , SIXTRL_CERRF_DAWSON_COEFF_XI_DEC SIXTRL_REAL_T  const* SIXTRL_RESTRICT xi,
+    SIXTRL_CERRF_DAWSON_COEFF_FZ_DEC SIXTRL_REAL_T  const* SIXTRL_RESTRICT Fz_xi,
+    SIXTRL_CERRF_DAWSON_COEFF_NT_DEC SIXTRL_INT32_TYPE const* SIXTRL_RESTRICT Fz_nt
+    #if ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
+    , SIXTRL_CERRF_DAWSON_COEFF_TAYLOR_DEC SIXTRL_REAL_T const* SIXTRL_RESTRICT Fz_kk_xi
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 ) */
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 ) */
+) SIXTRL_NOEXCEPT
+{
+    typedef SIXTRL_REAL_T real_type;
+
+    /* This implementation corresponds closely to the previously used
+     * "CERNLib C" version, translated from the FORTRAN function written at
+     * CERN by K. Koelbig, Program C335, 1970. The main difference to
+     * Gautschi's formulation is a split in the main loop and the introduction
+     * of arrays to store the intermediate results as a consequence of this.
+     * The version implemented here should perform roughly equally well or even
+     * slightly better on modern out-of-order super-scalar CPUs but has
+     * drastically improved performance on GPUs and GPU-like systems.
+     *
+     * See also M. Bassetti and G.A. Erskine,
+     * "Closed expression for the electric field of a two-dimensional Gaussian
+     *  charge density", CERN-ISR-TH/80-06; */
+
+    real_type h2_n;
+    real_type inv_h2 = ( real_type )1.0;
+    real_type y_plus_h = y;
+    int N = 0;
+    int nu;
+
+    bool use_taylor_sum = (
+        ( y < ( real_type )SIXTRL_CERRF_CERNLIB_Y0 ) &&
+        ( x < ( real_type )SIXTRL_CERRF_CERNLIB_X0 ) );
+
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
+    bool const use_dawson_approx = (
+        ( x >= ( real_type )SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MIN_X ) &&
+        ( x <= ( real_type )SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X ) &&
+        ( y <= ( real_type )SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MAX_Y ) );
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
+
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
+    use_taylor_sum &= !use_dawson_approx;
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
+
+    /* R_0 ... rectangle with width SIXTRL_CERRF_CERNLIB_X0 and
+     *         height SIXTRL_CERRF_CERNLIB_Y0. Inside R_0, w(z) is calculated using
+     *         a truncated Taylor expansion. Outside, a Gauss--Hermite
+     *         quadrature in the guise of a continuos fraction is used */
+
+	if( use_taylor_sum )
+    {
+        y_plus_h += ( real_type )SIXTRL_CERRF_CERNLIB_H_0;
+        h2_n      = ( real_type )2. * ( real_type )SIXTRL_CERRF_CERNLIB_H_0;
+        inv_h2    = ( real_type )1. / h2_n;
+
+        N    = ( int )SIXTRL_CERRF_CERNLIB_UPSTREAM_N;
+        h2_n = NS(pow_int_exp)( h2_n, N - 1 );
+        use_taylor_sum = ( h2_n > (
+            real_type )SIXTRL_CERRF_CERNLIB_MIN_POW_2H_N );
+    }
+
+    nu = ( !use_taylor_sum )
+       ? ( int )SIXTRL_CERRF_CERNLIB_K : ( int )SIXTRL_CERRF_CERNLIB_UPSTREAM_NU;
+
+    #if  defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+                ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
+    if( !use_dawson_approx )
+    {
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
+
+        int n = ( y > ( real_type )SIXTRL_CERRF_CERNLIB_MIN_Y ) ? nu : 0;
+        real_type nn = ( real_type )n;
+        real_type Rx = ( y > ( real_type )SIXTRL_CERRF_CERNLIB_MIN_Y )
+           ? ( real_type )0.0
+           : exp( -x * x ) / NS(MathConst_two_over_sqrt_pi)();
+
+        real_type temp, Ry, Sx, Sy, Wx, Wy;
+        Ry = Sx = Sy = ( real_type )0.0;
+
+        /* z outside of R_0: continued fraction / Gauss - Hermite quadrature
+         * z inside  of R_0: first iterations of recursion until n == N */
+        for( ; n > N ; --n, nn -= ( real_type )1.0 )
+        {
+            Wx     = y_plus_h + nn * Rx;
+            Wy     = x - nn * Ry;
+            temp   = ( Wx * Wx ) + ( Wy * Wy );
+            Rx     = ( real_type )0.5 * Wx;
+            Ry     = ( real_type )0.5 * Wy;
+            temp   = ( real_type )1.0 / temp;
+            Rx    *= temp;
+            Ry    *= temp;
+        }
+
+        /* loop rejects everything if z is not in R_0 because then n == 0
+         * already; otherwise, N iterations until taylor expansion
+         * is summed up */
+        for( ; n > 0 ; --n, nn -= ( real_type )1.0 )
+        {
+            Wx     = y_plus_h + nn * Rx;
+            Wy     = x - nn * Ry;
+            temp   = ( Wx * Wx ) + ( Wy * Wy );
+            Rx     = ( real_type )0.5 * Wx;
+            Ry     = ( real_type )0.5 * Wy;
+            temp   = ( real_type )1.0 / temp;
+            Rx    *= temp;
+            Ry    *= temp;
+
+            Wx     = h2_n + Sx;
+            h2_n  *= inv_h2;
+            Sx     = Rx * Wx - Ry * Sy;
+            Sy     = Ry * Wx + Rx * Sy;
+        }
+
+        *out_x = NS(MathConst_two_over_sqrt_pi)() * (
+            ( use_taylor_sum ) ? Sx : Rx );
+
+        *out_y = NS(MathConst_two_over_sqrt_pi)() * (
+            ( use_taylor_sum ) ? Sy : Ry );
+
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
+    }
+    else
+    {
+        #if defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
+                   ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 )
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt );
+        #elif defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
+                     ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y,
+                                xi, Fz_xi, Fz_nt, Fz_kk_xi );
+        #else
+        NS(dawson_cerrf)( x, y, out_x, out_y );
+        #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF ) */
+    }
+    #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
+}
+
+/* ------------------------------------------------------------------------- */
 
 SIXTRL_INLINE void NS(cerrf_alg680_q1)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
@@ -1027,9 +1222,6 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1)(
     real_type const y_squ = y * y;
     bool use_fourier_sum = true;
 
-    real_type wz_re = ( real_type )0.0;
-    real_type wz_im = ( real_type )0.0;
-
     #if defined( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION ) && \
                ( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION == 1 )
     bool const use_continued_fraction = ( ( x_squ + y_squ ) >= (
@@ -1069,6 +1261,9 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1)(
 
         real_type c3           = ( real_type )0.0;
         real_type c4           = ( real_type )1.0;
+
+        real_type wz_re        = ( real_type )0.0;
+        real_type wz_im        = ( real_type )0.0;
 
         real_type const c1     = ( real_type )SIXTRL_CERRF_ABQ2011_TM_SQU *
                                  ( x + y ) * ( x - y );
@@ -1326,20 +1521,24 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1)(
 
         wz_re  -= temp   * ( real_type )SIXTRL_CERRF_ABQ2011_TM_SQU_OVER_SQRT_PI;
         wz_im  += sum_im * ( real_type )SIXTRL_CERRF_ABQ2011_TM_SQU_OVER_SQRT_PI;
+
+        *out_x  = wz_re;
+        *out_y  = wz_im;
     }
 
     #if defined( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION ) && \
                ( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION == 1 )
     else if( use_continued_fraction )
     {
+        real_type wz_re, wz_im;
         real_type rx = ( real_type )0.0;
         real_type ry = ( real_type )0.0;
-        real_type nn = ( real_type )CERRF_CONTINUOUS_FRACTION_K;
+        real_type nn = ( real_type )SIXTRL_CERRF_ABQ2011_CONT_FRACTION_K;
 
         for( ; nn > ( real_type )0. ; nn -= ( real_type )1. )
         {
-            wz_re = in_y + nn * rx;
-            wz_im = in_x - nn * ry;
+            wz_re = y + nn * rx;
+            wz_im = x - nn * ry;
             temp  = ( wz_re * wz_re + wz_im * wz_im );
 
             rx    = ( real_type )0.5 * wz_re;
@@ -1350,8 +1549,8 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1)(
             ry   *= temp;
         }
 
-        wz_re = NS(MathConst_two_over_sqrt_pi)() * rx;
-        wz_im = NS(MathConst_two_over_sqrt_pi)() * ry;
+        *out_x = NS(MathConst_two_over_sqrt_pi)() * rx;
+        *out_y = NS(MathConst_two_over_sqrt_pi)() * ry;
     }
 
     #endif /* ( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION == 1 ) */
@@ -1360,28 +1559,18 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1)(
                ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
     else if( use_dawson_approx )
     {
-        SIXTRL_CERRF_RESULT_DEC temp_re, temp_im;
-
         #if defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt );
         #elif defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                      ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt, Fz_kk_xi );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt, Fz_kk_xi );
         #else /* ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 ) */
-        NS(dawson_cerrf)( x, y, &temp_wz_re, &temp_wz_im );
+        NS(dawson_cerrf)( x, y, out_x, out_y );
         #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF ) */
-
-        wz_re = temp_re;
-        wz_im = temp_im;
     }
 
     #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
-
-    *out_x = wz_re;
-    *out_y = wz_im;
 }
 
 
@@ -1457,7 +1646,7 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
     if( use_pole_taylor_approx )
     {
         real_type d_pole_squ = y_squ;
-        N_POLE = ( int )NS(round)( x * ( real_type )CERRF_TM_OVER_PI );
+        N_POLE = ( int )NS(round)( x * ( real_type )SIXTRL_CERRF_ABQ2011_TM_OVER_PI );
         temp   = x - ( ( real_type )SIXTRL_CERRF_ABQ2011_PI_OVER_TM *
                        ( real_type )N_POLE );
 
@@ -1560,6 +1749,9 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
 
         wz_re  -= temp   * ( real_type )SIXTRL_CERRF_ABQ2011_TM_SQU_OVER_SQRT_PI;
         wz_im  += sum_im * ( real_type )SIXTRL_CERRF_ABQ2011_TM_SQU_OVER_SQRT_PI;
+
+        *out_x = wz_re;
+        *out_y = wz_im;
     }
     #if defined( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION ) && \
                ( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION == 1 )
@@ -1567,12 +1759,12 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
     {
         real_type rx = ( real_type )0.0;
         real_type ry = ( real_type )0.0;
-        real_type nn = ( real_type )CERRF_CONTINUOUS_FRACTION_K;
+        real_type nn = ( real_type )SIXTRL_CERRF_ABQ2011_CONT_FRACTION_K;
 
         for( ; nn > ( real_type )0. ; nn -= ( real_type )1. )
         {
-            wz_re = in_y + nn * rx;
-            wz_im = in_x - nn * ry;
+            wz_re = y + nn * rx;
+            wz_im = x - nn * ry;
             temp  = ( wz_re * wz_re + wz_im * wz_im );
 
             rx    = ( real_type )0.5 * wz_re;
@@ -1583,8 +1775,8 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
             ry   *= temp;
         }
 
-        wz_re = NS(MathConst_two_over_sqrt_pi)() * rx;
-        wz_im = NS(MathConst_two_over_sqrt_pi)() * ry;
+        *out_x = NS(MathConst_two_over_sqrt_pi)() * rx;
+        *out_y = NS(MathConst_two_over_sqrt_pi)() * ry;
     }
 
     #endif /* ( SIXTRL_CERRF_ABQ2011_USE_CONT_FRACTION == 1 ) */
@@ -1592,22 +1784,15 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
                ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
     else if( use_dawson_approx )
     {
-        SIXTRL_CERRF_RESULT_DEC temp_re, temp_im;
-
         #if defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt );
         #elif defined( SIXTRL_CERRF_USE_DAWSON_COEFF ) && \
                      ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
-        NS(dawson_cerrf_coeff)( x, y, &temp_wz_re, &temp_wz_im,
-                                xi, Fz_xi, Fz_nt, Fz_kk_xi );
+        NS(dawson_cerrf_coeff)( x, y, out_x, out_y, xi, Fz_xi, Fz_nt, Fz_kk_xi );
         #else
-        NS(dawson_cerrf)( x, y, &temp_wz_re, &temp_wz_im );
+        NS(dawson_cerrf)( x, y, out_x, out_y );
         #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF ) */
-
-        wz_re = temp_re;
-        wz_im = temp_im;
     }
 
     #endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
@@ -1655,12 +1840,12 @@ SIXTRL_INLINE void NS(cerrf_abq2011_q1_coeff)(
             wz_re    -= b_n_value * dz_nn_im;
             wz_im    += b_n_value * dz_nn_re;
         }
+
+        *out_x = wz_re;
+        *out_y = wz_im;
     }
 
     #endif /* ( SIXTRL_CERRF_ABQ2011_USE_TAYLOR_POLE_APPROX == 1 ) */
-
-    *out_x = wz_re;
-    *out_y = wz_im;
 }
 
 
@@ -1701,6 +1886,21 @@ SIXTRL_INLINE void NS(cerrf_q1)(
     NS(cerrf_cernlib_c_baseline_q1)( x, y, out_x, out_y );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_UPSTREAM )
     NS(cerrf_cernlib_c_upstream_q1)( x, y, out_x, out_y );
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_FIXED )
+        #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+                   ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) \
+            defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
+                   ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 )
+            NS(cerrf_cernlib_c_optimised_fixed_q1)(
+                x, y, out_x, out_y, xi, Fz_xi, Fz_nt );
+            #if ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
+            NS(cerrf_cernlib_c_optimised_fixed_q1)(
+                x, y, out_x, out_y, xi, Fz_xi, Fz_nt, Fz_kk_xi );
+            #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 ) */
+        #else /* !SIXTRL_CERRF_USE_DAWSON_COEFF */
+            NS(cerrf_cernlib_c_optimised_fixed_q1)( x, y, out_x, out_y );
+        #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX && SIXTRL_CERRF_USE_DAWSON_COEFF */
+
     #elif SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ALG680
         #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) \
@@ -1815,7 +2015,23 @@ SIXTRL_INLINE void NS(cerrf)(
     NS(cerrf_cernlib_c_baseline_q1)( x, y, &Wx, &Wy );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_UPSTREAM )
     NS(cerrf_cernlib_c_upstream_q1)( x, y, &Wx, &Wy );
-    #elif SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ALG680
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_FIXED )
+        #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+                   ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
+            defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
+                   ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 )
+            NS(cerrf_cernlib_c_optimised_fixed_q1)(
+                x, y, &Wx, &Wy, xi, Fz_xi, Fz_nt );
+            #if ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 )
+            NS(cerrf_cernlib_c_optimised_fixed_q1)(
+                x, y, &Wx, &Wy, xi, Fz_xi, Fz_nt, Fz_kk_xi );
+            #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 ) */
+        #else /* !SIXTRL_CERRF_USE_DAWSON_COEFF */
+            NS(cerrf_cernlib_c_optimised_fixed_q1)( x, y, &Wx, &Wy );
+        #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX && SIXTRL_CERRF_USE_DAWSON_COEFF */
+
+
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ALG680 )
         #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
             defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
@@ -1828,7 +2044,7 @@ SIXTRL_INLINE void NS(cerrf)(
             NS(cerrf_alg680_q1)( x, y, &Wx, &Wy );
         #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX && SIXTRL_CERRF_USE_DAWSON_COEFF */
 
-    #elif SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ABQ2011
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ABQ2011 )
         #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
                    ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
             defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \

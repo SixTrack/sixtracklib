@@ -68,6 +68,34 @@ void NS(cerrf_cernlib_c_optimised_q1_ext)(
     #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX && SIXTRL_CERRF_USE_DAWSON_COEFF */
 }
 
+void NS(cerrf_cernlib_c_optimised_fixed_q1_ext)(
+    SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
+    SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_imag
+) SIXTRL_NOEXCEPT
+{
+    #if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_APPROX  == 1 ) && \
+        defined( SIXTRL_CERRF_USE_DAWSON_COEFF  ) && \
+               ( SIXTRL_CERRF_USE_DAWSON_COEFF   >= 1 )
+
+            #if ( SIXTRL_CERRF_USE_DAWSON_COEFF == 1 )
+                NS(cerrf_cernlib_c_optimised_fixed_q1)( x, y, out_real, out_imag,
+                    &NS(CERRF_DAWSON_XI)[ 0 ],&NS(CERRF_DAWSON_FZ_XI)[ 0 ],
+                        &NS(CERRF_DAWSON_NT_XI_REL_D14)[ 0 ] );
+
+            #else /* ( SIXTRL_CERRF_USE_DAWSON_COEFF > 1 ) */
+                NS(cerrf_cernlib_c_optimised_fixed_q1)( x, y, out_real, out_imag,
+                    &NS(CERRF_DAWSON_XI)[ 0 ],&NS(CERRF_DAWSON_FZ_XI)[ 0 ],
+                        &NS(CERRF_DAWSON_NT_XI_REL_D14)[ 0 ],
+                            &NS(CERRF_DAWSON_FZ_KK_XI)[ 0 ] );
+
+            #endif /* ( SIXTRL_CERRF_USE_DAWSON_COEFF >= 1 ) */
+    #else /* !SIXTRL_CERRF_USE_DAWSON_APPROX || SIXTRL_CERRF_USE_DAWSON_COEFF == 0 */
+        NS(cerrf_cernlib_c_optimised_fixed_q1)( x, y, out_real, out_imag );
+    #endif /* SIXTRL_CERRF_USE_DAWSON_APPROX && SIXTRL_CERRF_USE_DAWSON_COEFF */
+}
+
 void NS(cerrf_alg680_q1_ext)(
     SIXTRL_REAL_T const x, SIXTRL_REAL_T const y,
     SIXTRL_CERRF_RESULT_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT out_real,
@@ -167,6 +195,8 @@ void NS(cerrf_q1_ext)(
     NS(cerrf_cernlib_c_baseline_q1_ext)( x, y, out_real, out_imag );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_UPSTREAM )
     NS(cerrf_cernlib_c_upstream_q1_ext)( x, y, out_real, out_imag );
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_FIXED )
+    NS(cerrf_cernlib_c_optimised_q1_fixed_ext)( x, y, out_real, out_imag );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ALG680 )
     NS(cerrf_alg680_q1_ext)( x, y, out_real, out_imag );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ABQ2011 )
@@ -200,6 +230,8 @@ void NS(cerrf_ext)(
     NS(cerrf_cernlib_c_baseline_q1_ext)( x, y, &Wx, &Wy );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_UPSTREAM )
     NS(cerrf_cernlib_c_upstream_q1_ext)( x, y, &Wx, &Wy );
+    #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_CERNLIB_FIXED )
+    NS(cerrf_cernlib_c_upstream_fixed_q1_ext)( x, y, &Wx, &Wy );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ALG680 )
     NS(cerrf_alg680_q1_ext)( x, y, &Wx, &Wy );
     #elif ( SIXTRL_CERRF_METHOD == SIXTRL_CERRF_ABQ2011 )
