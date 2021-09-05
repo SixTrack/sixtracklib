@@ -38,8 +38,5 @@ if __name__ == '__main__':
             wz_re_alg680[ jj, ii ] = np.float64( out_re )
             wz_im_alg680[ jj, ii ] = np.float64( out_im )
 
-    print( np.fabs( wz_re_cmp - wz_re_alg680 ).max() )
-    print( np.fabs( wz_im_cmp - wz_im_alg680 ).max() )
-
-    assert np.fabs( wz_re_cmp - wz_re_alg680 ).max() < 1e-10
-    assert np.fabs( wz_im_cmp - wz_im_alg680 ).max() < 1e-10
+    assert np.fabs( wz_re_cmp - wz_re_alg680 ).max() < 0.5e-14
+    assert np.fabs( wz_im_cmp - wz_im_alg680 ).max() < 0.5e-14
