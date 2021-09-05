@@ -6710,6 +6710,12 @@ st_cerrf_cernlib_c_optimised_q1.restype = None
 st_cerrf_cernlib_c_optimised_q1.argtypes = [
     ct.c_double, ct.c_double, st_double_p, st_double_p, ]
 
+st_cerrf_cernlib_c_optimised_fixed_q1 = \
+    sixtracklib.st_cerrf_cernlib_c_optimised_fixed_q1_ext
+st_cerrf_cernlib_c_optimised_fixed_q1.restype = None
+st_cerrf_cernlib_c_optimised_fixed_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
 st_cerrf_alg680_q1 = sixtracklib.st_cerrf_alg680_q1_ext
 st_cerrf_alg680_q1.restype = None
 st_cerrf_alg680_q1.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
@@ -6721,6 +6727,21 @@ st_cerrf_abq2011_a_m_coeff.argtypes = [ ct.c_int ]
 st_cerrf_abq2011_q1 = sixtracklib.st_cerrf_abq2011_q1_ext
 st_cerrf_abq2011_q1.restype = None
 st_cerrf_abq2011_q1.argtypes = [ ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_abq2011_cf_q1 = sixtracklib.st_cerrf_abq2011_cf_q1_ext
+st_cerrf_abq2011_cf_q1.restype = None
+st_cerrf_abq2011_cf_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_abq2011_cf_daw_q1 = sixtracklib.st_cerrf_abq2011_cf_daw_q1_ext
+st_cerrf_abq2011_cf_daw_q1.restype = None
+st_cerrf_abq2011_cf_daw_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
+
+st_cerrf_abq2011_root_q1 = sixtracklib.st_cerrf_abq2011_root_q1_ext
+st_cerrf_abq2011_root_q1.restype = None
+st_cerrf_abq2011_root_q1.argtypes = [
+    ct.c_double, ct.c_double, st_double_p, st_double_p, ]
 
 st_cerrf_abq2011_q1_coeff = sixtracklib.st_cerrf_abq2011_q1_coeff_ext
 st_cerrf_abq2011_q1_coeff.restype = None
