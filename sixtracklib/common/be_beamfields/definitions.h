@@ -48,8 +48,9 @@ extern "C" {
 #define SIXTRL_CERRF_CERNLIB_OPTIMISED 0
 #define SIXTRL_CERRF_CERNLIB_BASELINE  1
 #define SIXTRL_CERRF_CERNLIB_UPSTREAM  2
-#define SIXTRL_CERRF_ALG680            3
-#define SIXTRL_CERRF_ABQ2011           4
+#define SIXTRL_CERRF_CERNLIB_FIXED     3
+#define SIXTRL_CERRF_ALG680            4
+#define SIXTRL_CERRF_ABQ2011           5
 
 /* ------------------------------------------------------------------------- */
 
@@ -77,7 +78,7 @@ extern "C" {
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_MIN_Y ) */
 
 #if !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_MIN_POW_2H_N )
-    #define SIXTRL_CERRF_CERNLIB_UPSTREAM_MIN_POW_2H_N 2.22044604925031e-16
+    #define SIXTRL_CERRF_CERNLIB_UPSTREAM_MIN_POW_2H_N 2.22507385850720e-307
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_MIN_POW_2H_N ) */
 
 #if !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_H_0 )
@@ -95,6 +96,22 @@ extern "C" {
 #if !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_K )
     #define SIXTRL_CERRF_CERNLIB_UPSTREAM_K 9
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_UPSTREAM_K ) */
+
+#if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
+           ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
+
+    #if !defined( SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MAX_Y )
+        #define SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MAX_Y 0.5
+    #endif /* !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_Y ) */
+
+    #if !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MIN_X )
+        #define SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MIN_X 0.0
+    #endif /* !defined( SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MIN_X ) */
+
+    #if !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X )
+        #define SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X 9.0
+    #endif /* !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X ) */
+#endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
 
 /* ************************************************************************* */
 /* Cernlib baseline and optimised: */
@@ -125,7 +142,7 @@ extern "C" {
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_MIN_Y ) */
 
 #if !defined( SIXTRL_CERRF_CERNLIB_MIN_POW_2H_N )
-    #define SIXTRL_CERRF_CERNLIB_MIN_POW_2H_N 2.22044604925031e-16
+    #define SIXTRL_CERRF_CERNLIB_MIN_POW_2H_N 2.22507385850720e-307
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_MIN_POW_2H_N ) */
 
 #if !defined( SIXTRL_CERRF_CERNLIB_H_0 )
@@ -151,22 +168,6 @@ extern "C" {
 #if !defined( SIXTRL_CERRF_CERNLIB_K )
     #define SIXTRL_CERRF_CERNLIB_K 9
 #endif /* !defined( SIXTRL_CERRF_CERNLIB_K ) */
-
-#if defined( SIXTRL_CERRF_USE_DAWSON_APPROX ) && \
-           ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 )
-
-    #if !defined( SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MAX_Y )
-        #define SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MAX_Y 0.5
-    #endif /* !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_Y ) */
-
-    #if !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MIN_X )
-        #define SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MIN_X 0.0
-    #endif /* !defined( SIXTRL_CERRF_CERNLIB_USE_DAWSON_APPROX_MIN_X ) */
-
-    #if !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X )
-        #define SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X 9.0
-    #endif /* !defined( SIXTRL_CERRF_CERNLIB_DAWSON_APPROX_MAX_X ) */
-#endif /* ( SIXTRL_CERRF_USE_DAWSON_APPROX == 1 ) */
 
 /* ************************************************************************* */
 /* ACM Algorithm 680: */
