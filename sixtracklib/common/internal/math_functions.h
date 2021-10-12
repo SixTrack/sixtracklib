@@ -144,6 +144,41 @@ namespace SIXTRL_CXX_NAMESPACE
 
     template< typename T >
     SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    void sincos( typename TypeMethodParamTraits< T >::const_argument_type arg,
+        SIXTRL_RESULT_PTR_DEC typename TypeMethodParamTraits< T >::pointer sin_res,
+        SIXTRL_RESULT_PTR_DEC typename TypeMethodParamTraits< T >::pointer cos_res
+    ) SIXTRL_NOEXCEPT
+    {
+        SIXTRL_ASSERT( sin_res != nullptr );
+        SIXTRL_ASSERT( cos_res != nullptr );
+        #if ( !defined( SIXTRL_NO_SINCOS ) ) && \
+            ( defined( __OPENCL_C_VERSION__ ) )
+
+        *sin_res = ::sincos( arg, cos_res );
+
+        #elif ( !defined( XSUITE_NO_SINCOS ) ) && \
+              ( ( defined( __CUDA_ARCH__ ) ) || \
+                ( defined( __GNUC__ ) && !defined( __clang__ ) && \
+              !defined( __STRICT_ANSI__ ) && !defined( __INTEL_COMPILER ) && \
+               defined( __NO_MATH_ERRNO__ ) ) )
+
+        ::sincos( arg, sin_res, cos_res );
+
+        #else
+
+        using std::sin;
+        using std::cos;
+
+        *sin_res = sin( arg );
+        *cos_res = cos( arg );
+
+        #endif
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
     typename TypeMethodParamTraits< T >::value_type tan( typename
         TypeMethodParamTraits< T >::const_argument_type arg ) SIXTRL_NOEXCEPT
     {
@@ -260,106 +295,78 @@ namespace SIXTRL_CXX_NAMESPACE
         std::is_integral< I >(),
         typename TypeMethodParamTraits< T >::value_type >::type
     pow_int_exp(
-        typename TypeMethodParamTraits< T >::const_argument_type base,
+        typename TypeMethodParamTraits< T >::const_argument_type x,
         typename TypeMethodParamTraits< I >::const_argument_type n
     ) SIXTRL_NOEXCEPT
     {
-        #if defined( _GPUCODE ) && defined( __OPENCL_VERSION__ )
-        return pown( base, n );
-        #elif ( __cplusplus >= 201103L )
-        #if !defined( _GPUCODE ) /* ADL! */
-        using std::pow;
-        #endif /* ADL / Host */
-        return pow( base, n );
-        #else
-        #if !defined( _GPUCODE ) /* ADL! */
-        using std::abs;
-        #endif /* ADL / Host */
-        namespace st = SIXTRL_CXX_NAMESPACE;
-        typedef typename st::TypeMethodParamTraits< I >::value_type int_t;
-        typedef typename st::TypeMethodParamTraits< T >::value_type real_t;
+        typedef typename TypeMethodParamTraits< T >::value_type real_type;
 
-        real_t result;
-        int_t const pos_exp = abs( n );
+        real_type x_n = x;
 
-        SIXTRL_ASSERT( ( st::Type_comp_all_more< T >(
-            st::abs< T >( base ), real_t{ 0 } ) ) || ( n > int_t{ 0 } ) );
+        unsigned int const n_div_16 = n >> 4u;
+        unsigned int const n_mod_16 = n - ( n_div_16 << 4u );
 
-        switch( pos_exp )
+        switch( n_mod_16 )
         {
-            case 0:
-            {
-                result = real_t{ 1 };
-                break;
-            }
+            case  0u: { x_n = real_type{ 1.0 }; break; }
+            case  1u: { break; }
+            case  2u: { x_n *= x;                                       break; }
+            case  3u: { x_n *= x * x;                                   break; }
+            case  4u: { x_n *= x;     x_n *= x_n;                       break; }
+            case  5u: { x_n *= x;     x_n *= x_n * x;                   break; }
+            case  6u: { x_n *= x * x; x_n *= x_n;                       break; }
+            case  7u: { x_n *= x * x; x_n *= x_n * x;                   break; }
+            case  8u: { x_n *= x;     x_n *= x_n;     x_n *= x_n;       break; }
+            case  9u: { x_n *= x * x; x_n *= x_n * x_n;                 break; }
+            case 10u: { x_n *= x * x; x_n *= x_n * x_n * x;             break; }
+            case 11u: { x_n *= x;     x_n *= x_n * x; x_n *= x_n * x;   break; }
+            case 12u: { x_n *= x * x; x_n *= x_n;     x_n *= x_n;       break; }
+            case 13u: { x_n *= x * x; x_n *= x_n;     x_n *= x_n * x;   break; }
+            case 14u: { x_n *= x * x; x_n *= x_n * x; x_n *= x_n;       break; }
+            case 15u: { x_n *= x;     x_n *= x_n * x; x_n *= x_n * x_n; break; }
+            default:  { x_n = real_type{ 0.0 }; }
+        };
 
-            case 1:
-            {
-                result = base;
-                break;
-            }
+        if( n_div_16 > 0u ){ x *= x; x *= x; x *= x; x *= x; }
 
-            case 2:
-            {
-                result = base * base;
-                break;
-            }
+        switch( n_div_16 )
+        {
+            case  0u: { x_n  = ( n_mod_16 != 0u ) ? x_n : real_type{ 1.0 }; break; }
+            case  1u: { x_n *= x;                                           break; }
+            case  2u: { x   *= x; x_n *= x;                                 break; }
+            case  3u: { x_n *= x * x * x;                                   break; }
+            case  4u: { x   *= x; x *= x; x_n *= x;                         break; }
+            case  5u: { x_n *= x; x *= x; x *= x; x_n *= x;                 break; }
+            case  6u: { x   *= x * x; x *= x; x_n *= x;                     break; }
+            case  7u: { x_n *= x; x *= x * x; x *= x; x_n *= x;             break; }
+            case  8u: { x *= x; x *= x; x*= x; x_n *= x;                    break; }
+            case  9u: { x *= x * x; x *= x * x; x_n *= x;                   break; }
+            case 10u: { x_n *= x; x *= x * x; x *= x * x; x_n *= x;         break; }
+            case 11u: { x_n *= x * x; x *= x * x; x *= x * x; x_n *= x;     break; }
+            case 12u: { x *= x; x *= x; x_n *= x; x *= x; x_n *= x;         break; }
+            case 13u: { x_n *= x; x *= x; x *= x; x_n *= x; x *= x;
+                        x_n *= x; break; }
 
-            case 3:
-            {
-                result = base * base * base;
-                break;
-            }
+            case 14u: { x_n *= x * x; x *= x; x *= x; x_n *= x; x *= x;
+                        x_n *= x; break; }
 
-            case 4:
-            {
-                real_t const base_squ = base * base;
-                result = base_squ * base_squ;
-                break;
-            }
-
-            case 5:
-            {
-                real_t const base_squ = base * base;
-                result = base_squ * base_squ * base;
-                break;
-            }
-
-            case 6:
-            {
-                real_t const base_cub = base * base * base;
-                result = base_cub * base_cub;
-                break;
-            }
-
-            case 7:
-            {
-                real_t const base_cub = base * base * base;
-                result = base_cub * base_cub * base;
-                break;
-            }
-
-            case 8:
-            {
-                real_t const base_squ = base * base;
-                real_t const base_quad = base_squ * base_squ;
-                result = base_quad * base_quad;
-                break;
-            }
+            case 15u: { x *= x * x; x_n *= x * x; x *= x * x; x_n *= x;    break; }
 
             default:
             {
-                real_t const base_pow_8 =
-                    st::pow_int_exp< T, I >( base, int_t{ 8 } );
+                unsigned int ii = 0u;
+                unsigned int nn = n_div_16 % 16u;
 
-                result  = st::pow_int_exp< T, I >( base_pow_8, pos_exp >> 3 );
-                result *= st::pow_int_exp< T, I >( base_pow_8,
-                    pos_exp - ( ( pos_exp >> 3 ) << 3 ) );
+                for( ; ii < nn ; ++ii ) x_n *= x;
+
+                x *= x; x *= x; x *= x; x *= x;
+                nn = ( n_div_16 - nn ) >> 4u;
+
+                for( ii = 0u ; ii < nn ; ++ii ) x_n *= x;
             }
-        };
+        }
 
-        return ( n >= int_t{ 0 } ) ? result : real_t{ 1 }  / result;
-        #endif
+        return x_n;
     }
 
     template< typename T >
@@ -409,6 +416,69 @@ namespace SIXTRL_CXX_NAMESPACE
         using std::min;
         #endif /* ADL / Host */
         return min( lhs, rhs );
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    round( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        typedef typename TypeMethodParamTraits< T >::value_type value_type;
+        typedef SIXTRL_INT64_T int_type;
+        #endif /* !defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::round;
+        #endif /* ADL / Host */
+
+        #if defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return round( arg );
+        #else
+        return static_cast< value_type >( static_cast< int_type >(
+                            value_type{ 0.5 } + arg ) );
+        #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+    }
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    floor( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        typedef typename TypeMethodParamTraits< T >::value_type value_type;
+        typedef SIXTRL_INT64_T int_type;
+        #endif /* !defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::floor;
+        #endif /* ADL / Host */
+
+        #if defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return round( arg );
+        #else
+        return static_cast< value_type >( static_cast< int_type >( arg ) );
+        #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+    }
+
+    template< typename T >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+    typename std::enable_if< SIXTRL_CXX_NAMESPACE::Type_is_scalar< T >(),
+    typename TypeMethodParamTraits< T >::value_type >::type
+    ceil( typename TypeMethodParamTraits< T >::const_argument_type arg
+        ) SIXTRL_NOEXCEPT
+    {
+        #if !defined( _GPUCODE ) /* ADL! */
+        using std::ceil;
+        #endif /* ADL / Host */
+
+        return ceil( arg );
     }
 }
 
@@ -472,6 +542,20 @@ NS(acos)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
                 T >::value_type{ +1 } ) );
 
     return acos( arg );
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN void NS(sincos)(
+    typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::const_argument_type arg,
+    SIXTRL_RESULT_PTR_DEC typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::pointer SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+        T >::pointer SIXTRL_RESTRICT cos_res ) SIXTRL_NOEXCEPT
+{
+    SIXTRL_CXX_NAMESPACE::sincos( arg, sin_res, cos_res );
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -670,6 +754,35 @@ typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type NS(min)(
     return SIXTRL_CXX_NAMESPACE::min( lhs, rhs );
 }
 
+/* ------------------------------------------------------------------------ */
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(round)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::round< T >( arg );
+}
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(floor)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::floor< T >( arg );
+}
+
+template< typename T >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN
+typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits< T >::value_type
+NS(ceil)( typename SIXTRL_CXX_NAMESPACE::TypeMethodParamTraits<
+    T >::const_argument_type arg ) SIXTRL_NOEXCEPT
+{
+    return SIXTRL_CXX_NAMESPACE::ceil< T >( arg );
+}
+
 #endif /* defined( __cplusplus ) */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -684,6 +797,11 @@ NS(asin)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(cos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN void NS(sincos)( SIXTRL_REAL_T const arg,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT cos_res
+) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(acos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
@@ -720,14 +838,23 @@ NS(pow_positive_base)( SIXTRL_REAL_T const base,
                        SIXTRL_REAL_T const n ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
-NS(pow_int_exp)( SIXTRL_REAL_T const base,
-                 SIXTRL_INT64_T const n ) SIXTRL_NOEXCEPT;
+NS(pow_int_exp)( SIXTRL_REAL_T base,
+                 SIXTRL_UINT64_T const n ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(min)( SIXTRL_REAL_T const lhs, SIXTRL_REAL_T const rhs ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(max)( SIXTRL_REAL_T const lhs, SIXTRL_REAL_T const rhs ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(floor)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(round)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+NS(ceil)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT;
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -769,6 +896,32 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(cos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
     #endif /* Host, ADL */
 
     return cos( arg );
+}
+
+SIXTRL_INLINE void NS(sincos)( SIXTRL_REAL_T const arg,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT sin_res,
+    SIXTRL_RESULT_PTR_DEC SIXTRL_REAL_T* SIXTRL_RESTRICT cos_res
+) SIXTRL_NOEXCEPT
+{
+    SIXTRL_ASSERT( sin_res != SIXTRL_NULLPTR );
+    SIXTRL_ASSERT( cos_res != SIXTRL_NULLPTR );
+
+    #if ( !defined( SIXTRL_NO_SINCOS ) ) && \
+        ( defined( __OPENCL_C_VERSION__ ) )
+    *sin_res = sincos( arg, cos_res );
+
+    #elif ( !defined( XSUITE_NO_SINCOS ) ) && \
+            ( ( defined( __CUDA_ARCH__ ) ) || \
+            ( defined( __GNUC__ ) && !defined( __clang__ ) && \
+            !defined( __STRICT_ANSI__ ) && !defined( __INTEL_COMPILER ) && \
+             defined( __NO_MATH_ERRNO__ ) ) )
+    sincos( arg, sin_res, cos_res );
+
+    #else
+    *sin_res = sin( arg );
+    *cos_res = cos( arg );
+
+    #endif
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(acos)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
@@ -882,99 +1035,84 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(pow_positive_base)(
     #endif
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(pow_int_exp)( SIXTRL_REAL_T const base,
-                 SIXTRL_INT64_T const n ) SIXTRL_NOEXCEPT
+SIXTRL_INLINE SIXTRL_REAL_T NS(pow_int_exp)( SIXTRL_REAL_T x,
+                 SIXTRL_UINT64_T const n ) SIXTRL_NOEXCEPT
 {
-    #if defined( _GPUCODE ) && defined( __OPENCL_VERSION__ )
-        return pown( base, n );
-        #elif defined( __cplusplus ) && ( __cplusplus >= 201103L )
-        #if !defined( _GPUCODE ) /* ADL */
-        using std::pow;
-        #endif /* ADL / Host */
-        return pow( base, n );
-        #else
-        #if !defined( _GPUCODE ) && defined( __cplusplus ) /* ADL */
-        using std::llabs;
-        #endif /* ADL / Host */
-        typedef SIXTRL_REAL_T real_t;
-        typedef SIXTRL_INT64_T int_t;
+    #if defined( __OPENCL_C_VERSION__ )
+    return pown( x, n );
+    #else /* !defined( __OPENCL_C_VERSION__ ) */
 
-        real_t result;
-        int_t const pos_exp = llabs( n );
+    typedef SIXTRL_REAL_T real_type;
 
-        switch( pos_exp )
+    real_type x_n = x;
+
+    unsigned int const n_div_16 = n >> 4u;
+    unsigned int const n_mod_16 = n - ( n_div_16 << 4u );
+
+    SIXTRL_ASSERT( n >= 0 );
+
+    switch( n_mod_16 )
+    {
+        case  0u: { x_n = ( real_type )1.0; break; }
+        case  1u: { break; }
+        case  2u: { x_n *= x;                                       break; }
+        case  3u: { x_n *= x * x;                                   break; }
+        case  4u: { x_n *= x;     x_n *= x_n;                       break; }
+        case  5u: { x_n *= x;     x_n *= x_n * x;                   break; }
+        case  6u: { x_n *= x * x; x_n *= x_n;                       break; }
+        case  7u: { x_n *= x * x; x_n *= x_n * x;                   break; }
+        case  8u: { x_n *= x;     x_n *= x_n;     x_n *= x_n;       break; }
+        case  9u: { x_n *= x * x; x_n *= x_n * x_n;                 break; }
+        case 10u: { x_n *= x * x; x_n *= x_n * x_n * x;             break; }
+        case 11u: { x_n *= x;     x_n *= x_n * x; x_n *= x_n * x;   break; }
+        case 12u: { x_n *= x * x; x_n *= x_n;     x_n *= x_n;       break; }
+        case 13u: { x_n *= x * x; x_n *= x_n;     x_n *= x_n * x;   break; }
+        case 14u: { x_n *= x * x; x_n *= x_n * x; x_n *= x_n;       break; }
+        case 15u: { x_n *= x;     x_n *= x_n * x; x_n *= x_n * x_n; break; }
+        default:  { x_n = ( real_type )0.0; }
+    };
+
+    if( n_div_16 > 0u ){ x *= x; x *= x; x *= x; x *= x; }
+
+    switch( n_div_16 )
+    {
+        case  0u: { x_n  = ( n_mod_16 != 0u ) ? x_n : ( real_type )1.0; break; }
+        case  1u: { x_n *= x;                                           break; }
+        case  2u: { x   *= x; x_n *= x;                                 break; }
+        case  3u: { x_n *= x * x * x;                                   break; }
+        case  4u: { x   *= x; x *= x; x_n *= x;                         break; }
+        case  5u: { x_n *= x; x *= x; x *= x; x_n *= x;                 break; }
+        case  6u: { x   *= x * x; x *= x; x_n *= x;                     break; }
+        case  7u: { x_n *= x; x *= x * x; x *= x; x_n *= x;             break; }
+        case  8u: { x *= x; x *= x; x*= x; x_n *= x;                    break; }
+        case  9u: { x *= x * x; x *= x * x; x_n *= x;                   break; }
+        case 10u: { x_n *= x; x *= x * x; x *= x * x; x_n *= x;         break; }
+        case 11u: { x_n *= x * x; x *= x * x; x *= x * x; x_n *= x;     break; }
+        case 12u: { x *= x; x *= x; x_n *= x; x *= x; x_n *= x;         break; }
+        case 13u: { x_n *= x; x *= x; x *= x; x_n *= x; x *= x;
+                    x_n *= x; break; }
+
+        case 14u: { x_n *= x * x; x *= x; x *= x; x_n *= x; x *= x;
+                    x_n *= x; break; }
+
+        case 15u: { x *= x * x; x_n *= x * x; x *= x * x; x_n *= x;    break; }
+
+        default:
         {
-            case 0:
-            {
-                result = ( real_t )1;
-                break;
-            }
+            unsigned int ii = 0u;
+            unsigned int nn = n_div_16 % 16u;
 
-            case 1:
-            {
-                result = base;
-                break;
-            }
+            for( ; ii < nn ; ++ii ) x_n *= x;
 
-            case 2:
-            {
-                result = base * base;
-                break;
-            }
+            x *= x; x *= x; x *= x; x *= x;
+            nn = ( n_div_16 - nn ) >> 4u;
 
-            case 3:
-            {
-                result = base * base * base;
-                break;
-            }
+            for( ii = 0u ; ii < nn ; ++ii ) x_n *= x;
+        }
+    };
 
-            case 4:
-            {
-                real_t const base_squ = base * base;
-                result = base_squ * base_squ;
-                break;
-            }
-
-            case 5:
-            {
-                real_t const base_squ = base * base;
-                result = base_squ * base_squ * base;
-                break;
-            }
-
-            case 6:
-            {
-                real_t const base_cub = base * base * base;
-                result = base_cub * base_cub;
-                break;
-            }
-
-            case 7:
-            {
-                real_t const base_cub = base * base * base;
-                result = base_cub * base_cub * base;
-                break;
-            }
-
-            case 8:
-            {
-                real_t const base_squ = base * base;
-                real_t const base_quad = base_squ * base_squ;
-                result = base_quad * base_quad;
-                break;
-            }
-
-            default:
-            {
-                real_t const base_pow_8 = NS(pow_int_exp)( base, ( int_t )8 );
-                result  = NS(pow_int_exp)( base_pow_8, pos_exp >> 3 );
-                result *= NS(pow_int_exp)( base_pow_8,
-                    pos_exp - ( ( pos_exp >> 3 ) << 3 ) );
-            }
-        };
-
-        return ( n >= ( int_t )0 ) ? result : ( real_t )1  / result;
-        #endif
+    return x_n;
+    #endif /* defined( __OPENCL_C_VERSION__ ) */
 }
 
 SIXTRL_INLINE SIXTRL_REAL_T NS(min)(
@@ -1001,6 +1139,43 @@ SIXTRL_INLINE SIXTRL_REAL_T NS(max)(
     #else
     return ( lhs >= rhs ) ? lhs : rhs;
     #endif /* _GPUCODE */
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(floor)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+        return ( SIXTRL_REAL_T )( SIXTRL_INT64_T )( arg );
+    #else /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+        #if defined( __cplusplus ) && !defined( _GPUCODE )
+        using std::floor;
+        #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+        return floor( arg );
+    #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+}
+
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(round)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if !defined( SIXTRL_REAL_USE_SAFE_ROUNDING )
+    return ( SIXTRL_REAL_T )( SIXTRL_INT64_T )(
+        ( SIXTRL_REAL_T )0.5 + arg );
+
+    #else /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+        #if defined( __cplusplus ) && !defined( _GPUCODE )
+        using std::round;
+        #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+        return round( arg );
+    #endif /* defined( SIXTRL_REAL_USE_SAFE_ROUNDING ) */
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(ceil)( SIXTRL_REAL_T const arg ) SIXTRL_NOEXCEPT
+{
+    #if defined( __cplusplus ) && !defined( _GPUCODE )
+    using std::ceil;
+    #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
+
+    return ceil( arg );
 }
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

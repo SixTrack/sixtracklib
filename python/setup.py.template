@@ -14,7 +14,7 @@ setuptools.setup(
         'sixtracklib': [ 'sixtracklib/@PYTHON_SIXTRACKLIB_SHARED_LIB@' ],
         'sixtracklib_test': [ 'sixtracklib_test/@PYTHON_SIXTRACKLIB_TEST_SHARED_LIB@' ]
     },
-    install_requires=['numpy','cobjects>=0.0.4','pysixtrack>=0.0.0','sixtracktools>=0.0.2']
+    install_requires=['numpy', 'scipy', 'cobjects>=0.0.4','pysixtrack>=0.0.6','sixtracktools>=0.0.2']
 )
 
 # end python/setup.py

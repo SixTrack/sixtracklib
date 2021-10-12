@@ -24,9 +24,10 @@
 #include "sixtracklib/common/output/elem_by_elem_config.h"
 #include "sixtracklib/common/output/output_buffer.h"
 #include "sixtracklib/opencl/internal/base_context.h"
-#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/opencl.h"
 
 #if defined( __cplusplus )
+#include "sixtracklib/opencl/opencl.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {

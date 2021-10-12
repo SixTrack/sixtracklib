@@ -28,7 +28,7 @@
     #include "sixtracklib/common/buffer.h"
     #include "sixtracklib/common/particles.h"
 
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
     #include "sixtracklib/opencl/internal/base_context.h"
     #include "sixtracklib/opencl/argument.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
@@ -38,6 +38,7 @@
 #if !defined( SIXTRL_NO_INCLUDES )
     #include "sixtracklib/common/buffer.hpp"
     #include "sixtracklib/common/particles.hpp"
+    #include "sixtracklib/opencl/opencl.hpp"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE

@@ -1,7 +1,14 @@
-set( SIXTRL_COMMON_BE_BEAMFIELDS_SOURCES be_beamfields.c )
+set( SIXTRL_COMMON_BE_BEAMFIELDS_SOURCES
+     be_beamfields.c faddeeva.c dawson_approx.c dawson_coeff_xn96_ntmax25.c
+     abq2011_coeff_nf24_tm12.c
+     abq2011_coeff_poles_nf24_tm12_nt6.c
+     abq2011_cf_q1.c
+     abq2011_cf_daw_q1.c
+     abq2011_root_q1.c )
 
 set( SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS
-     be_beamfields.h track.h faddeeva_cern.h gauss_fields.h )
+     be_beamfields.h track.h faddeeva.h abq2011_coeff.h
+     dawson_approx.h dawson_coeff.h gauss_fields.h )
 
 add_library( sixtrack_common_be_beamfields OBJECT
     ${SIXTRL_COMMON_BE_BEAMFIELDS_HEADERS}

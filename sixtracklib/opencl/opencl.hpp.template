@@ -1,0 +1,62 @@
+#ifndef SIXTRACKLIB_OPENCL_OPENCL_HPP__
+#define SIXTRACKLIB_OPENCL_OPENCL_HPP__
+
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/common/definitions.h"
+    #include "sixtracklib/opencl/opencl.h"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
+#if defined( __cplusplus ) && !defined( _GPUCODE )
+
+#if !defined( CL_HPP_MINIMUM_OPENCL_VERSION )
+    #define CL_HPP_MINIMUM_OPENCL_VERSION @SIXTRACKL_MIN_OPENCL_VERSION@
+#endif /* !defined( CL_HPP_MINIMUM_OPENCL_VERSION ) */
+
+#if !defined( CL_HPP_TARGET_OPENCL_VERSION )
+    #define CL_HPP_TARGET_OPENCL_VERSION @SIXTRACKL_TARGET_OPENCL_VERSION@
+#endif /* !defined( CL_HPP_TARGET_OPENCL_VERSION ) */
+
+#if !defined( SIXTRL_OPENCL_CXX_HEADER_FILE )
+    #define SIXTRL_OPENCL_CXX_HEADER_FILE "@SIXTRL_OPENCL_CXX_HEADER_FILE@"
+#endif /* !defined( SIXTRL_OPENCL_CXX_HEADER_FILE ) */
+
+#if !defined( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION )
+    #define SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION @SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION@
+#endif /* !defined( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION ) */
+
+#if !defined( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED )
+    #define SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED @SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED@
+#endif /* !defined( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED ) */
+
+#if !defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG )
+    #define SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG @SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG@
+#endif /* !defined( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG ) */
+
+#if !defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT )
+    #define SIXTRL_OPENCL_PRINT_BUILD_REPORT @SIXTRL_OPENCL_PRINT_BUILD_REPORT@
+#endif /* !defined( SIXTRL_OPENCL_PRINT_BUILD_REPORT ) */
+
+@SIXTRL_OPENCL_ENABLE_EXCEPTION_STR@
+
+#if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
+
+    /* Attempt to disable -Wignored-attributes warnings on affected compilers
+     * only for the C++ OpenCL header -> cf.
+     * http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1221 for reference */
+
+    #if defined( __GNUC__ ) && __GNUC__ >= 6
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wignored-attributes"
+        #pragma GCC diagnostic ignored "-Wpedantic"
+    #endif
+
+    #include <@SIXTRL_OPENCL_CXX_HEADER_FILE@>
+
+    #if defined( __GNUC__ ) && __GNUC__ >= 6
+        #pragma GCC diagnostic pop
+    #endif
+
+#endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
+#endif /* C++, Host */
+
+#endif /* SIXTRACKLIB_OPENCL_OPENCL_HPP__ */

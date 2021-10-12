@@ -45,7 +45,18 @@ if( SIXTRACKL_ENABLE_OPENCL )
     add_executable( track_lhc_no_bb_opencl_cxx track_lhc_no_bb_opencl.cpp )
     list( APPEND EXAMPLE_OPENCL_TARGETS track_lhc_no_bb_opencl_cxx )
 
+    # -------------------------------------------------------------------------
+    # track_fodo_opencl_cxx:
+    add_executable( track_fodo_opencl_cxx track_fodo_opencl.cpp )
+    list( APPEND EXAMPLE_OPENCL_TARGETS track_fodo_opencl_cxx )
 
+endif()
+
+if( SIXTRACKL_ENABLE_CUDA )
+    # -------------------------------------------------------------------------
+    # track_fodo_opencl_cxx:
+    add_executable( track_fodo_cuda_cxx track_fodo_cuda.cpp )
+    list( APPEND EXAMPLE_CUDA_TARGETS track_fodo_cuda_cxx )
 endif()
 
 # ==============================================================================
@@ -55,17 +66,12 @@ set( ALL_EXAMPLE_TARGETS
      ${EXAMPLE_TARGETS} ${EXAMPLE_OPENCL_TARGETS} ${EXAMPLE_CUDA_TARGETS} )
 
 if( ALL_EXAMPLE_TARGETS )
-
-    set(  EXAMPLE_COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS} )
-    list( APPEND EXAMPLE_COMPILE_OPTIONS -Wall )
-    list( APPEND EXAMPLE_COMPILE_OPTIONS -Werror )
-    list( APPEND EXAMPLE_COMPILE_OPTIONS -pedantic )
-
     set_property( TARGET ${ALL_EXAMPLE_TARGETS} PROPERTY LINKER_LANGUAGE CXX )
     set_property( TARGET ${ALL_EXAMPLE_TARGETS} PROPERTY CXX_STANDARD 11 )
     set_property( TARGET ${ALL_EXAMPLE_TARGETS} PROPERTY CXX_STANDARD_REQUIRED ON )
     set_property( TARGET ${ALL_EXAMPLE_TARGETS}
-                  APPEND PROPERTY COMPILE_OPTIONS ${EXAMPLE_COMPILE_OPTIONS} )
+                  APPEND PROPERTY COMPILE_OPTIONS ${SIXTRACKLIB_CPU_FLAGS}
+                  ${SIXTRACKLIB_CXX_FLAGS} ${SIXTRACKL_CXX_AUTOVEC_FLAGS} )
 
     set_property( TARGET ${ALL_EXAMPLE_TARGETS}
                   PROPERTY LINK_LIBRARIES ${EXAMPLE_LINK_LIBRARIES} )
@@ -186,5 +192,3 @@ if( SIXTRACKL_INSTALL_EXAMPLES AND ALL_EXAMPLE_TARGETS )
         configure_file( \"${CMAKELISTS_TXT_IN_PATH}\"
                         \"${CMAKELISTS_TXT_INSTALL_PATH}\" ESCAPE_QUOTES @ONLY )" )
 endif()
-
-# end: examples/cxx/CMakeLists.txt

@@ -21,10 +21,11 @@
 #include "sixtracklib/common/buffer/buffer_object.h"
 #include "sixtracklib/common/buffer/buffer_garbage.h"
 #include "sixtracklib/common/buffer/buffer_generic.h"
+#include "sixtracklib/common/be_beamfields/definitions.h"
 #include "sixtracklib/common/be_beamfields/be_beamfields.h"
-#include "sixtracklib/common/be_beamfields/track.h"
-#include "sixtracklib/common/be_beamfields/faddeeva_cern.h"
+#include "sixtracklib/common/be_beamfields/faddeeva.h"
 #include "sixtracklib/common/be_beamfields/gauss_fields.h"
+#include "sixtracklib/common/be_beamfields/track.h"
 #include "sixtracklib/common/be_cavity/be_cavity.h"
 #include "sixtracklib/common/be_cavity/track.h"
 #include "sixtracklib/common/be_drift/be_drift.h"
@@ -74,7 +75,7 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
     #include "sixtracklib/opencl/argument.h"
     #include "sixtracklib/opencl/context.h"
     #include "sixtracklib/opencl/track_job_cl.h"

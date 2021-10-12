@@ -5,187 +5,277 @@ if( NOT  SIXTRACKL_CMAKE_SETUP_OPENCL_FINISHED )
 
     # --------------------------------------------------------------------------
     # Add OPENCL to the list of supported modules and track its state:
-
-    list( APPEND SIXTRACKLIB_SUPPORTED_MODULES "OPENCL" )
-
-    if( SIXTRACKL_ENABLE_OPENCL )
-        list( APPEND SIXTRACKLIB_SUPPORTED_MODULES_VALUES "1" )
-    else()
-        list( APPEND SIXTRACKLIB_SUPPORTED_MODULES_VALUES "0" )
-    endif()
+    set( SIXTRACKLIB_MODULE_VALUE_OPENCL 0 )
 
     # --------------------------------------------------------------------------
     # Provide include directories and library directories for OpenCL, if enabled
 
-    if( NOT  SIXTRACKL_OPENCL_INCLUDE_DIR )
-        set( SIXTRACKL_OPENCL_INCLUDE_DIR   )
-    endif()
-
-    if( NOT  SIXTRACKL_OPENCL_LIBRARY )
-        set( SIXTRACKL_OPENCL_LIBRARY )
-    endif()
-
-    if( NOT  SIXTRACKL_OPENCL_VERSION_STR )
-        set( SIXTRACKL_OPENCL_VERSION_STR "" )
-    endif()
-
-    set( khr_cxx_ocl_UPDATED 0 )
-    set( khr_cxx_ocl_SYNC 0 )
-    set( khr_cxx_ocl_EXT_DIR "${CMAKE_SOURCE_DIR}/external/CL" )
-
     if( SIXTRACKL_ENABLE_OPENCL )
+        if( NOT DEFINED SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS )
+            set( SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS OFF )
+        endif()
+
+        set( SIXTRL_OPENCL_INCLUDE_DIRS )
+        set( SIXTRL_OPENCL_LIBRARIES )
+        set( SIXTRL_OPENCL_C99_HEADERS_DOWNLOADED 0 )
+        set( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED 0 )
+
         if( NOT OpenCL_FOUND )
-            find_package( OpenCL REQUIRED )
+            find_package( OpenCL QUIET )
         endif()
 
         if( OpenCL_FOUND )
-            set( SIXTRACKL_OPENCL_LIBRARY
-               ${SIXTRACKL_OPENCL_LIBRARY} ${OpenCL_LIBRARY} )
+            set( SIXTRL_TEMP_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS} )
+            set( SIXTRL_OPENCL_LIBRARIES ${OpenCL_LIBRARIES} )
+            message( STATUS "---- OpenCL environment found (ver. ${OpenCL_VERSION_STRING})" )
+        elseif( SIXTRACKL_REQUIRE_OFFLINE_BUILD )
+            message( FATAL_ERROR
+                "---- Unable to find OpenCL setup, unable to download since offline build required" )
+        else()
+            message( STATUS "---- OpenCL not found, use fallback headers due to offline build" )
+            set( SIXTRL_TEMP_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/external" )
+        endif()
 
-            set( SIXTRACKL_OPENCL_VERSION_STR
-               ${SIXTRACKL_OPENCL_VERSION_STR} ${OpenCL_VERSION_STRING} )
-
-            set( SIXTRACKL_OPENCL_INCLUDE_DIR
-               ${SIXTRACKL_OPENCL_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} )
-
-            if( NOT SIXTRACKL_USE_LEGACY_CL_HPP )
-                set( CXX_OPENCL_HEADER_NAME "cl2.hpp" )
-            else()
-                set( CXX_OPENCL_HEADER_NAME "cl.hpp" )
-            endif()
-
-            set( CXX_OPENCL_HEADER "${OpenCL_INCLUDE_DIR}/CL/${CXX_OPENCL_HEADER_NAME}" )
-
-            if( NOT EXISTS ${CXX_OPENCL_HEADER} )
-                message( STATUS "------ Unable to find OpenCl 1.x C++ header" )
-
-                include( SetupGit )
-                include( SetupPython )
-
-                if( Git_FOUND )
-                    message( STATUS "------ Attempt to download headers ... " )
-                    set( khr_cxx_ocl_GIT_REPOSITORY https://github.com/KhronosGroup/OpenCL-CLHPP.git )
-                    set( khr_cxx_ocl_GIT_BRANCH master )
-
-                    Git_sync_with_repo( TARGET khr_cxx_ocl
-                        GIT_REPOSITORY ${khr_cxx_ocl_GIT_REPOSITORY}
-                        GIT_BRANCH ${khr_cxx_ocl_GIT_BRANCH} )
-
-                    if( NOT khr_cxx_ocl_DIR )
-                        message( FATAL_ERROR "------ Unable to fetch C++ OpenCL headers from git repository" )
-                    endif()
-
-                    if( ${khr_cxx_ocl_SYNC} EQUAL 1 )
-                        if( ${khr_cxx_ocl_UPDATED} EQUAL 0 )
-                            message( STATUS "------ C++ OpenCL headers already sync, no update for embedded library" )
-                        elseif( ${khr_cxx_ocl_UPDATED} EQUAL 1 )
-                            message( STATUS "------ C++ OpenCL headers successfully cloned/pulled from ${khr_cxx_ocl_GIT_REPOSITORY}/${khr_cxx_ocl_GIT_BRANCH}" )
-                            message( STATUS "------ Attempting to update the embedded library at ${khr_cxx_ocl_EXT_DIR} ..." )
-
-                            set( khr_cxx_ocl_TRANSFERRED_HEADER_FILES 0 )
-                            if( EXISTS "${khr_cxx_ocl_DIR}/LICENSE.txt" )
-                                configure_file( "${khr_cxx_ocl_DIR}/LICENSE.txt"
-                                                "${khr_cxx_ocl_EXT_DIR}/LICENSE.txt" COPYONLY )
-                            endif()
-
-                            if( EXISTS "${khr_cxx_ocl_DIR}/README.md" )
-                                configure_file( "${khr_cxx_ocl_DIR}/README.md"
-                                                "${khr_cxx_ocl_EXT_DIR}/OpenCL-CLHPP_README.md" COPYONLY )
-                            endif()
-
-                            if( EXISTS "${khr_cxx_ocl_DIR}/CODE_OF_CONDUCT.md" )
-                                configure_file( "${khr_cxx_ocl_DIR}/CODE_OF_CONDUCT.md"
-                                                "${khr_cxx_ocl_EXT_DIR}/CODE_OF_CONDUCT.md" COPYONLY )
-                            endif()
-
-                            if( EXISTS "${khr_cxx_ocl_DIR}/include/CL/cl2.hpp" )
-                                configure_file( "${khr_cxx_ocl_DIR}/include/CL/cl2.hpp"
-                                                "${khr_cxx_ocl_EXT_DIR}/cl2.hpp" COPYONLY )
-                                set( khr_cxx_ocl_TRANSFERRED_HEADER_FILES 1 )
-                            else()
-                                message( WARNING "------ No CL/cl2.hpp header found inside ${khr_cxx_ocl_DIR}/include -> skipping!" )
-                            endif()
-
-                            if( PYTHONINTERP_FOUND
-                                AND EXISTS "${khr_cxx_ocl_DIR}/gen_cl_hpp.py"
-                                AND EXISTS "${khr_cxx_ocl_DIR}/input_cl.hpp" )
-
-                                execute_process( COMMAND ${PYTHON_EXECUTABLE} gen_cl_hpp.py
-                                    WORKING_DIRECTORY ${khr_cxx_ocl_DIR}
-                                    OUTPUT_VARIABLE EXE_PROCESS_OUTPUT
-                                    RESULT_VARIABLE EXE_PROCESS_RESULT
-                                    ERROR_VARIABLE  EXE_PROCESS_ERROR )
-
-                                if( NOT ( ${EXE_PROCESS_RESULT} EQUAL 0 ) AND EXE_PROCESS_OUTPUT )
-                                    message( STATUS "------ Error python gen_cl_hpp.py: ${EXE_PROCESS_ERROR}" )
-                                endif()
-
-                                if( EXISTS "${khr_cxx_ocl_DIR}/cl.hpp" )
-                                    configure_file( "${khr_cxx_ocl_DIR}/cl.hpp"
-                                                    "${khr_cxx_ocl_EXT_DIR}/cl.hpp" COPYONLY )
-                                    set( khr_cxx_ocl_TRANSFERRED_HEADER_FILES 1 )
-                                else()
-                                    message( WARNING "------ No cl.hpp file present to add to ${khr_cxx_ocl_EXT_DIR} -> skipping!" )
-                                endif()
-
-                            else()
-                                message( WARNING "------ Unable to run generator script gen_cl_hpp.py to create cl.hpp -> skipping!" )
-                            endif()
-
-                            if( ${khr_cxx_ocl_TRANSFERRED_HEADER_FILES} EQUAL 1 )
-                                message( STATUS "------ transfered header files to ${khr_cxx_ocl_EXT_DIR}" )
-                            endif()
-                        else()
-                            message( FATAL_ERROR "------ internal error Git_sync_with_repo" )
-                        endif()
-                    else()
-                        message( WARNING "----- Unable to sync external OpenCL C++ headers -> rely on existing headers instead" )
-                    endif()
-                endif()
-
-                if( ${khr_cxx_ocl_SYNC} EQUAL 1 AND
-                    EXISTS "${khr_cxx_ocl_EXT_DIR}/${CXX_OPENCL_HEADER_NAME}" )
-                    set( CXX_OPENCL_HEADER "${khr_cxx_ocl_EXT_DIR}/${CXX_OPENCL_HEADER_NAME}" )
-                    set( SIXTRACKL_OPENCL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external" )
+        foreach( dir ${SIXTRL_TEMP_INCLUDE_DIRS} )
+            if( NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE )
+                if( EXISTS "${dir}/CL/opencl.h" )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/opencl.h" )
+                    set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${dir} )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 3 )
+                elseif( EXISTS "${dir}/CL/cl.h" )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/cl.h" )
+                    set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${dir} )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 1 )
                 endif()
             endif()
 
-            if( EXISTS ${CXX_OPENCL_HEADER} )
-                set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR "" )
-                set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 0 )
+            if( NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE )
+                if( EXISTS "${dir}/CL/opencl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/opencl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${dir} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 3 )
+                elseif( EXISTS "${dir}/CL/cl2.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl2.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${dir} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 2 )
+                elseif( EXISTS "${dir}/CL/cl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${dir} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 1 )
+                endif()
+            endif()
+        endforeach()
 
-                if( SIXTRACKL_USE_LEGACY_CL_HPP )
-                    set( SIXTRL_OPENCL_CL_HPP "CL/cl.hpp" )
-                    set( SIXTRL_USES_CL2_HPP 0 )
-                    set( SIXTRL_USES_CL_HPP  1 )
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                    if( SIXTRL_OPENCL_ENABLE_HOST_EXCEPTIONS )
-                        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "    #if !defined( __CL_ENABLE_EXCEPTIONS )\r\n" )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "        #define __CL_ENABLE_EXCEPTIONS  \r\n" )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "    #endif /* !defined( __CL_ENABLE_EXCEPTIONS ) */ \r\n" )
-                    endif()
-                else()
-                    set( SIXTRL_OPENCL_CL_HPP "CL/cl2.hpp" )
-                    set( SIXTRL_USES_CL2_HPP 1 )
-                    set( SIXTRL_USES_CL_HPP  0 )
+        if( NOT OpenCL_FOUND OR
+            SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS OR
+            NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE OR
+            NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE )
 
-                    if( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS )
-                        set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "    #if !defined( CL_HPP_ENABLE_EXCEPTIONS )\r\n" )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "        #define CL_HPP_ENABLE_EXCEPTIONS \r\n" )
-                        string( APPEND SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
-                                "    #endif /* !defined( CL_HPP_ENABLE_EXCEPTIONS ) */ \r\n" )
-                    endif()
+            set( SIXTRL_OPENCL_EXT_INCLUDE_DIR "${CMAKE_BINARY_DIR}/include" )
+            include( FetchContent )
+        endif()
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        if( ( NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD ) AND
+            ( SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS OR
+              NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE OR
+              NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE_VERSION ) )
+
+            if( NOT EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
+                file( MAKE_DIRECTORY "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL" )
+            endif()
+
+            FetchContent_Declare( opencl_c99_headers
+                GIT_REPOSITORY "https://github.com/KhronosGroup/OpenCL-Headers.git"
+                GIT_TAG "v2020.06.16"
+                GIT_SHALLOW 1
+                CONFIGURE_COMMAND ${CMAKE_COMMAND} -E echo "Configure: no operation"
+                BUILD_COMMAND ${CMAKE_COMMAND} -E echo "Build: no operation"
+                INSTALL_COMMAND ${CMAKE_COMMAND} -E echo "Install: handled outside of this step" )
+
+            FetchContent_GetProperties( opencl_c99_headers )
+            message( STATUS "------ Using external OpenCL C99 headers" )
+            if( NOT opencl_c99_headers_POPULATED )
+                message( STATUS "------ Downloading external OpenCL C99 headers ..." )
+                FetchContent_Populate( opencl_c99_headers )
+                message( STATUS "------ Downloading external OpenCL C99 headers [DONE]" )
+            endif()
+
+            if( opencl_c99_headers_POPULATED )
+                file( COPY "${opencl_c99_headers_SOURCE_DIR}/CL/"
+                      DESTINATION "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL"
+                      PATTERN "*.h" )
+
+                if( EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL/opencl.h" )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/opencl.h" )
+                    set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 3 )
+                    set( SIXTRL_OPENCL_C99_HEADERS_DOWNLOADED 1 )
+                elseif( EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL/cl.h" )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE "CL/cl.h" )
+                    set( SIXTRL_OPENCL_C99_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                    set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION 1 )
+                    set( SIXTRL_OPENCL_C99_HEADERS_DOWNLOADED 1 )
                 endif()
             endif()
         endif()
-    endif()
-endif()
 
-#end: cmake/SetupOpenCL.cmake
+        if( ( NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD ) AND
+            ( SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS OR
+              NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE OR
+              NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION ) )
+            if( NOT EXISTS ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                file( MAKE_DIRECTORY ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+            endif()
+
+            FetchContent_Declare( opencl_cxx_headers
+                GIT_REPOSITORY "https://github.com/KhronosGroup/OpenCL-CLHPP.git"
+                GIT_TAG "master"
+                GIT_SHALLOW 1
+                CONFIGURE_COMMAND ${CMAKE_COMMAND} -E echo "Configure: no operation"
+                BUILD_COMMAND ${CMAKE_COMMAND} -E echo "Build: no operation"
+                INSTALL_COMMAND ${CMAKE_COMMAND} -E echo "Install: handled outside of this step" )
+
+            FetchContent_GetProperties( opencl_cxx_headers )
+            message( STATUS "------ Using external OpenCL C++ headers" )
+            if( NOT opencl_cxx_headers_POPULATED )
+                message( STATUS "------ Downloading external OpenCL C++ headers ..." )
+                FetchContent_Populate( opencl_cxx_headers )
+                message( STATUS "------ Downloading external OpenCL C++ headers [DONE]" )
+            endif()
+
+            if( opencl_cxx_headers_POPULATED )
+                file( COPY "${opencl_cxx_headers_SOURCE_DIR}/include/CL/"
+                      DESTINATION "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL"
+                      PATTERN "*.hpp" )
+
+                if( EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL/opencl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/opencl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 3 )
+                    set( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED 1 )
+                elseif( EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL/cl2.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl2.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 2 )
+                    set( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED 1 )
+                elseif( EXISTS "${SIXTRL_OPENCL_EXT_INCLUDE_DIR}/CL/cl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE "CL/cl.hpp" )
+                    set( SIXTRL_OPENCL_CXX_INCLUDE_DIR ${SIXTRL_OPENCL_EXT_INCLUDE_DIR} )
+                    set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION 1 )
+                    set( SIXTRL_OPENCL_CXX_HEADERS_DOWNLOADED 1 )
+                endif()
+            endif()
+        endif()
+
+        if( NOT DEFINED SIXTRL_OPENCL_CXX_HEADER_FILE OR
+            NOT DEFINED SIXTRL_OPENCL_CXX_INCLUDE_DIR )
+            message( FATAL_ERROR "---- No C++ OpenCL headers available" )
+        endif()
+
+        if( NOT DEFINED SIXTRL_OPENCL_C99_HEADER_FILE OR
+            NOT DEFINED SIXTRL_OPENCL_C99_INCLUDE_DIR )
+            message( FATAL_ERROR "---- No C OpenCL headers available" )
+        endif()
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        if( OpenCL_FOUND )
+            set( SIXTRACKLIB_MODULE_VALUE_OPENCL 1 )
+        elseif( NOT OpenCL_FOUND AND NOT SIXTRACKL_REQUIRE_OFFLINE_BUILD )
+            FetchContent_Declare( opencl_icd_loader
+                GIT_REPOSITORY "https://github.com/KhronosGroup/OpenCL-ICD-Loader.git"
+                GIT_TAG "v2020.06.16"
+                GIT_SHALLOW 1 )
+
+            if( NOT opencl_icd_loader_POPULATED )
+                message( STATUS "------ Downloading external OpenCL ICD Loader ..." )
+                FetchContent_Populate( opencl_icd_loader )
+                message( STATUS "------ Downloading external OpenCL ICD Loader [DONE]" )
+            endif()
+
+            get_filename_component( SIXTRL_TEMP_INCLUDE_DIRS
+                "${SIXTRL_OPENCL_C99_INCLUDE_DIR}/${SIXTRL_OPENCL_C99_HEADER_FILE}"
+                DIRECTORY )
+
+            file( COPY "${SIXTRL_TEMP_INCLUDE_DIRS}/"
+                  DESTINATION "${opencl_icd_loader_SOURCE_DIR}/inc"
+                  PATTERN "*.h" )
+
+            FetchContent_MakeAvailable( opencl_icd_loader )
+            set( SIXTRL_OPENCL_LIBRARIES ${SIXTRL_OPENCL_LIBRARIES} OpenCL )
+            set( SIXTRACKLIB_MODULE_VALUE_OPENCL 1 )
+
+        elseif( NOT OpenCL_FOUND )
+            message( FATAL_ERROR
+                "---- Unable to download OpenCL icd loader due to offline build requirement" )
+        endif()
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        set( SIXTRL_OPENCL_INCLUDE_DIRS ${SIXTRL_OPENCL_INCLUDE_DIRS}
+             ${SIXTRL_OPENCL_C99_INCLUDE_DIR} )
+
+        if( NOT ( "${SIXTRL_OPENCL_CXX_INCLUDE_DIR}" STREQUAL
+                  "${SIXTRL_OPENCL_C99_INCLUDE_DIR}" ) )
+            set(   SIXTRL_OPENCL_INCLUDE_DIRS ${SIXTRL_OPENCL_INCLUDE_DIRS}
+                 ${SIXTRL_OPENCL_CXX_INCLUDE_DIR} )
+        endif()
+    endif()
+
+    # ---------------------------------------------------------------------------
+
+    set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR "" )
+    set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 0 )
+
+    if( ${SIXTRACKLIB_MODULE_VALUE_OPENCL} EQUAL 1 )
+        if( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS )
+            set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS
+                ${SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS} )
+        endif()
+
+        if( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS )
+            if( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION EQUAL 2 OR
+                SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION EQUAL 3 )
+                set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO
+                    "CL_HPP_ENABLE_EXCEPTIONS" )
+            else()
+                set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO
+                    "__CL_ENABLE_EXCEPTIONS" )
+            endif()
+
+            set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG 1 )
+            set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
+                "#if !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} )
+                    #define ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO}
+                 #endif /* !defined( ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR_MACRO} ) */" )
+        endif()
+    endif()
+
+    set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+
+    if( SIXTRACKL_OPENCL_PRINT_BUILD_REPORT )
+        if( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "always" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 2 )
+            message( STATUS "------- setting opencl build program report policy to \"always\"" )
+        elseif( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "error" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 1 )
+            message( STATUS "------- setting opencl build program report policy to \"error\"" )
+        elseif( "${SIXTRACKL_OPENCL_PRINT_BUILD_REPORT}" STREQUAL "never" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+            message( STATUS "------- setting opencl build program report policy to \"never\"" )
+        else()
+            message( STATUS "------- illegal value for SIXTRACKL_OPENCL_PRINT_BUILD_REPORT, choosing \"never\"" )
+            set( SIXTRL_OPENCL_PRINT_BUILD_REPORT 0 )
+        endif()
+    endif()
+
+    # ---------------------------------------------------------------------------
+
+    list( APPEND SIXTRACKLIB_SUPPORTED_MODULES "OPENCL" )
+    list( APPEND SIXTRACKLIB_SUPPORTED_MODULES_VALUES
+            "${SIXTRACKLIB_MODULE_VALUE_OPENCL}" )
+endif()

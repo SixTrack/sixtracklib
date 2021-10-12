@@ -44,10 +44,14 @@ struct NS(Buffer);
 #endif /* defined( __cplusplus ) */
 
 #if !defined( SIXTRL_NO_INCLUDES )
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
+#if !defined( SIXTRL_NO_INCLUDES )
+    #include "sixtracklib/opencl/opencl.hpp"
+#endif /* !defined( SIXTRL_NO_INCLUDES ) */
+
 namespace SIXTRL_CXX_NAMESPACE
 {
     class ClContextBase;
@@ -57,7 +61,7 @@ namespace SIXTRL_CXX_NAMESPACE
         public:
 
         using context_base_t     = ClContextBase;
-        using size_type          = std::size_t;
+        using size_type          = ::NS(arch_size_t);
         using cobj_buffer_t      = struct NS(Buffer);
         using cxx_cobj_buffer_t  = SIXTRL_CXX_NAMESPACE::Buffer;
         using status_t           = SIXTRL_CXX_NAMESPACE::arch_status_t;

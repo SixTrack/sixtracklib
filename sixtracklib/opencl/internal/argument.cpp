@@ -19,8 +19,11 @@
 #include "sixtracklib/common/control/definitions.h"
 #include "sixtracklib/common/control/debug_register.h"
 #include "sixtracklib/common/buffer.h"
-#include "sixtracklib/opencl/cl.h"
+#include "sixtracklib/opencl/opencl.h"
 #include "sixtracklib/opencl/context.h"
+
+#if defined( __cplusplus )
+#include "sixtracklib/opencl/opencl.hpp"
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -521,6 +524,7 @@ namespace SIXTRL_CXX_NAMESPACE
         return;
     }
 }
+#endif /* C++ */
 
 /* ========================================================================= */
 

@@ -3,7 +3,7 @@
 
 message( STATUS "---- processing sixtracklib/opencl/CMakeLists.txt" )
 
-set( C99_HEADERS_INSTALL_PATH "include/sixtracklib/opencl" )
+set( C99_HEADERS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/include/sixtracklib/opencl" )
 set( CXX_HEADERS_INSTALL_PATH ${C99_HEADERS_INSTALL_PATH}  )
 set( SIXTRL_DEFAULT_OPENCL_COMPILER_FLAGS "" )
 
@@ -12,22 +12,30 @@ if( SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS )
          "${SIXTRACKL_OPENCL_DEFAULT_COMPILER_FLAGS}" )
 endif()
 
-set( CL_H_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/cl.h.template" )
-set( CL_H_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cl.h" )
-configure_file( ${CL_H_IN_FILE} ${CL_H_OUT_FILE} @ONLY )
+set( OPENCL_H_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/opencl.h.template" )
+set( OPENCL_H_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/opencl.h" )
+configure_file( ${OPENCL_H_IN_FILE} ${OPENCL_H_OUT_FILE} @ONLY )
+
+set( OPENCL_HPP_IN_FILE  "${CMAKE_CURRENT_SOURCE_DIR}/opencl.hpp.template" )
+set( OPENCL_HPP_OUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/opencl.hpp" )
+configure_file( ${OPENCL_HPP_IN_FILE} ${OPENCL_HPP_OUT_FILE} @ONLY )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Handle install of cl.h
 
-set( CL_H_INSTALL_PATH
-     "${CMAKE_INSTALL_PREFIX}/${CXX_HEADERS_INSTALL_PATH}/${CL_H_OUT_FILE}" )
+set( OPENCL_H_INSTALL_FILE "${CXX_HEADERS_INSTALL_PATH}/${OPENCL_H_OUT_FILE}" )
+set( OPENCL_HPP_INSTALL_FILE "${CXX_HEADERS_INSTALL_PATH}/${OPENCL_HPP_OUT_FILE}" )
 
 set( CL_H_INSTALL_INFO
     "set( SIXTRACKL_MIN_OPENCL_VERSION    ${SIXTRACKL_MIN_OPENCL_VERSION} )
      set( SIXTRACKL_TARGET_OPENCL_VERSION ${SIXTRACKL_TARGET_OPENCL_VERSION} )
-     set( SIXTRL_OPENCL_CL_HPP ${SIXTRL_OPENCL_CL_HPP} )
-     set( SIXTRL_USES_CL2_HPP  ${SIXTRL_USES_CL2_HPP}  )
-     set( SIXTRL_USES_CL_HPP   ${SIXTRL_USES_CL_HPP}   )
+     set( SIXTRL_OPENCL_CXX_HEADER_FILE \"${SIXTRL_OPENCL_CXX_HEADER_FILE}\" )
+     set( SIXTRL_OPENCL_CXX_INCLUDE_DIR \"${SIXTRL_OPENCL_CXX_INCLUDE_DIR}\" )
+     set( SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION ${SIXTRL_OPENCL_CXX_HEADER_FILE_VERSION} )
+     set( SIXTRL_OPENCL_C99_HEADER_FILE \"${SIXTRL_OPENCL_C99_HEADER_FILE}\" )
+     set( SIXTRL_OPENCL_C99_INCLUDE_DIR \"${SIXTRL_OPENCL_C99_INCLUDE_DIR}\" )
+     set( SIXTRL_OPENCL_C99_HEADER_FILE_VERSION ${SIXTRL_OPENCL_C99_HEADER_FILE_VERSION} )
+     set( SIXTRL_OPENCL_PRINT_BUILD_REPORT ${SIXTRL_OPENCL_PRINT_BUILD_REPORT} )
      set( SIXTRL_OPENCL_ENABLE_EXCEPTION_STR
           ${SIXTRL_OPENCL_ENABLE_EXCEPTION_STR} )
      set( SIXTRL_OPENCL_ENABLES_EXCEPTION_FLAG
@@ -35,13 +43,17 @@ set( CL_H_INSTALL_INFO
 
 install( CODE "
          ${CL_H_INSTALL_INFO}
-         message( STATUS \"Generating: ${CL_H_INSTALL_PATH}\" )
-         configure_file( \"${CL_H_IN_FILE}\" \"${CL_H_INSTALL_PATH}\" @ONLY)" )
+         message( STATUS \"Generating: ${OPENCL_H_INSTALL_FILE}\" )
+         configure_file( \"${OPENCL_H_IN_FILE}\"
+                         \"${OPENCL_H_INSTALL_FILE}\" @ONLY )
+         message( STATUS \"Generating: ${OPENCL_HPP_INSTALL_FILE}\" )
+         configure_file( \"${OPENCL_HPP_IN_FILE}\"
+                         \"${OPENCL_HPP_INSTALL_FILE}\" @ONLY )" )
 
 # ------------------------------------------------------------------------------
 
-set( SIXTRACKLIB_OPENCL_HEADERS
-     ${CL_H_OUT_FILE} argument.h context.h track_job_cl.h make_track_job.h )
+set( SIXTRACKLIB_OPENCL_HEADERS ${OPENCL_H_OUT_FILE} ${OPENCL_HPP_OUT_FILE}
+    argument.h context.h track_job_cl.h make_track_job.h )
 
 set( SIXTRACKLIB_OPENCL_INTERNAL_HEADERS
      internal/default_compile_options.h internal/base_context.h )
@@ -67,10 +79,10 @@ add_library( sixtrack_opencl OBJECT
 
 target_include_directories( sixtrack_opencl
     PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-    PUBLIC $<BUILD_INTERFACE:${SIXTRACKL_OPENCL_INCLUDE_DIR}> )
+    PUBLIC $<BUILD_INTERFACE:${SIXTRL_OPENCL_INCLUDE_DIRS}> )
 
 set_target_properties( sixtrack_opencl PROPERTIES LINKER_LANGUAGE C
-    POSITION_INDEPENDENT_CODE True CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON )
+    POSITION_INDEPENDENT_CODE ON CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON )
 
 target_compile_definitions( sixtrack_opencl PUBLIC
         ${SIXTRACKLIB_NAMESPACE_FLAGS} -DCL_USE_DEPRECATED_OPENCL_1_2_APIS )
@@ -86,7 +98,7 @@ set( SIXTRACKL_LIBRARY_MODULES ${SIXTRACKL_LIBRARY_MODULES}
      $<TARGET_OBJECTS:sixtrack_opencl> CACHE INTERNAL "" FORCE )
 
 set( SIXTRACKL_LINK_LIBRARIES ${SIXTRACKL_LINK_LIBRARIES}
-     ${SIXTRACKL_OPENCL_LIBRARY} CACHE INTERNAL "" FORCE )
+     ${SIXTRL_OPENCL_LIBRARIES} CACHE INTERNAL "" FORCE )
 
 # ------------------------------------------------------------------------------
 # install :

@@ -30,6 +30,8 @@
 #if defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) && \
            ( SIXTRACKLIB_ENABLE_MODULE_OPENCL == 1 )
 
+    #include "sixtracklib/opencl/opencl.hpp"
+
 #endif /* defined( SIXTRACKLIB_ENABLE_MODULE_OPENCL ) */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

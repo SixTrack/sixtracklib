@@ -23,8 +23,28 @@
 
 #if !defined( SIXTRL_MATH_CONST_PI )
     #define SIXTRL_MATH_CONST_PI \
-        3.1415926535897932384626433832795028841971693993751L
+        3.141592653589793238462643383279502884197169399375105820974944592L
 #endif /* !defined( SIXTRL_MATH_CONST_PI ) */
+
+#if !defined( SIXTRL_MATH_CONST_PI_SQU )
+    #define SIXTRL_MATH_CONST_PI_SQU \
+        9.869604401089358618834490999876151135313699407240790626413349376371L
+#endif /* !defined( SIXTRL_MATH_CONST_PI_SQU ) */
+
+#if !defined( SIXTRL_MATH_CONST_SQRT_PI )
+    #define SIXTRL_MATH_CONST_SQRT_PI \
+        1.77245385090551602729816748334114518279754945612238712821380779L
+#endif /* !defined( SIXTRL_MATH_CONST_SQRT_PI ) */
+
+#if !defined( SIXTRL_MATH_CONST_SQRT_TWO )
+    #define SIXTRL_MATH_CONST_SQRT_TWO \
+        1.414213562373095048801688724209698078569671875376948073176679738L
+#endif /* !defined( SIXTRL_MATH_CONST_SQRT_TWO ) */
+
+#if !defined( SIXTRL_MATH_CONST_TWO_OVER_SQRT_PI )
+    #define SIXTRL_MATH_CONST_TWO_OVER_SQRT_PI \
+        1.128379167095512573896158903121545171688101258657997713688171443L
+#endif /* SIXTRL_MATH_CONST_TWO_OVER_SQRT_PI */
 
 #if !defined( SIXTRL_MATH_CONST_DEG2RAD )
     #define SIXTRL_MATH_CONST_DEG2RAD \
@@ -36,10 +56,7 @@
         57.29577951308232087679815481410517033240547246656432154916L
 #endif /* !defined( SIXTRL_MATH_CONST_RAD2DEG ) */
 
-#if !defined( SIXTRL_MATH_CONST_SQRT_PI )
-    #define SIXTRL_MATH_CONST_SQRT_PI \
-        1.77245385090551602729816748334114518279754945612238712821381L
-#endif /* !defined( SIXTRL_MATH_CONST_SQRT_PI ) */
+
 
 #if defined( __cplusplus )
 #if !defined( SIXTRL_NO_INCLUDES )
@@ -59,6 +76,34 @@ namespace SIXTRL_CXX_NAMESPACE
             return static_cast< R >( SIXTRL_MATH_CONST_PI );
         }
 
+        SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_sqrt_two() SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+        {
+            return static_cast< R >( SIXTRL_MATH_CONST_SQRT_TWO );
+        }
+
+        SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_pi_squ() SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+        {
+            return static_cast< R >( SIXTRL_MATH_CONST_PI_SQU );
+        }
+
+        SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_sqrt_pi() SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+        {
+            return static_cast< R >( SIXTRL_MATH_CONST_SQRT_PI );
+        }
+
+        SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_two_over_sqrt_pi() SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+        {
+            return static_cast< R >( SIXTRL_MATH_CONST_TWO_OVER_SQRT_PI );
+        }
+
         SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_deg2rad() SIXTRL_NOEXCEPT_COND(
             std::is_nothrow_copy_constructible< R >::value &&
             std::is_nothrow_move_constructible< R >::value )
@@ -73,12 +118,7 @@ namespace SIXTRL_CXX_NAMESPACE
             return static_cast< R >( SIXTRL_MATH_CONST_RAD2DEG );
         }
 
-        SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R get_sqrt_pi() SIXTRL_NOEXCEPT_COND(
-            std::is_nothrow_copy_constructible< R >::value &&
-            std::is_nothrow_move_constructible< R >::value )
-        {
-            return static_cast< R >( SIXTRL_MATH_CONST_SQRT_PI );
-        }
+
     };
 
     /* --------------------------------------------------------------------- */
@@ -89,7 +129,25 @@ namespace SIXTRL_CXX_NAMESPACE
             std::is_nothrow_copy_constructible< R >::value &&
             std::is_nothrow_move_constructible< R >::value )
     {
-        return MathConstHelper< R >::get_pi();
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_pi();
+    }
+
+    template< class R >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R MathConst_pi_squ()
+        SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+    {
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_pi_squ();
+    }
+
+    template< class R >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R MathConst_sqrt_two()
+        SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+    {
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_sqrt_two();
     }
 
     template< class R >
@@ -98,7 +156,7 @@ namespace SIXTRL_CXX_NAMESPACE
             std::is_nothrow_copy_constructible< R >::value &&
             std::is_nothrow_move_constructible< R >::value )
     {
-        return MathConstHelper< R >::get_deg2rad();
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_deg2rad();
     }
 
     template< class R >
@@ -107,7 +165,17 @@ namespace SIXTRL_CXX_NAMESPACE
             std::is_nothrow_copy_constructible< R >::value &&
             std::is_nothrow_move_constructible< R >::value )
     {
-        return MathConstHelper< R >::get_rad2deg();
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_rad2deg();
+    }
+
+    template< class R >
+    SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R MathConst_two_over_sqrt_pi()
+        SIXTRL_NOEXCEPT_COND(
+            std::is_nothrow_copy_constructible< R >::value &&
+            std::is_nothrow_move_constructible< R >::value )
+    {
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper<
+            R >::get_two_over_sqrt_pi();
     }
 
     template< class R >
@@ -116,7 +184,7 @@ namespace SIXTRL_CXX_NAMESPACE
             std::is_nothrow_copy_constructible< R >::value &&
             std::is_nothrow_move_constructible< R >::value )
     {
-        return MathConstHelper< R >::get_sqrt_pi();
+        return SIXTRL_CXX_NAMESPACE::MathConstHelper< R >::get_sqrt_pi();
     }
 }
 
@@ -124,6 +192,12 @@ template< class R >
 SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R NS(MathConst_pi)()
 {
     return SIXTRL_CXX_NAMESPACE::MathConst_pi< R >();
+}
+
+template< class R >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R NS(MathConst_pi_squ)()
+{
+    return SIXTRL_CXX_NAMESPACE::MathConst_pi_squ< R >();
 }
 
 template< class R >
@@ -144,6 +218,18 @@ SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R NS(MathConst_sqrt_pi)()
     return SIXTRL_CXX_NAMESPACE::MathConst_sqrt_pi< R >();
 }
 
+template< class R >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R NS(MathConst_sqrt_two)()
+{
+    return SIXTRL_CXX_NAMESPACE::MathConst_sqrt_two< R >();
+}
+
+template< class R >
+SIXTRL_STATIC SIXTRL_INLINE SIXTRL_FN R NS(MathConst_two_over_sqrt_pi)()
+{
+    return SIXTRL_CXX_NAMESPACE::MathConst_two_over_sqrt_pi< R >();
+}
+
 #endif /* C++ */
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
@@ -151,6 +237,8 @@ extern "C" {
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(MathConst_pi)( void ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T NS(MathConst_pi_squ)( void ) SIXTRL_NOEXCEPT;
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 NS(MathConst_deg2rad)( void ) SIXTRL_NOEXCEPT;
@@ -160,6 +248,12 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 
 SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
     NS(MathConst_sqrt_pi)( void ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+    NS(MathConst_two_over_sqrt_pi)( void ) SIXTRL_NOEXCEPT;
+
+SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
+    NS(MathConst_sqrt_two)( void ) SIXTRL_NOEXCEPT;
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )
 }
@@ -173,24 +267,39 @@ SIXTRL_STATIC SIXTRL_FN SIXTRL_REAL_T
 extern "C" {
 #endif /* defined( __cplusplus ) && !defined( _GPUCODE ) */
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_pi)( void ) SIXTRL_NOEXCEPT
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_pi)() SIXTRL_NOEXCEPT
 {
     return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_PI;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_deg2rad)( void ) SIXTRL_NOEXCEPT
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_pi_squ)() SIXTRL_NOEXCEPT
+{
+    return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_PI_SQU;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_deg2rad)() SIXTRL_NOEXCEPT
 {
     return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_DEG2RAD;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_rad2deg)( void ) SIXTRL_NOEXCEPT
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_rad2deg)() SIXTRL_NOEXCEPT
 {
     return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_RAD2DEG;
 }
 
-SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_sqrt_pi)( void ) SIXTRL_NOEXCEPT
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_sqrt_two)() SIXTRL_NOEXCEPT
+{
+    return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_SQRT_TWO;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_sqrt_pi)() SIXTRL_NOEXCEPT
 {
     return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_SQRT_PI;
+}
+
+SIXTRL_INLINE SIXTRL_REAL_T NS(MathConst_two_over_sqrt_pi)() SIXTRL_NOEXCEPT
+{
+    return ( SIXTRL_REAL_T )SIXTRL_MATH_CONST_TWO_OVER_SQRT_PI;
 }
 
 #if defined( __cplusplus ) && !defined( _GPUCODE )

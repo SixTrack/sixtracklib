@@ -19,7 +19,7 @@ int main( int const argc, char* argv[] )
     {
         printf( "Usage: %s PATH_TO_DUMP_FILE [BASE_ADDR=%lu] "
                 "[PATH_TO_OUTPUT_FILE=PATH_TO_DUMP_FILE]\r\n",
-                argv[ 0 ], target_base_addr );
+                argv[ 0 ], ( unsigned long )target_base_addr );
     }
 
     if( argc >= 2 )

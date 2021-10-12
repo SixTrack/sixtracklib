@@ -131,10 +131,18 @@ if( SIXTRACKL_ENABLE_OPENCL )
     set( SIXTRACKL_TARGET_OPENCL_VERSION "120" CACHE STRING
         "Target OpenCL 1.x version" )
 
-    option( SIXTRACKL_USE_LEGACY_CL_HPP "Use legacy cl.hpp header" OFF )
+    option( SIXTRACKL_USE_LEGACY_CL_HPP
+            "Use legacy cl.hpp header [DEPRECATED!]" OFF )
+
+    option( SIXTRACKL_OPENCL_ALWAYS_DOWNLOAD_HEADERS
+            "Always try to download latest stable OpenCL headers" OFF )
 
     option( SIXTRACKL_OPENCL_CXX_ENABLE_EXCEPTIONS
             "Enable OpenCL 1.x Host-side C++ Exceptions" ON )
+
+    set( SIXTRACKL_OPENCL_PRINT_BUILD_REPORT "error" CACHE STRING
+         "print OpenCL build report [values: always, error, never]" )
+
 endif()
 
 # ------------------------------------------------------------------------------

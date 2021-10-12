@@ -72,7 +72,7 @@ int main( int argc, char* argv[] )
 
     printf( "Selected NUM_PARTICLES = %10lu\r\n"
             "Selected NUM_TURNS     = %10lu\r\n"
-            "\r\n", NUM_PARTICLES, NUM_TURNS );
+            "\r\n", ( unsigned long )NUM_PARTICLES, ( unsigned long )NUM_TURNS );
 
     /* ********************************************************************** */
     /* ****   Building Particles Data from LHC Particle Dump Data        **** */

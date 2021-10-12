@@ -16,7 +16,7 @@
     #include "sixtracklib/common/generated/path.h"
     #include "sixtracklib/common/control/definitions.h"
     #include "sixtracklib/common/context/compute_arch.h"
-    #include "sixtracklib/opencl/cl.h"
+    #include "sixtracklib/opencl/opencl.h"
 #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 #if defined( __cplusplus )
@@ -34,7 +34,9 @@
         #include <regex>
     #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
-using NS(arch_size_t) = std::size_t;
+    #if !defined( SIXTRL_NO_INCLUDES )
+        #include "sixtracklib/opencl/opencl.hpp"
+    #endif /* !defined( SIXTRL_NO_INCLUDES ) */
 
 namespace SIXTRL_CXX_NAMESPACE
 {
@@ -1175,6 +1177,16 @@ namespace SIXTRL_CXX_NAMESPACE
 
         private:
 
+        std::string get_program_build_log(
+            cl::Device& SIXTRL_RESTRICT_REF build_device,
+            cl::Program& SIXTRL_RESTRICT_REF program ) const;
+
+        void update_program_data_with_build_error(
+            cl_build_status build_status,
+            cl::Device& SIXTRL_RESTRICT_REF build_device,
+            cl::Program& SIXTRL_RESTRICT_REF cl_program,
+            program_data_t& SIXTRL_RESTRICT_REF program_data );
+
         void doParseConfigStringBaseImpl(
             const char *const SIXTRL_RESTRICT config_str );
 
@@ -1232,10 +1244,6 @@ typedef SIXTRL_CXX_NAMESPACE::ClContextBase::kernel_arg_type_t
         NS(kernel_arg_type_t);
 
 #else /* defined( __cplusplus ) */
-
-    #if !defined( SIXTRL_NO_SYSTEM_INCLUDES )
-        #include <CL/cl.h>
-    #endif /* !defined( SIXTRL_NO_SYSTEM_INCLUDES ) */
 
 typedef void NS(ClContextBase);
 typedef uint32_t NS(kernel_arg_type_t);

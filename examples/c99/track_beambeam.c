@@ -70,7 +70,8 @@ int main( int argc, char* argv[] )
     }
 
     printf( "Use: NUM_PARTICLES = %10lu\r\n"
-            "     NUM_TURNS     = %10lu\r\n\r\n", NUM_PARTICLES, NUM_TURNS );
+            "     NUM_TURNS     = %10lu\r\n\r\n",
+            ( unsigned long )NUM_PARTICLES, ( unsigned long )NUM_TURNS );
 
     /* ********************************************************************** */
     /* ****   Building Particles Data from Input Example Particle Data   **** */

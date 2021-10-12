@@ -399,16 +399,19 @@ SIXTRL_INLINE void NS(Particles_print_out_single)(
                  NS(Particles_get_charge_ratio_value)( particles, index ) );
 
         printf( "particle_id    = %18ld\r\n",
-                 NS(Particles_get_particle_id_value)( particles, index ) );
+                 ( long int )NS(Particles_get_particle_id_value)(
+                    particles, index ) );
 
         printf( "at_elem_id     = %18ld\r\n",
-                 NS(Particles_get_at_element_id_value)( particles, index ) );
+                 ( long int )NS(Particles_get_at_element_id_value)(
+                    particles, index ) );
 
         printf( "at_turn        = %18ld\r\n",
-                 NS(Particles_get_at_turn_value)( particles, index ) );
+                 ( long int )NS(Particles_get_at_turn_value)(
+                    particles, index ) );
 
         printf( "state          = %18ld\r\n\r\n",
-                 NS(Particles_get_state_value)( particles, index ) );
+                 ( long int )NS(Particles_get_state_value)( particles, index ) );
     }
 
     #else /* !defined( _GPUCODE ) */
@@ -435,7 +438,7 @@ SIXTRL_INLINE void NS(Particles_print_out)(
         {
             if( num_particles > 1u )
             {
-                printf( "particle id    = %8lu\r\n", ii );
+                printf( "particle id    = %8lu\r\n", ( long unsigned )ii );
             }
 
             NS(Particles_print_out_single)( particles, ii );
